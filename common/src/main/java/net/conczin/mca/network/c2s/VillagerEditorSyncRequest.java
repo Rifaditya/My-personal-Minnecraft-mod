@@ -30,18 +30,20 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag data) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<VillagerEditorSyncRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("villager_editor_sync_request"));
+    public static final CustomPacketPayload.Type<VillagerEditorSyncRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("villager_editor_sync_request"));
     public static final StreamCodec<FriendlyByteBuf, VillagerEditorSyncRequest> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, VillagerEditorSyncRequest::command,
             UUIDUtil.STREAM_CODEC, VillagerEditorSyncRequest::uuid,
             ByteBufCodecs.COMPOUND_TAG, VillagerEditorSyncRequest::data,
-            VillagerEditorSyncRequest::new
-    );
+            VillagerEditorSyncRequest::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
@@ -62,7 +64,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
                 break;
             case "profession":
                 if (entity instanceof VillagerEntityMCA villager) {
-                    VillagerProfession profession = BuiltInRegistries.VILLAGER_PROFESSION.get(ResourceLocation.parse(data.getString("profession")));
+                    VillagerProfession profession = BuiltInRegistries.VILLAGER_PROFESSION
+                            .get(ResourceLocation.parse(data.getString("profession")));
                     villager.setProfession(profession);
                 }
                 break;
@@ -75,7 +78,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             // fetch hair
             String hair;
             if (data.contains("offset")) {
-                hair = HairList.getInstance().getPool(getGender(villagerData)).pickNext(villagerData.getString("Hair"), data.getInt("offset"));
+                hair = HairList.getInstance().getPool(getGender(villagerData)).pickNext(villagerData.getString("Hair"),
+                        data.getInt("offset"));
             } else {
                 hair = HairList.getInstance().getPool(getGender(villagerData)).pickOne();
             }
@@ -92,13 +96,16 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             String clothes = "mca:missing";
             if (entity instanceof Player) {
                 if (data.contains("offset")) {
-                    clothes = ClothingList.getInstance().getPool(getGender(villagerData), VillagerProfession.NONE).pickNext(villagerData.getString("Clothes"), data.getInt("offset"));
+                    clothes = ClothingList.getInstance().getPool(getGender(villagerData), VillagerProfession.NONE)
+                            .pickNext(villagerData.getString("Clothes"), data.getInt("offset"));
                 } else {
-                    clothes = ClothingList.getInstance().getPool(getGender(villagerData), VillagerProfession.NONE).pickOne();
+                    clothes = ClothingList.getInstance().getPool(getGender(villagerData), VillagerProfession.NONE)
+                            .pickOne();
                 }
             } else if (entity instanceof VillagerLike<?> villager) {
                 if (data.contains("offset")) {
-                    clothes = ClothingList.getInstance().getPool(villager).pickNext(villager.getClothes(), data.getInt("offset"));
+                    clothes = ClothingList.getInstance().getPool(villager).pickNext(villager.getClothes(),
+                            data.getInt("offset"));
                 } else {
                     clothes = ClothingList.getInstance().getPool(villager).pickOne();
                 }
@@ -115,8 +122,9 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             data.setEntityDataSet(true);
             syncFamilyTree(player, entity, villagerData);
 
-            //also update players
-            serverPlayer.serverLevel().players().forEach(p -> Network.sendToPlayer(new PlayerDataMessage(player.getUUID(), villagerData), p));
+            // also update players
+            serverPlayer.serverLevel().players()
+                    .forEach(p -> Network.sendToPlayer(new PlayerDataMessage(player.getUUID(), villagerData), p));
         } else if (entity instanceof VillagerLike<?> villagerLike) {
             villagerLike.syncFromEditor(villagerData);
             entity.refreshDimensions();
@@ -137,24 +145,31 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             UUID uuid = UUID.fromString(name);
             Optional<FamilyTreeNode> node = tree.getOrEmpty(uuid);
             if (node.isPresent()) {
-                player.displayClientMessage(Component.translatable("gui.villager_editor.uuid_known", name, node.get().getName()), true);
+                player.displayClientMessage(
+                        Component.translatable("gui.villager_editor.uuid_known", name, node.get().getName()), true);
                 return node;
             } else {
-                player.displayClientMessage(Component.translatable("gui.villager_editor.uuid_unknown", name).withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                        Component.translatable("gui.villager_editor.uuid_unknown", name).withStyle(ChatFormatting.RED),
+                        true);
                 return Optional.empty();
             }
         } catch (IllegalArgumentException exception) {
             List<FamilyTreeNode> nodes = tree.getAllWithName(name).toList();
             if (nodes.isEmpty()) {
-                //create a new entry
-                player.displayClientMessage(Component.translatable("gui.villager_editor.name_created", name).withStyle(ChatFormatting.YELLOW), true);
+                // create a new entry
+                player.displayClientMessage(Component.translatable("gui.villager_editor.name_created", name)
+                        .withStyle(ChatFormatting.YELLOW), true);
                 return Optional.of(tree.getOrCreate(UUID.randomUUID(), name, gender));
             } else {
                 if (nodes.size() > 1) {
-                    player.displayClientMessage(Component.translatable("gui.villager_editor.name_not_unique", name).withStyle(ChatFormatting.RED), true);
+                    player.displayClientMessage(Component.translatable("gui.villager_editor.name_not_unique", name)
+                            .withStyle(ChatFormatting.RED), true);
 
-                    String uuids = nodes.stream().map(FamilyTreeNode::id).map(UUID::toString).collect(Collectors.joining(", "));
-                    player.displayClientMessage(Component.translatable("gui.villager_editor.list_of_ids", uuids), false);
+                    String uuids = nodes.stream().map(FamilyTreeNode::id).map(UUID::toString)
+                            .collect(Collectors.joining(", "));
+                    player.displayClientMessage(Component.translatable("gui.villager_editor.list_of_ids", uuids),
+                            false);
                 } else {
                     player.displayClientMessage(Component.translatable("gui.villager_editor.name_unique", name), true);
                 }
@@ -172,7 +187,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         String s = villagerData.getString("CustomName");
         if (!s.isEmpty()) {
             try {
-                entry.setName(Objects.requireNonNull(Component.Serializer.fromJson(s, entity.registryAccess())).getString());
+                entry.setName(
+                        Objects.requireNonNull(Component.Serializer.fromJson(s, entity.registryAccess())).getString());
             } catch (Exception e) {
                 MCA.LOGGER.error("Failed to parse custom name for villager: {}", s, e);
             }
@@ -197,15 +213,45 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         }
 
         if (villagerData.contains("FamilyTreeNewSpouseName")) {
-            String name = villagerData.getString("FamilyTreeNewSpouseName");
-            if (MCA.isBlankString(name)) {
-                Optional.of(entry.partner()).flatMap(tree::getOrEmpty).ifPresent(node -> node.updatePartner(null, null));
-                entry.updatePartner(null, null);
+            String names = villagerData.getString("FamilyTreeNewSpouseName");
+            if (MCA.isBlankString(names)) {
+                // Clear all partners
+                Set<UUID> currentPartners = new HashSet<>(entry.partners());
+                for (UUID partnerId : currentPartners) {
+                    tree.getOrEmpty(partnerId).ifPresent(node -> node.removePartner(entry.id()));
+                }
+                entry.partners().clear();
+                entry.setName(entry.getName()); // Force save
             } else {
-                getFamilyNode(player, tree, name, entry.gender().opposite()).ifPresent(node -> {
-                    entry.updatePartner(node);
-                    node.updatePartner(entry);
-                });
+                // Parse names
+                String[] nameList = names.split(",");
+                Set<UUID> newPartnerIds = new HashSet<>();
+
+                for (String name : nameList) {
+                    name = name.trim();
+                    if (!name.isEmpty()) {
+                        getFamilyNode(player, tree, name, entry.gender().opposite()).ifPresent(node -> {
+                            newPartnerIds.add(node.id());
+                            // Ensure bidirectional relationship
+                            if (!node.partners().contains(entry.id())) {
+                                node.updatePartner(entry);
+                            }
+                        });
+                    }
+                }
+
+                // Remove partners that are no longer in the list
+                Set<UUID> currentPartners = new HashSet<>(entry.partners());
+                for (UUID partnerId : currentPartners) {
+                    if (!newPartnerIds.contains(partnerId)) {
+                        tree.getOrEmpty(partnerId).ifPresent(node -> node.removePartner(entry.id()));
+                    }
+                }
+
+                // Update this entry's partners
+                entry.partners().clear();
+                entry.partners().addAll(newPartnerIds);
+                entry.setName(entry.getName()); // Force save
             }
         }
     }

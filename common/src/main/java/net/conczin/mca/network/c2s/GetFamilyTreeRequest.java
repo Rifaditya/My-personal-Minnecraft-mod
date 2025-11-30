@@ -19,19 +19,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public record GetFamilyTreeRequest(UUID uuid) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<GetFamilyTreeRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("get_family_tree_request"));
+    public static final CustomPacketPayload.Type<GetFamilyTreeRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("get_family_tree_request"));
     public static final StreamCodec<FriendlyByteBuf, GetFamilyTreeRequest> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, GetFamilyTreeRequest::uuid,
-            GetFamilyTreeRequest::new
-    );
+            GetFamilyTreeRequest::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
         FamilyTree.get(player.serverLevel()).getOrEmpty(uuid).ifPresent(entry -> {
             Map<UUID, FamilyTreeNode> familyEntries = Stream.concat(
-                            entry.lookup(Stream.of(entry.id(), entry.partner())),
-                            entry.lookup(entry.getRelatives(2, 1))
-                    ).distinct()
+                    entry.lookup(Stream.concat(Stream.of(entry.id()), entry.partners().stream())),
+                    entry.lookup(entry.getRelatives(2, 1))).distinct()
                     .collect(Collectors.toMap(FamilyTreeNode::id, Function.identity()));
 
             Network.sendToPlayer(new GetFamilyTreeResponse(uuid, familyEntries), player);

@@ -31,6 +31,15 @@ public class Genetics implements Iterable<Genetics.Gene> {
     public static final GeneType VOICE = new GeneType("Voice");
     public static final GeneType VOICE_TONE = new GeneType("VoiceTone");
 
+    // Wildfire Physics Genes
+    public static final GeneType BOUNCE_MULTIPLIER = new GeneType("BounceMultiplier");
+    public static final GeneType FLOPPINESS = new GeneType("Floppiness");
+    public static final GeneType CLEAVAGE = new GeneType("Cleavage");
+    public static final GeneType UNIBOOB = new GeneType("Uniboob");
+    public static final GeneType BREAST_X_OFFSET = new GeneType("BreastXOffset");
+    public static final GeneType BREAST_Y_OFFSET = new GeneType("BreastYOffset");
+    public static final GeneType BREAST_Z_OFFSET = new GeneType("BreastZOffset");
+
     private static final CEnumParameter<Gender> GENDER = CParameter.create("Gender", Gender.UNASSIGNED);
 
     private final Map<GeneType, Gene> genes = new HashMap<>();
@@ -83,7 +92,7 @@ public class Genetics implements Iterable<Genetics.Gene> {
         return genes.computeIfAbsent(type, Gene::new);
     }
 
-    //initializes the genes with random numbers
+    // initializes the genes with random numbers
     public void randomize() {
         for (GeneType type : GENOMES) {
             getGenome(type).randomize();
@@ -110,6 +119,17 @@ public class Genetics implements Iterable<Genetics.Gene> {
 
         setGene(EUMELANIN, random.nextFloat());
         setGene(PHEOMELANIN, random.nextFloat());
+
+        // Physics Randomization
+        setGene(BOUNCE_MULTIPLIER, centeredRandom()); // Bell curve for bounce
+        setGene(FLOPPINESS, random.nextFloat()); // Uniform for floppiness
+        setGene(CLEAVAGE, random.nextFloat() * 0.5f); // Skew towards less cleavage
+        setGene(UNIBOOB, random.nextFloat() > 0.8f ? 1.0f : 0.0f); // 20% chance of uniboob (synced physics)
+
+        // Offsets - center around 0.5 (which maps to 0 offset)
+        setGene(BREAST_X_OFFSET, centeredRandom());
+        setGene(BREAST_Y_OFFSET, centeredRandom());
+        setGene(BREAST_Z_OFFSET, centeredRandom());
     }
 
     /**

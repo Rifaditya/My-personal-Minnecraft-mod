@@ -90,10 +90,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-
-public class VillagerEntityMCA extends Villager implements VillagerLike<VillagerEntityMCA>, MenuProvider, CompassionateEntity<BreedableRelationship>, CrossbowAttackMob {
+public class VillagerEntityMCA extends Villager implements VillagerLike<VillagerEntityMCA>, MenuProvider,
+        CompassionateEntity<BreedableRelationship>, CrossbowAttackMob {
     private static final CDataParameter<Float> INFECTION_PROGRESS = CParameter.create("InfectionProgress", 0.0f);
-    private static final CDataParameter<Integer> GROWTH_AMOUNT = CParameter.create("GrowthAmount", -AgeState.getMaxAge());
+    private static final CDataParameter<Integer> GROWTH_AMOUNT = CParameter.create("GrowthAmount",
+            -AgeState.getMaxAge());
     private static final CDataManager<VillagerEntityMCA> DATA = createTrackedData(VillagerEntityMCA.class).build();
     private static final int RECALCULATE_DIMENSIONS_EVERY_N_TICKS = 100;
     public final ConversationManager conversationManager = new ConversationManager(this);
@@ -130,8 +131,9 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     private static boolean canEat(ItemStack i) {
         FoodProperties foodProperties = i.get(DataComponents.FOOD);
         return foodProperties != null
-               && foodProperties.nutrition() > 0
-               && foodProperties.effects().stream().noneMatch(e -> StatusEffectDangerSet.IS_DANGER.contains(e.effect().getEffect()));
+                && foodProperties.nutrition() > 0
+                && foodProperties.effects().stream()
+                        .noneMatch(e -> StatusEffectDangerSet.IS_DANGER.contains(e.effect().getEffect()));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -184,7 +186,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public void refreshBrain(ServerLevel world) {
         Brain<VillagerEntityMCA> brain = getMCABrain();
         brain.stopAll(world, this);
-        //copyWithoutBehaviors will copy the memories of the old brain to the new brain
+        // copyWithoutBehaviors will copy the memories of the old brain to the new brain
         this.brain = brain.copyWithoutBehaviors();
         VillagerTasksMCA.initializeTasks(this, getMCABrain());
     }
@@ -234,7 +236,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, SpawnGroupData groupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+            MobSpawnType spawnType, SpawnGroupData groupData) {
         SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, groupData);
 
         initialize(spawnType);
@@ -244,8 +247,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         FamilyTreeNode entry = getRelationships().getFamilyEntry();
         if (!FamilyTreeNode.isValid(entry.father()) && !FamilyTreeNode.isValid(entry.mother())) {
             FamilyTree tree = FamilyTree.get(level.getLevel());
-            FamilyTreeNode father = tree.getOrCreate(UUID.randomUUID(), Names.pickCitizenName(Gender.MALE), Gender.MALE);
-            FamilyTreeNode mother = tree.getOrCreate(UUID.randomUUID(), Names.pickCitizenName(Gender.FEMALE), Gender.FEMALE);
+            FamilyTreeNode father = tree.getOrCreate(UUID.randomUUID(), Names.pickCitizenName(Gender.MALE),
+                    Gender.MALE);
+            FamilyTreeNode mother = tree.getOrCreate(UUID.randomUUID(), Names.pickCitizenName(Gender.FEMALE),
+                    Gender.FEMALE);
             father.setDeceased(true);
             mother.setDeceased(true);
             entry.setFather(father);
@@ -286,7 +291,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Override
     public void setVillagerData(VillagerData data) {
-        boolean hasChanged = !level().isClientSide && getProfession() != data.getProfession() && data.getProfession() != ProfessionsMCA.OUTLAW;
+        boolean hasChanged = !level().isClientSide && getProfession() != data.getProfession()
+                && data.getProfession() != ProfessionsMCA.OUTLAW;
         super.setVillagerData(data);
         if (hasChanged) {
             randomizeClothes();
@@ -361,21 +367,25 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     public boolean canInteractWithItemStackInHand(ItemStack stack) {
         return stack.getItem() != ItemsMCA.VILLAGER_EDITOR
-               && stack.getItem() != ItemsMCA.NEEDLE_AND_THREAD
-               && stack.getItem() != ItemsMCA.COMB
-               && stack.getItem() != ItemsMCA.POTION_OF_FEMININITY
-               && stack.getItem() != ItemsMCA.POTION_OF_MASCULINITY;
+                && stack.getItem() != ItemsMCA.NEEDLE_AND_THREAD
+                && stack.getItem() != ItemsMCA.COMB
+                && stack.getItem() != ItemsMCA.POTION_OF_FEMININITY
+                && stack.getItem() != ItemsMCA.POTION_OF_MASCULINITY;
     }
 
     @Override
     public final InteractionResult interactAt(Player player, Vec3 pos, @NotNull InteractionHand hand) {
-        // This allows hitbox interactions to be ignored if the player is carrying a child villager.
-        if (getVehicle() != null && getVehicle().equals(player)) return InteractionResult.PASS;
+        // This allows hitbox interactions to be ignored if the player is carrying a
+        // child villager.
+        if (getVehicle() != null && getVehicle().equals(player))
+            return InteractionResult.PASS;
 
         ItemStack stack = player.getItemInHand(hand);
-        boolean isOnBlacklist = Config.getInstance().villagerInteractionItemBlacklist.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
-        if (hand.equals(InteractionHand.MAIN_HAND) && !isOnBlacklist && !stack.is(TagsMCA.Items.VILLAGER_EGGS) && canInteractWithItemStackInHand(stack) && !getVillagerBrain().isPanicking()) {
-            //make sure dialogueType is synced in case the client needs it
+        boolean isOnBlacklist = Config.getInstance().villagerInteractionItemBlacklist
+                .contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+        if (hand.equals(InteractionHand.MAIN_HAND) && !isOnBlacklist && !stack.is(TagsMCA.Items.VILLAGER_EGGS)
+                && canInteractWithItemStackInHand(stack) && !getVillagerBrain().isPanicking()) {
+            // make sure dialogueType is synced in case the client needs it
             getDialogueType(player);
 
             if (player.isShiftKeyDown()) {
@@ -395,11 +405,14 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
-        // This allows hitbox interactions to be ignored if the player is carrying a child villager.
-        if (getVehicle() != null && getVehicle().equals(player)) return InteractionResult.PASS;
+        // This allows hitbox interactions to be ignored if the player is carrying a
+        // child villager.
+        if (getVehicle() != null && getVehicle().equals(player))
+            return InteractionResult.PASS;
 
         ItemStack stack = player.getItemInHand(hand);
-        if (!stack.is(TagsMCA.Items.VILLAGER_EGGS) && isAlive() && !isTrading() && !isSleeping() && canInteractWithItemStackInHand(stack) && !getVillagerBrain().isPanicking()) {
+        if (!stack.is(TagsMCA.Items.VILLAGER_EGGS) && isAlive() && !isTrading() && !isSleeping()
+                && canInteractWithItemStackInHand(stack) && !getVillagerBrain().isPanicking()) {
             if (isBaby()) {
                 copiedSayNo();
             } else if (!level().isClientSide) {
@@ -452,7 +465,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
         if (player.hasEffect(MobEffects.HERO_OF_THE_VILLAGE)) {
             MobEffectInstance statusEffect = player.getEffect(MobEffects.HERO_OF_THE_VILLAGE);
-            //noinspection ConstantConditions
+            // noinspection ConstantConditions
             int amplifier = statusEffect.getAmplifier();
 
             for (MerchantOffer tradeOffer2 : this.getOffers()) {
@@ -498,7 +511,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
         // you can't hit babies!
         // TODO: Verify the `isUnblockable` replacement for 1.19.4, ensure same behavior
-        if (!Config.getInstance().canHurtBabies && !source.is(DamageTypeTags.BYPASSES_SHIELD) && getAgeState() == AgeState.BABY) {
+        if (!Config.getInstance().canHurtBabies && !source.is(DamageTypeTags.BYPASSES_SHIELD)
+                && getAgeState() == AgeState.BABY) {
             if (source.getEntity() instanceof Player && requestCooldown()) {
                 sendEventMessage(Component.translatable("villager.baby_hit"));
             }
@@ -515,7 +529,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         }
 
         if (!level().isClientSide) {
-            //scream and loose hearts
+            // scream and loose hearts
             if (source.getEntity() instanceof Player player) {
                 if (level().getGameTime() - lastHit > 40) {
                     lastHit = level().getGameTime();
@@ -528,18 +542,21 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                     }
                 }
 
-                //loose hearts, the weaker the villager, the more it is scared. The first hit might be an accident.
+                // loose hearts, the weaker the villager, the more it is scared. The first hit
+                // might be an accident.
                 int trustIssues = (int) ((1.0 - getHealth() / getMaxHealth() * 0.75) * (3.0 + 2.0 * damageAmount));
                 getVillagerBrain().getMemoriesForPlayer(player).modHearts(-trustIssues);
             }
 
-            //infect the villager
+            // infect the villager
             if (source.getDirectEntity() instanceof Zombie
-                && getProfession() != ProfessionsMCA.GUARD
-                && Config.getInstance().enableInfection
-                && random.nextFloat() < Config.getInstance().zombieBiteInfectionChance
-                && random.nextFloat() > (getVillagerData().getLevel() - 1) * Config.getInstance().infectionChanceDecreasePerLevel
-                && (getResidency().getHomeVillage().filter(v -> v.hasBuilding("infirmary")).isEmpty() || random.nextBoolean())) {
+                    && getProfession() != ProfessionsMCA.GUARD
+                    && Config.getInstance().enableInfection
+                    && random.nextFloat() < Config.getInstance().zombieBiteInfectionChance
+                    && random.nextFloat() > (getVillagerData().getLevel() - 1)
+                            * Config.getInstance().infectionChanceDecreasePerLevel
+                    && (getResidency().getHomeVillage().filter(v -> v.hasBuilding("infirmary")).isEmpty()
+                            || random.nextBoolean())) {
                 setInfected(true);
                 sendChatToAllAround("villager.bitten");
                 MCA.LOGGER.info("{} has been infected", getName());
@@ -605,11 +622,13 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     }
 
     public boolean isHitBy(ServerPlayer player) {
-        return Objects.requireNonNull(getBrain().getMemoryInternal(MemoryModuleTypeMCA.HIT_BY_PLAYER)).filter(v -> v == player).isPresent();
+        return Objects.requireNonNull(getBrain().getMemoryInternal(MemoryModuleTypeMCA.HIT_BY_PLAYER))
+                .filter(v -> v == player).isPresent();
     }
 
     private int getMaxWarnings(Player attacker) {
-        return getVillagerBrain().getMemoriesForPlayer(attacker).getHearts() / Math.max(1, Config.getInstance().heartsForPardonHit);
+        return getVillagerBrain().getMemoriesForPlayer(attacker).getHearts()
+                / Math.max(1, Config.getInstance().heartsForPardonHit);
     }
 
     @Override
@@ -634,7 +653,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 if (foodProperties != null) {
                     eat(level(), food);
                 } else {
-                    //noinspection ConstantConditions
+                    // noinspection ConstantConditions
                     if (!findAndEquipToMain(VillagerEntityMCA::canEat)) {
                         heal(1); // natural regeneration
                     }
@@ -703,7 +722,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
             // mood particles
             Mood mood = mcaBrain.getMood();
-            if (mood.getParticle() != null && this.tickCount % mood.getParticleInterval() == 0 && level().random.nextBoolean()) {
+            if (mood.getParticle() != null && this.tickCount % mood.getParticleInterval() == 0
+                    && level().random.nextBoolean()) {
                 addParticlesAroundSelf(mood.getParticle());
             }
         } else {
@@ -733,15 +753,17 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 sendChatToAllAround("sirben");
             }
 
-            //strengthen experienced villagers
+            // strengthen experienced villagers
             AttributeInstance instance = this.getAttributes().getInstance(Attributes.MAX_HEALTH);
             if (instance != null) {
                 int level = this.getVillagerData().getLevel() - 1;
                 instance.removeModifier(EXTRA_HEALTH_EFFECT_ID);
-                instance.addTransientModifier(new AttributeModifier(EXTRA_HEALTH_EFFECT_ID, Config.getInstance().villagerHealthBonusPerLevel * level, AttributeModifier.Operation.ADD_VALUE));
+                instance.addTransientModifier(new AttributeModifier(EXTRA_HEALTH_EFFECT_ID,
+                        Config.getInstance().villagerHealthBonusPerLevel * level,
+                        AttributeModifier.Operation.ADD_VALUE));
             }
 
-            //twice a day, randomize the mood a bit
+            // twice a day, randomize the mood a bit
             if (this.tickCount % 12000 == 0) {
                 int base = Math.round(mcaBrain.getMoodValue() / 12.0f);
                 int value = random.nextInt(7) - 3;
@@ -762,8 +784,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             dimensions.set(current);
         }
 
-        // todo calculateDimensions call move, move sets some flags, but since it's a "fake" move no collision happen
-        // without collision the pathfinder skips the frame, causing children to not move
+        // todo calculateDimensions call move, move sets some flags, but since it's a
+        // "fake" move no collision happen
+        // without collision the pathfinder skips the frame, causing children to not
+        // move
         // there are more flags affected, none of them seem to affect the game tho
         boolean oldOnGround = this.onGround();
         super.refreshDimensions();
@@ -836,9 +860,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             this.setItemSlot(slot, ItemStack.EMPTY);
         }
 
-        //death message
+        // death message
         if (!level().isClientSide) {
-            getResidency().getHomeVillage().flatMap(Village::getCivilRegistry).ifPresent(r -> r.addText(getCombatTracker().getDeathMessage()));
+            getResidency().getHomeVillage().flatMap(Village::getCivilRegistry)
+                    .ifPresent(r -> r.addText(getCombatTracker().getDeathMessage()));
         }
 
         super.die(cause);
@@ -847,10 +872,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             return;
         }
 
-        //drop stuff
+        // drop stuff
         InventoryUtils.dropAllItems(this, inventory);
 
-        //alert family and nearby villagers
+        // alert family and nearby villagers
         relations.onDeath(cause);
 
         Optional<Village> village = residency.getHomeVillage();
@@ -862,7 +887,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             });
         }
 
-        //move out
+        // move out
         residency.leaveHome();
 
         if (interactedWith) {
@@ -900,7 +925,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     @Override
     public SoundEvent getDeathSound() {
         if (Config.getInstance().useMCAVoices) {
-            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_SCREAM : SoundsMCA.VILLAGER_FEMALE_SCREAM;
+            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_SCREAM
+                    : SoundsMCA.VILLAGER_FEMALE_SCREAM;
         } else if (Config.getInstance().useVanillaVoices) {
             return super.getDeathSound();
         } else {
@@ -910,7 +936,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     public SoundEvent getSurprisedSound() {
         if (Config.getInstance().useMCAVoices) {
-            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_SURPRISE : SoundsMCA.VILLAGER_FEMALE_SURPRISE;
+            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_SURPRISE
+                    : SoundsMCA.VILLAGER_FEMALE_SURPRISE;
         } else {
             return SoundsMCA.SILENT;
         }
@@ -920,32 +947,34 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     @Override
     protected final SoundEvent getAmbientSound() {
         if (Config.getInstance().useMCAVoices) {
-            //baby sounds
+            // baby sounds
             if (getAgeState() == AgeState.BABY) {
                 return SoundsMCA.VILLAGER_BABY_LAUGH;
             }
 
-            //snoring
+            // snoring
             if (isSleeping()) {
-                return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_SNORE : SoundsMCA.VILLAGER_FEMALE_SNORE;
+                return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_SNORE
+                        : SoundsMCA.VILLAGER_FEMALE_SNORE;
             }
 
-            //scream in terror and pain
+            // scream in terror and pain
             if (getVillagerBrain().isPanicking()) {
                 return getDeathSound();
             }
 
-            //coughing
+            // coughing
             if (isInfected() && random.nextBoolean()) {
-                return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_COUGH : SoundsMCA.VILLAGER_FEMALE_COUGH;
+                return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_COUGH
+                        : SoundsMCA.VILLAGER_FEMALE_COUGH;
             }
 
-            //sirben
+            // sirben
             if (random.nextBoolean() && getTraits().hasTrait(Traits.SIRBEN)) {
                 return SoundsMCA.SIRBEN;
             }
 
-            //generic mood sounds
+            // generic mood sounds
             Mood mood = getVillagerBrain().getMood();
             if (mood.getSoundInterval() > 0 && tickCount % mood.getSoundInterval() == 0) {
                 return getGenetics().getGender() == Gender.MALE ? mood.getSoundMale() : mood.getSoundFemale();
@@ -962,7 +991,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     @Override
     protected final SoundEvent getHurtSound(DamageSource cause) {
         if (Config.getInstance().useMCAVoices) {
-            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_HURT : SoundsMCA.VILLAGER_FEMALE_HURT;
+            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_HURT
+                    : SoundsMCA.VILLAGER_FEMALE_HURT;
         } else if (Config.getInstance().useVanillaVoices) {
             return super.getHurtSound(cause);
         } else {
@@ -972,7 +1002,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     public final void playWelcomeSound() {
         if (Config.getInstance().useMCAVoices && !getVillagerBrain().isPanicking() && getAgeState() != AgeState.BABY) {
-            playSound(getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_GREET : SoundsMCA.VILLAGER_FEMALE_GREET, getSoundVolume(), getVoicePitch());
+            playSound(getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_GREET
+                    : SoundsMCA.VILLAGER_FEMALE_GREET, getSoundVolume(), getVoicePitch());
         }
     }
 
@@ -985,7 +1016,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     @Override
     public SoundEvent getNotifyTradeSound() {
         if (Config.getInstance().useMCAVoices) {
-            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_YES : SoundsMCA.VILLAGER_FEMALE_YES;
+            return getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_YES
+                    : SoundsMCA.VILLAGER_FEMALE_YES;
         } else if (Config.getInstance().useVanillaVoices) {
             return super.getNotifyTradeSound();
         } else {
@@ -1017,7 +1049,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     @Override
     public void playCelebrateSound() {
         if (Config.getInstance().useMCAVoices) {
-            playSound(getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_CELEBRATE : SoundsMCA.VILLAGER_FEMALE_CELEBRATE, getSoundVolume(), getVoicePitch());
+            playSound(getGenetics().getGender() == Gender.MALE ? SoundsMCA.VILLAGER_MALE_CELEBRATE
+                    : SoundsMCA.VILLAGER_FEMALE_CELEBRATE, getSoundVolume(), getVoicePitch());
         } else if (Config.getInstance().useVanillaVoices) {
             super.playCelebrateSound();
         } else {
@@ -1107,16 +1140,15 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 relations.getParents()
                         .filter(ServerPlayer.class::isInstance)
                         .map(ServerPlayer.class::cast).forEach(
-                                e -> CriterionMCA.CHILD_AGE_STATE_CHANGE.trigger(e, state.name())
-                        );
+                                e -> CriterionMCA.CHILD_AGE_STATE_CHANGE.trigger(e, state.name()));
 
                 if (state == AgeState.ADULT) {
                     // Notify player parents of the age up and set correct dialogue type.
                     relations.getParents()
                             .filter(Player.class::isInstance)
                             .map(Player.class::cast).forEach(
-                                    p -> sendEventMessage(Component.translatable("notify.child.grownup", getName()), p)
-                            );
+                                    p -> sendEventMessage(Component.translatable("notify.child.grownup", getName()),
+                                            p));
                 }
 
                 refreshBrain((ServerLevel) level());
@@ -1132,7 +1164,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> par) {
-        if (getTypeDataManager().isParam(AGE_STATE, par) || getTypeDataManager().isParam(Genetics.SIZE.getParam(), par) || getTypeDataManager().isParam(Genetics.WIDTH.getParam(), par)) {
+        if (getTypeDataManager().isParam(AGE_STATE, par) || getTypeDataManager().isParam(Genetics.SIZE.getParam(), par)
+                || getTypeDataManager().isParam(Genetics.WIDTH.getParam(), par)) {
             refreshDimensions();
         }
 
@@ -1171,16 +1204,18 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public void handleEntityEvent(byte id) {
         switch (id) {
             case Status.MCA_VILLAGER_NEG_INTERACTION ->
-                    level().addAlwaysVisibleParticle(ParticleTypesMCA.NEG_INTERACTION, true, getX(), getEyeY() + 0.5, getZ(), 0, 0, 0);
+                level().addAlwaysVisibleParticle(ParticleTypesMCA.NEG_INTERACTION, true, getX(), getEyeY() + 0.5,
+                        getZ(), 0, 0, 0);
             case Status.MCA_VILLAGER_POS_INTERACTION ->
-                    level().addAlwaysVisibleParticle(ParticleTypesMCA.POS_INTERACTION, true, getX(), getEyeY() + 0.5, getZ(), 0, 0, 0);
+                level().addAlwaysVisibleParticle(ParticleTypesMCA.POS_INTERACTION, true, getX(), getEyeY() + 0.5,
+                        getZ(), 0, 0, 0);
             case Status.MCA_VILLAGER_TRAGEDY -> this.addParticlesAroundSelf(ParticleTypes.DAMAGE_INDICATOR);
             default -> super.handleEntityEvent(id);
         }
     }
 
     public void onInvChange(Container inventoryFromListener) {
-        //nop
+        // nop
     }
 
     @SuppressWarnings("unchecked")
@@ -1201,7 +1236,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         }
 
         if (mob instanceof ZombieVillager zombie) {
-            zombie.finalizeSpawn((ServerLevel) level(), level().getCurrentDifficultyAt(zombie.blockPosition()), MobSpawnType.CONVERSION, new Zombie.ZombieGroupData(false, true));
+            zombie.finalizeSpawn((ServerLevel) level(), level().getCurrentDifficultyAt(zombie.blockPosition()),
+                    MobSpawnType.CONVERSION, new Zombie.ZombieGroupData(false, true));
             zombie.setVillagerData(getVillagerData());
             zombie.setGossips(getGossips().store(NbtOps.INSTANCE));
             zombie.setTradeOffers(getOffers().copy());
@@ -1274,9 +1310,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         return getProfession() == ProfessionsMCA.OUTLAW;
     }
 
-    //friends will not get slapped in revenge
+    // friends will not get slapped in revenge
     public boolean isFriend(EntityType<?> type) {
-        return type == EntityType.IRON_GOLEM || type == EntitiesMCA.FEMALE_VILLAGER || type == EntitiesMCA.MALE_VILLAGER;
+        return type == EntityType.IRON_GOLEM || type == EntitiesMCA.FEMALE_VILLAGER
+                || type == EntitiesMCA.MALE_VILLAGER;
     }
 
     @Override
@@ -1286,12 +1323,12 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Override
     public void setChargingCrossbow(boolean charging) {
-        //nop
+        // nop
     }
 
     @Override
     public void onCrossbowAttackPerformed() {
-        //nop
+        // nop
     }
 
     @Override
@@ -1333,7 +1370,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     private void tickDespawnDelay() {
         if (this.despawnDelay > 0 && !this.isTrading() && --this.despawnDelay == 0) {
-            if (getRelationships().getPartner().isPresent() || getVillagerBrain().getMemories().values().stream().anyMatch(m -> random.nextInt(Config.getInstance().marriageHeartsRequirement) < m.getHearts())) {
+            if (getRelationships().getPartner().isPresent() || getVillagerBrain().getMemories().values().stream()
+                    .anyMatch(m -> random.nextInt(Config.getInstance().marriageHeartsRequirement) < m.getHearts())) {
                 setProfession(VillagerProfession.NONE);
                 setDespawnDelay(0);
             } else {

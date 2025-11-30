@@ -15,11 +15,20 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.world.entity.LivingEntity;
+import net.conczin.mca.client.render.wildfire.WildfireBreastRenderer;
+import net.conczin.mca.client.physics.BreastPhysics;
+import net.conczin.mca.entity.ai.Genetics;
+import net.conczin.mca.entity.ai.relationship.Gender;
 
-public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>> extends HumanoidModel<T> implements CommonVillagerModel<T> {
+public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>> extends HumanoidModel<T>
+        implements CommonVillagerModel<T> {
     protected static final String BREASTS = "breasts";
 
     public final ModelPart breasts;
+
+    protected final WildfireBreastRenderer wildfireRenderer = new WildfireBreastRenderer();
+    protected T currentEntity;
+    protected float currentPartialTicks;
 
     final VillagerDimensions.Mutable dimensions = new VillagerDimensions.Mutable(AgeState.ADULT);
     float breastSize;
@@ -63,19 +72,20 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
     }
 
     @Override
-    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw,
+            float headPitch) {
         if (villager.getAgeState() == AgeState.BABY && !villager.isPassenger()) {
             limbDistance = (float) Math.sin(villager.tickCount / 12F);
             limbAngle = (float) Math.cos(villager.tickCount / 9F) * 3;
             headYaw += (float) Math.sin(villager.tickCount / 2F);
         }
 
-        //remove the boost for babies
+        // remove the boost for babies
         if (villager.isBaby()) {
             limbAngle /= 3.0f;
         }
 
-        //and add our own
+        // and add our own
         limbAngle /= (0.2f + villager.getRawVerticalScaleFactor());
 
         super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
@@ -84,34 +94,109 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
             float toRadians = (float) Math.PI / 180;
 
             float armRaise = (((float) Math.sin(animationProgress / 5) * 30 - 180)
-                              + ((float) Math.sin(animationProgress / 3) * 3))
-                             * toRadians;
+                    + ((float) Math.sin(animationProgress / 3) * 3))
+                    * toRadians;
             float waveSideways = ((float) Math.sin(animationProgress / 2) * 12 - 17) * toRadians;
 
-            this.leftArm.xRot = armRaise;
-            this.leftArm.zRot = -waveSideways;
             this.rightArm.xRot = -armRaise;
             this.rightArm.zRot = waveSideways;
         }
 
-        applyVillagerDimensions(villager, villager.isCrouching());
+        setPhysicsEntity(villager, animationProgress - villager.tickCount);
     }
 
-    @Override
-    public void copyPropertiesTo(HumanoidModel<T> target) {
-        super.copyPropertiesTo(target);
+    public void setPhysicsEntity(T villager, float partialTicks) {
+        this.currentEntity = villager;
+        this.currentPartialTicks = partialTicks;
+        this.breasts.visible = false;
 
-        if (target instanceof VillagerEntityBaseModelMCA<T> m) {
-            copyCommonAttributes(m);
-
-            m.breasts.visible = breasts.visible;
-            m.breasts.copyFrom(breasts);
+        // Physics Tick
+        net.conczin.mca.client.physics.PhysicsState state = net.conczin.mca.client.physics.PhysicsState.get(villager);
+        if (villager.level().isClientSide && state.lastTick != villager.tickCount) {
+            state.lastTick = villager.tickCount;
+            state.leftPhysics.update(villager,
+                    net.conczin.mca.client.render.wildfire.IGenderArmor
+                            .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
+                    createPhysicsConfig(villager));
+            state.rightPhysics.update(villager,
+                    net.conczin.mca.client.render.wildfire.IGenderArmor
+                            .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
+                    createPhysicsConfig(villager));
         }
     }
 
     @Override
     public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         renderCommon(matrices, vertices, light, overlay, color);
+
+        if (currentEntity != null && currentEntity.getGenetics().getGender() == Gender.FEMALE) {
+            wildfireRenderer.render(matrices, vertices, light, overlay, color, currentEntity, this.body,
+                    currentPartialTicks, createPhysicsConfig(currentEntity));
+        }
+    }
+
+    protected BreastPhysics.PhysicsConfig createPhysicsConfig(T entity) {
+        return new VillagerPhysicsConfig(entity);
+    }
+
+    protected class VillagerPhysicsConfig implements BreastPhysics.PhysicsConfig {
+        private final T entity;
+        private final Genetics genetics;
+
+        public VillagerPhysicsConfig(T entity) {
+            this.entity = entity;
+            this.genetics = entity.getGenetics();
+        }
+
+        @Override
+        public float getBustSize() {
+            return genetics.getGene(Genetics.BREAST);
+        }
+
+        @Override
+        public boolean canHaveBreasts() {
+            return entity.getGenetics().getGender() == Gender.FEMALE;
+        }
+
+        @Override
+        public float getBounceMultiplier() {
+            return genetics.getGene(Genetics.BOUNCE_MULTIPLIER);
+        }
+
+        @Override
+        public float getFloppiness() {
+            return genetics.getGene(Genetics.FLOPPINESS);
+        }
+
+        @Override
+        public boolean isUniboob() {
+            return genetics.getGene(Genetics.UNIBOOB) > 0.5f;
+        }
+
+        @Override
+        public boolean getArmorPhysicsOverride() {
+            return false;
+        }
+
+        @Override
+        public float getBreastXOffset() {
+            return genetics.getGene(Genetics.BREAST_X_OFFSET);
+        }
+
+        @Override
+        public float getBreastYOffset() {
+            return genetics.getGene(Genetics.BREAST_Y_OFFSET);
+        }
+
+        @Override
+        public float getBreastZOffset() {
+            return genetics.getGene(Genetics.BREAST_Z_OFFSET);
+        }
+
+        @Override
+        public float getCleavage() {
+            return genetics.getGene(Genetics.CLEAVAGE);
+        }
     }
 
     @Override

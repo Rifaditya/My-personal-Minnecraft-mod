@@ -44,7 +44,7 @@ public final class FamilyTreeNode {
     private String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE).toString();
     private UUID father;
     private UUID mother;
-    private UUID partner = Util.NIL_UUID;
+    private Set<UUID> partners = new HashSet<>();
     private RelationshipState relationshipState = RelationshipState.SINGLE;
     private boolean deceased;
 
@@ -71,9 +71,14 @@ public final class FamilyTreeNode {
         children.addAll(NbtHelper.toList(nbt.getList("children", Tag.TAG_COMPOUND), c -> ((CompoundTag) c).getUUID("uuid")));
         profession = nbt.getString("profession");
         deceased = nbt.getBoolean("isDeceased");
+        
         if (nbt.hasUUID("spouse")) {
-            partner = nbt.getUUID("spouse");
+            partners.add(nbt.getUUID("spouse"));
         }
+        if (nbt.contains("partners", Tag.TAG_LIST)) {
+            partners.addAll(NbtHelper.toList(nbt.getList("partners", Tag.TAG_COMPOUND), c -> ((CompoundTag) c).getUUID("uuid")));
+        }
+        
         relationshipState = RelationshipState.byId(nbt.getInt("marriageState"));
     }
 
@@ -176,9 +181,15 @@ public final class FamilyTreeNode {
 
     /**
      * Id of the last this entity's most recent partner.
+     * @deprecated Use {@link #partners()} instead.
      */
+    @Deprecated
     public UUID partner() {
-        return partner;
+        return partners.stream().findFirst().orElse(Util.NIL_UUID);
+    }
+    
+    public Set<UUID> partners() {
+        return partners;
     }
 
     public RelationshipState getRelationshipState() {
@@ -190,28 +201,46 @@ public final class FamilyTreeNode {
         this.relationshipState = relationshipState;
     }
 
-    public void updatePartner(@Nullable Entity newPartner, @Nullable RelationshipState state) {
-        //cancel relationship with previous partner
-        if (!this.partner.equals(Util.NIL_UUID) && (newPartner == null || !this.partner.equals(newPartner.getUUID()))) {
-            getRoot().getOrEmpty(this.partner).ifPresent(n -> {
-                n.partner = Util.NIL_UUID;
-                n.relationshipState = RelationshipState.SINGLE;
-            });
-        }
-
-        this.partner = newPartner == null ? Util.NIL_UUID : newPartner.getUUID();
-        this.relationshipState = state == null && newPartner == null ? RelationshipState.SINGLE : state;
-
-        // ensure the family tree has an entry
-        if (newPartner != null) {
-            rootNode.getOrCreate(newPartner);
-        }
-
+    public void addPartner(Entity newPartner, RelationshipState state) {
+        if (newPartner == null) return;
+        
+        this.partners.add(newPartner.getUUID());
+        this.relationshipState = state; // Update state to married
+        
+        rootNode.getOrCreate(newPartner);
         rootNode.setDirty();
+    }
+    
+    public void removePartner(UUID partnerId) {
+        this.partners.remove(partnerId);
+        if (this.partners.isEmpty()) {
+            this.relationshipState = RelationshipState.SINGLE;
+        }
+        markDirty();
+    }
+
+    public void clearPartners() {
+        this.partners.clear();
+        this.relationshipState = RelationshipState.SINGLE;
+        markDirty();
+    }
+
+    public void updatePartner(@Nullable Entity newPartner, @Nullable RelationshipState state) {
+        // Legacy support: if newPartner is null, clear all. If not null, add it (or replace? Plan said add).
+        // But wait, existing code used updatePartner to SET the partner.
+        // For polygamy, we should probably change this to addPartner, but to keep compatibility with existing calls
+        // that might expect "set", we need to be careful.
+        // However, the plan says "Update updatePartner to addPartner logic".
+        
+        if (newPartner == null) {
+            clearPartners();
+        } else {
+            addPartner(newPartner, state);
+        }
     }
 
     public void updatePartner(FamilyTreeNode spouse) {
-        this.partner = spouse.id();
+        this.partners.add(spouse.id());
         this.relationshipState = spouse.isPlayer ? RelationshipState.MARRIED_TO_PLAYER : RelationshipState.MARRIED_TO_VILLAGER;
         markDirty();
     }
@@ -402,7 +431,7 @@ public final class FamilyTreeNode {
         if (!children.isEmpty()) {
             return true;
         }
-        if (!partner.equals(Util.NIL_UUID)) {
+        if (!partners.isEmpty()) {
             return true;
         }
         return !getParents().allMatch(FamilyTreeNode::probablyGenerated);
@@ -417,7 +446,16 @@ public final class FamilyTreeNode {
         nbt.putInt("gender", gender.getId());
         nbt.putUUID("father", father);
         nbt.putUUID("mother", mother);
-        nbt.putUUID("spouse", partner);
+        // Legacy support: save first partner as "spouse"
+        if (!partners.isEmpty()) {
+            nbt.putUUID("spouse", partners.iterator().next());
+        }
+        nbt.put("partners", NbtHelper.fromList(partners, p -> {
+            CompoundTag n = new CompoundTag();
+            n.putUUID("uuid", p);
+            return n;
+        }));
+        
         nbt.putInt("marriageState", relationshipState.ordinal());
         nbt.put("children", NbtHelper.fromList(children, child -> {
             CompoundTag n = new CompoundTag();

@@ -9,6 +9,7 @@ import net.conczin.mca.network.Network;
 import net.conczin.mca.network.s2c.OpenDestinyGuiRequest;
 import net.conczin.mca.network.s2c.ShowToastRequest;
 import net.conczin.mca.server.world.data.PlayerSaveData;
+import net.conczin.mca.server.world.data.FamilyTreeNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -24,15 +25,16 @@ public class ServerInteractionManager {
     private static final ServerInteractionManager INSTANCE = new ServerInteractionManager();
 
     /**
-     * Maps a player's UUID to a list of UUIDs that have proposed to them with /mca propose
+     * Maps a player's UUID to a list of UUIDs that have proposed to them with /mca
+     * propose
      */
     private final Map<UUID, List<UUID>> proposals = new HashMap<>();
 
     /**
-     * List of UUIDs that initiated procreation mapped to the time the request expires.
+     * List of UUIDs that initiated procreation mapped to the time the request
+     * expires.
      */
     private final Object2LongArrayMap<UUID> procreateMap = new Object2LongArrayMap<>();
-
 
     private ServerInteractionManager() {
     }
@@ -64,13 +66,11 @@ public class ServerInteractionManager {
             } else if (Config.getInstance().allowDestinyCommandOnce) {
                 Network.sendToPlayer(new ShowToastRequest(
                         "server.destinyNotSet.title",
-                        "server.destinyNotSet.description"
-                ), player);
+                        "server.destinyNotSet.description"), player);
             } else if (Config.getInstance().allowFullPlayerEditor) {
                 Network.sendToPlayer(new ShowToastRequest(
                         "server.playerNotCustomized.title",
-                        "server.playerNotCustomized.description"
-                ), player);
+                        "server.playerNotCustomized.description"), player);
             }
         }
 
@@ -141,6 +141,12 @@ public class ServerInteractionManager {
      * @param sender   The player sending the proposal.
      * @param receiver The player being proposed to.
      */
+    /**
+     * Sends a proposal from the sender to the receiver.
+     *
+     * @param sender   The player sending the proposal.
+     * @param receiver The player being proposed to.
+     */
     public void sendProposal(ServerPlayer sender, ServerPlayer receiver) {
         // Checks if the admin allows this
         if (!Config.getInstance().allowPlayerMarriage) {
@@ -148,9 +154,19 @@ public class ServerInteractionManager {
             return;
         }
 
-        // Ensure the sender isn't already married.
-        if (PlayerSaveData.get(sender).isMarried()) {
-            failMessage(sender, Component.translatable("server.alreadyMarried"));
+        PlayerSaveData senderData = PlayerSaveData.get(sender);
+        PlayerSaveData receiverData = PlayerSaveData.get(receiver);
+
+        // Ensure the sender can marry (gender check / polyandry check)
+        if (!senderData.canMarry(receiver)) {
+            failMessage(sender, Component.translatable("server.alreadyMarried")); // Or a more specific message like
+                                                                                  // "You cannot have more spouses"
+            return;
+        }
+
+        // Ensure the receiver can marry
+        if (!receiverData.canMarry(sender)) {
+            failMessage(sender, Component.translatable("server.targetAlreadyMarried", receiver.getScoreboardName()));
             return;
         }
 
@@ -204,12 +220,25 @@ public class ServerInteractionManager {
         if (!hasProposalFrom(receiver, sender)) {
             failMessage(sender, Component.translatable("server.noProposal", receiver.getDisplayName()));
         } else {
+            PlayerSaveData senderData = PlayerSaveData.get(sender);
+            PlayerSaveData receiverData = PlayerSaveData.get(receiver);
+
+            // Double check eligibility (race conditions)
+            if (!senderData.canMarry(receiver)) {
+                failMessage(sender, Component.translatable("server.alreadyMarried"));
+                return;
+            }
+            if (!receiverData.canMarry(sender)) {
+                failMessage(sender, Component.translatable("server.targetAlreadyMarried", receiver.getDisplayName()));
+                return;
+            }
+
             // Notify of acceptance.
             successMessage(receiver, Component.translatable("server.proposalAccepted", sender.getDisplayName()));
 
             // Set both player data as married.
-            PlayerSaveData.get(sender).marry(receiver);
-            PlayerSaveData.get(receiver).marry(sender);
+            senderData.marry(receiver);
+            receiverData.marry(sender);
 
             // Send success messages.
             successMessage(sender, Component.translatable("server.married", receiver.getDisplayName()));
@@ -226,7 +255,8 @@ public class ServerInteractionManager {
      * @param sender The person ending their marriage.
      */
     public void endMarriage(ServerPlayer sender) {
-        // Retrieve all data instances and an instance of the ex-spouse if they are present.
+        // Retrieve all data instances and an instance of the ex-spouse if they are
+        // present.
         EntityRelationship.of(sender).ifPresent(senderData -> {
             // Ensure the sender is married
             if (!senderData.isMarried()) {
@@ -241,24 +271,104 @@ public class ServerInteractionManager {
             }
 
             // Notify the sender of the success and end both marriages.
-            senderData.getPartnerName().ifPresent(name ->
-                    successMessage(sender, Component.translatable("server.endMarriage", name.getString()))
-            );
-            senderData.getPartner().ifPresent(spouse -> {
+            senderData.getPartnerName().ifPresent(
+                    name -> successMessage(sender, Component.translatable("server.endMarriage", name.getString())));
+
+            // Notify all partners
+            senderData.getPartners().forEach(spouse -> {
                 if (spouse instanceof Player player) {
                     // Notify the ex if they are online.
                     failMessage(player, Component.translatable("server.marriageEnded", sender.getScoreboardName()));
+                    // Remove sender from spouse's partners
+                    PlayerSaveData.get((ServerPlayer) player).getFamilyEntry().removePartner(sender.getUUID());
                 }
             });
-            senderData.endRelationShip(RelationshipState.SINGLE);
-            senderData.getPartnerUUID().map(id -> PlayerSaveData.get(sender)).ifPresent(r -> r.endRelationShip(RelationshipState.SINGLE));
+
+            // Let's iterate UUIDs for correctness.
+            Set<UUID> partnerIds = new HashSet<>(senderData.getFamilyEntry().partners());
+            for (UUID partnerId : partnerIds) {
+                PlayerSaveData.getIfPresent(sender.getServer().overworld(), partnerId).ifPresent(partnerData -> {
+                    partnerData.getFamilyEntry().removePartner(sender.getUUID());
+                });
+            }
+
+            senderData.endRelationShip(RelationshipState.SINGLE); // This clears all partners
         });
     }
 
+    public void endMarriage(ServerPlayer sender, String spouseName) {
+        EntityRelationship.of(sender).ifPresent(senderData -> {
+            if (!senderData.isMarried()) {
+                failMessage(sender, Component.translatable("server.endMarriageNotMarried"));
+                return;
+            }
+
+            // Find partner by name
+            Optional<UUID> targetPartner = senderData.getFamilyEntry().partners().stream()
+                    .filter(uuid -> {
+                        // Try to resolve name
+                        Optional<String> name = senderData.getFamilyTree().getOrEmpty(uuid)
+                                .map(FamilyTreeNode::getName);
+                        return name.isPresent() && name.get().equalsIgnoreCase(spouseName);
+                    })
+                    .findFirst();
+
+            if (targetPartner.isPresent()) {
+                UUID partnerId = targetPartner.get();
+
+                // Remove from us
+                senderData.getFamilyEntry().removePartner(partnerId);
+                successMessage(sender, Component.translatable("server.endMarriage", spouseName));
+
+                // Remove from them (if online/loaded)
+                PlayerSaveData.getIfPresent(sender.getServer().overworld(), partnerId).ifPresent(partnerData -> {
+                    partnerData.getFamilyEntry().removePartner(sender.getUUID());
+                    if (partnerData instanceof PlayerSaveData psd && psd.getUUID() != null) {
+                        ServerPlayer sp = sender.getServer().getPlayerList().getPlayer(psd.getUUID());
+                        if (sp != null) {
+                            failMessage(sp, Component.translatable("server.marriageEnded", sender.getScoreboardName()));
+                        }
+                    }
+                });
+
+            } else {
+                failMessage(sender, Component.translatable("server.spouseNotPresent")); // Or "Spouse not found"
+            }
+        });
+    }
+
+    public void forceMarry(ServerPlayer source, ServerPlayer target1, ServerPlayer target2) {
+        PlayerSaveData data1 = PlayerSaveData.get(target1);
+        PlayerSaveData data2 = PlayerSaveData.get(target2);
+
+        if (target1 == target2) {
+            failMessage(source, Component.translatable("server.proposedToYourself"));
+            return;
+        }
+
+        // Check eligibility
+        if (!data1.canMarry(target2)) {
+            failMessage(source,
+                    Component.literal("Target 1 cannot marry Target 2 (Already married/Gender restrictions)"));
+            return;
+        }
+        if (!data2.canMarry(target1)) {
+            failMessage(source,
+                    Component.literal("Target 2 cannot marry Target 1 (Already married/Gender restrictions)"));
+            return;
+        }
+
+        // Marry them
+        data1.marry(target2);
+        data2.marry(target1);
+
+        successMessage(source, Component.literal(
+                "Forced marriage between " + target1.getScoreboardName() + " and " + target2.getScoreboardName()));
+        successMessage(target1, Component.translatable("server.married", target2.getDisplayName()));
+        successMessage(target2, Component.translatable("server.married", target1.getDisplayName()));
+    }
+
     /**
-     * Initiates procreation with a married player.
-     *
-     * @param sender The person requesting procreation.
      */
     public void procreate(ServerPlayer sender) {
         // Ensure the sender is married.
@@ -283,7 +393,8 @@ public class ServerInteractionManager {
 
         // Ensure the spouse is online.
         senderData.getPartner().filter(e -> e instanceof Player).map(Player.class::cast).ifPresentOrElse(spouse -> {
-            // If the spouse is online and has previously sent a procreation request that hasn't expired, we can continue.
+            // If the spouse is online and has previously sent a procreation request that
+            // hasn't expired, we can continue.
             // Otherwise, we notify the spouse that they must also enter the command.
             if (!procreateMap.containsKey(spouse.getUUID())) {
                 procreateMap.put(sender.getUUID(), System.currentTimeMillis() + 10000);

@@ -22,12 +22,12 @@ def getAppVersion = { ->
         }
         def tag = stdout.toString().trim()
         if (tag.isEmpty()) {
-            return rootProject.minecraft_version + "-SNAPSHOT"
+            return rootProject.properties['version']
         }
         return tag
     } catch (Exception e) {
         println "Warning: ${e.message}, is git installed?"
-        return rootProject.minecraft_version + "-DEV"
+        return rootProject.properties['version']
     }
 } as Object
 

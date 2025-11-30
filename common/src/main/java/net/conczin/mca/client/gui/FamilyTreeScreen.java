@@ -31,6 +31,7 @@ public class FamilyTreeScreen extends Screen {
     private static final int VERTICAL_SPACING = 60;
 
     private static final int SPOUSE_HORIZONTAL_SPACING = 50;
+    private static final int SPOUSE_GAP = 10; // Gap between multiple spouses
     private final Map<UUID, FamilyTreeNode> family = new HashMap<>();
     private final TreeNode emptyNode = new TreeNode();
     private final Screen parent;
@@ -70,9 +71,10 @@ public class FamilyTreeScreen extends Screen {
     public void init() {
         focusEntity(focusedEntityId);
 
-        addRenderableWidget(new ButtonWidget(width / 2 - 100, height - 25, 200, 20, Component.translatable("gui.done"), sender -> {
-            onClose();
-        }));
+        addRenderableWidget(
+                new ButtonWidget(width / 2 - 100, height - 25, 200, 20, Component.translatable("gui.done"), sender -> {
+                    onClose();
+                }));
     }
 
     @Override
@@ -156,17 +158,31 @@ public class FamilyTreeScreen extends Screen {
     }
 
     private TreeNode insertParents(TreeNode root, FamilyTreeNode focusedNode, int levels) {
-        @Nullable FamilyTreeNode father = family.get(focusedNode.father());
-        @Nullable FamilyTreeNode mother = family.get(focusedNode.mother());
+        @Nullable
+        FamilyTreeNode father = family.get(focusedNode.father());
+        @Nullable
+        FamilyTreeNode mother = family.get(focusedNode.mother());
 
-        @Nullable FamilyTreeNode newRoot = father != null ? father : mother;
+        @Nullable
+        FamilyTreeNode newRoot = father != null ? father : mother;
 
         TreeNode fNode = newRoot == null ? new TreeNode() : new TreeNode(newRoot, false);
         fNode.children.add(root);
 
-        @Nullable FamilyTreeNode spouse = newRoot == father ? mother : father;
+        @Nullable
+        FamilyTreeNode spouse = newRoot == father ? mother : father;
 
-        fNode.spouse = spouse == null ? new TreeNode() : new TreeNode(spouse, false);
+        if (spouse != null) {
+            fNode.spouses.add(new TreeNode(spouse, false));
+        } else {
+            // If we want to show a placeholder for a missing spouse, we can add an empty
+            // node.
+            // But for parents, usually we only show known ones.
+            // The original code did: fNode.spouse = spouse == null ? new TreeNode() : new
+            // TreeNode(spouse, false);
+            // Let's keep that behavior if it was intended to show a "???" box.
+            fNode.spouses.add(new TreeNode());
+        }
 
         if (newRoot != null && levels > 0) {
             return insertParents(fNode, newRoot, levels - 1);
@@ -182,9 +198,9 @@ public class FamilyTreeScreen extends Screen {
 
         public boolean contains(int mouseX, int mouseY) {
             return mouseX >= left
-                   && mouseY >= top
-                   && mouseX <= right
-                   && mouseY <= bottom;
+                    && mouseY >= top
+                    && mouseX <= right
+                    && mouseY <= bottom;
         }
     }
 
@@ -195,7 +211,7 @@ public class FamilyTreeScreen extends Screen {
         private final List<TreeNode> children = new ArrayList<>();
         private final RelationshipState relationship;
         private final String defaultNodeName = "???";
-        TreeNode spouse;
+        List<TreeNode> spouses = new ArrayList<>();
         private boolean widthComputed;
         private int width;
         private int labelWidth;
@@ -216,7 +232,8 @@ public class FamilyTreeScreen extends Screen {
             this.id = node.id();
             this.deceased = node.isDeceased();
             this.relationship = node.getRelationshipState();
-            final MutableComponent text = Component.literal(MCA.isBlankString(node.getName()) ? defaultNodeName : node.getName());
+            final MutableComponent text = Component
+                    .literal(MCA.isBlankString(node.getName()) ? defaultNodeName : node.getName());
             this.label.add(text.setStyle(text.getStyle().withColor(node.gender().getColor())));
             this.label.add(node.getProfessionText().withStyle(ChatFormatting.GRAY));
 
@@ -238,12 +255,20 @@ public class FamilyTreeScreen extends Screen {
                     }
                 });
 
-                FamilyTreeNode spouse = family.get(node.partner());
-
-                if (spouse != null) {
-                    this.spouse = new TreeNode(spouse, parsed, false);
+                Set<UUID> partners = node.partners();
+                if (!partners.isEmpty()) {
+                    for (UUID partnerId : partners) {
+                        FamilyTreeNode partnerNode = family.get(partnerId);
+                        if (partnerNode != null) {
+                            this.spouses.add(new TreeNode(partnerNode, parsed, false));
+                        } else {
+                            // Partner exists but not in local cache? Should probably show ???
+                            this.spouses.add(new TreeNode());
+                        }
+                    }
                 } else if (!children.isEmpty()) {
-                    this.spouse = new TreeNode();
+                    // If there are children but no partners recorded, show a placeholder spouse
+                    this.spouses.add(new TreeNode());
                 }
             }
         }
@@ -323,39 +348,58 @@ public class FamilyTreeScreen extends Screen {
 
             if (deceased) {
                 Icon icon = MCAScreens.getInstance().getIcon("deceased");
-                context.blit(InteractScreen.ICON_TEXTURES, bounds.left + 6, bounds.top + 6, 0, icon.u(), icon.v(), 16, 16, 256, 256);
+                context.blit(InteractScreen.ICON_TEXTURES, bounds.left + 6, bounds.top + 6, 0, icon.u(), icon.v(), 16,
+                        16, 256, 256);
 
                 if (isFocused && mouseX <= bounds.left + 20) {
                     matrices.pushPose();
                     matrices.translate(0, 0, 20);
-                    context.renderTooltip(font, Component.translatable("gui.family_tree.label.deceased"), mouseX, mouseY);
+                    context.renderTooltip(font, Component.translatable("gui.family_tree.label.deceased"), mouseX,
+                            mouseY);
                     matrices.popPose();
                 }
             }
 
-            if (spouse != null) {
-                int x = bounds.left - SPOUSE_HORIZONTAL_SPACING;
+            if (!spouses.isEmpty()) {
+                int currentX = bounds.left; // Start at left edge of main node
                 int y = bounds.top + bounds.bottom / 2;
 
-                context.hLine(x, bounds.left - 1, y, 0xffffffff);
+                for (int i = 0; i < spouses.size(); i++) {
+                    TreeNode spouse = spouses.get(i);
+                    int spouseWidth = spouse.getWidth();
 
-                if (relationship == RelationshipState.MARRIED_TO_PLAYER ||
-                    relationship == RelationshipState.MARRIED_TO_VILLAGER ||
-                    relationship == RelationshipState.ENGAGED ||
-                    relationship == RelationshipState.PROMISED ||
-                    relationship == RelationshipState.WIDOW) {
+                    // Calculate position for this spouse
+                    // We place them to the left, in a chain
+                    int spouseRight = currentX - SPOUSE_HORIZONTAL_SPACING;
+                    int spouseLeft = spouseRight - spouseWidth;
+
+                    // Draw connecting line
+                    context.hLine(spouseRight, currentX - 1, y, 0xffffffff);
+
+                    // Draw marriage icon (rings) on the connecting line
+                    int iconX = (spouseRight + currentX) / 2 - 8;
                     Icon icon = MCAScreens.getInstance().getIcon(relationship.getIcon());
-                    context.blit(InteractScreen.ICON_TEXTURES, bounds.left - SPOUSE_HORIZONTAL_SPACING / 2 - 8, y - 8, 0, icon.u(), icon.v(), 16, 16, 256, 256);
+                    context.blit(InteractScreen.ICON_TEXTURES, iconX, y - 8, 0, icon.u(), icon.v(), 16, 16, 256, 256);
+
+                    // Render spouse node
+                    // TreeNode.render expects coordinates relative to the parent matrix,
+                    // but here we are translating manually.
+                    // The node's content is centered around (0,0) in its local space?
+                    // Based on getBounds(), it seems to be centered around 0 on X axis.
+                    // So we translate to the center of where we want it.
+
+                    // Center of the spouse node:
+                    int drawX = spouseLeft + spouseWidth / 2;
+                    int spouseY = y - spouse.label.size() * font.lineHeight / 2;
+
+                    matrices.pushPose();
+                    matrices.translate(drawX, spouseY, 0);
+                    spouse.render(context, mouseX - drawX, mouseY - spouseY);
+                    matrices.popPose();
+
+                    // Move currentX to the left edge of this spouse for the next iteration
+                    currentX = spouseLeft;
                 }
-
-                y -= spouse.label.size() * font.lineHeight / 2;
-                x -= spouse.getWidth() / 2 - 6;
-
-                matrices.pushPose();
-                matrices.translate(x, y, 0);
-
-                spouse.render(context, mouseX - x, mouseY - y);
-                matrices.popPose();
             }
         }
 
@@ -374,9 +418,12 @@ public class FamilyTreeScreen extends Screen {
                 if (deceased) {
                     labelWidth += 20;
                 }
-                width = Math.max(labelWidth + 10, children.stream().mapToInt(TreeNode::getWidth).sum()) + (HORIZONTAL_SPACING / 2);
-                if (spouse != null) {
-                    width += spouse.getWidth() + SPOUSE_HORIZONTAL_SPACING;
+                width = Math.max(labelWidth + 10, children.stream().mapToInt(TreeNode::getWidth).sum())
+                        + (HORIZONTAL_SPACING / 2);
+                if (!spouses.isEmpty()) {
+                    for (TreeNode s : spouses) {
+                        width += s.getWidth() + SPOUSE_HORIZONTAL_SPACING; // Add spacing for each
+                    }
                 }
             }
             return width;
@@ -391,8 +438,7 @@ public class FamilyTreeScreen extends Screen {
                         (-labelWidth / 2) - padding,
                         (labelWidth / 2) + padding * 2,
                         -padding,
-                        font.lineHeight * label.size() + padding * 2
-                );
+                        font.lineHeight * label.size() + padding * 2);
             }
             return bounds;
         }

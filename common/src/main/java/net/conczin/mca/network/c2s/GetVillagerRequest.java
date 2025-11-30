@@ -21,11 +21,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public record GetVillagerRequest(UUID id) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<GetVillagerRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("get_villager_request"));
+    public static final CustomPacketPayload.Type<GetVillagerRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("get_villager_request"));
     public static final StreamCodec<FriendlyByteBuf, GetVillagerRequest> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, GetVillagerRequest::id,
-            GetVillagerRequest::new
-    );
+            GetVillagerRequest::new);
 
     private static void storeNode(CompoundTag data, Optional<FamilyTreeNode> entry, String prefix) {
         if (entry.isPresent()) {
@@ -50,7 +50,17 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
         FamilyTree tree = FamilyTree.get((ServerLevel) e.level());
         FamilyTreeNode entry = tree.getOrCreate(e);
 
-        storeNode(data, tree.getOrEmpty(entry.partner()), "Spouse");
+        if (!entry.partners().isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (UUID partnerId : entry.partners()) {
+                if (sb.length() > 0)
+                    sb.append(", ");
+                tree.getOrEmpty(partnerId).ifPresent(p -> sb.append(p.getName()));
+            }
+            data.putString("FamilyTreeSpouseName", sb.toString());
+        } else {
+            data.putString("FamilyTreeSpouseName", "");
+        }
         storeNode(data, tree.getOrEmpty(entry.father()), "Father");
         storeNode(data, tree.getOrEmpty(entry.mother()), "Mother");
 

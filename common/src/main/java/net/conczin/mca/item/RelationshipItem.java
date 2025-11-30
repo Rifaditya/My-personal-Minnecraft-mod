@@ -29,7 +29,7 @@ public abstract class RelationshipItem extends TooltippedItem implements Special
             response = "interaction.relationship.fail.married";
         } else if (villager.getRelationships().isEngaged() && !Relationship.IS_ENGAGED.test(villager, player)) {
             response = "interaction.relationship.fail.engaged";
-        } else if (playerData.isMarried()) {
+        } else if (!playerData.canMarry(villager)) {
             response = "interaction.relationship.fail.playermarried";
         } else if (memory.getHearts() < getHeartsRequired()) {
             response = "interaction.relationship.fail.lowhearts";

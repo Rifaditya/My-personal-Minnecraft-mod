@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.mca.MCA;
 import net.conczin.mca.MCAClient;
 import net.conczin.mca.client.model.PlayerEntityExtendedModel;
+import net.conczin.mca.client.model.VillagerEntityBaseModelMCA;
 import net.conczin.mca.client.model.VillagerEntityModelMCA;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.client.Minecraft;
@@ -59,7 +60,8 @@ public abstract class VillagerLayer<T extends LivingEntity, M extends HumanoidMo
     }
 
     @Override
-    public void render(PoseStack transform, MultiBufferSource provider, int light, T villager, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+    public void render(PoseStack transform, MultiBufferSource provider, int light, T villager, float limbAngle,
+            float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         Minecraft client = Minecraft.getInstance();
         boolean visible = !villager.isInvisible();
         boolean glowing = client.shouldEntityAppearGlowing(villager);
@@ -68,25 +70,34 @@ public abstract class VillagerLayer<T extends LivingEntity, M extends HumanoidMo
             return;
         }
 
-        //primarily restores compatibility with Armourers Workshop
-        //noinspection rawtypes
+        // primarily restores compatibility with Armourers Workshop
+        // noinspection rawtypes
         if (model instanceof VillagerEntityModelMCA layer) {
-            //noinspection unchecked
+            // noinspection unchecked
             layer.copyVisibility(getParentModel());
         }
-        //noinspection rawtypes
+        // noinspection rawtypes
         if (model instanceof PlayerEntityExtendedModel layer) {
-            //noinspection unchecked
+            // noinspection unchecked
             layer.copyVisibility(getParentModel());
         }
 
-        //copy the animation to this layers model
+        // copy the animation to this layers model
         getParentModel().copyPropertiesTo(model);
+
+        if (model instanceof VillagerEntityBaseModelMCA) {
+            // noinspection unchecked,rawtypes
+            ((VillagerEntityBaseModelMCA) model).setPhysicsEntity(villager, tickDelta);
+        } else if (model instanceof PlayerEntityExtendedModel) {
+            // noinspection unchecked
+            ((PlayerEntityExtendedModel<T>) model).setPhysicsEntity(villager, tickDelta);
+        }
 
         renderFinal(transform, provider, light, villager, tickDelta, visible, glowing);
     }
 
-    public void renderFinal(PoseStack transform, MultiBufferSource provider, int light, T villager, float tickDelta, boolean visible, boolean glowing) {
+    public void renderFinal(PoseStack transform, MultiBufferSource provider, int light, T villager, float tickDelta,
+            boolean visible, boolean glowing) {
         int tint = LivingEntityRenderer.getOverlayCoords(villager, 0);
 
         ResourceLocation skin = getSkin(villager);
@@ -102,7 +113,8 @@ public abstract class VillagerLayer<T extends LivingEntity, M extends HumanoidMo
     }
 
     @Nullable
-    protected RenderType getRenderLayer(ResourceLocation texture, boolean showBody, boolean translucent, boolean showOutline) {
+    protected RenderType getRenderLayer(ResourceLocation texture, boolean showBody, boolean translucent,
+            boolean showOutline) {
         if (translucent) {
             return RenderType.itemEntityTranslucentCull(texture);
         } else if (showBody) {
@@ -112,9 +124,11 @@ public abstract class VillagerLayer<T extends LivingEntity, M extends HumanoidMo
         }
     }
 
-    private void renderModel(PoseStack transform, MultiBufferSource provider, int light, M model, int color, ResourceLocation texture, int overlay, boolean visible, boolean glowing) {
+    private void renderModel(PoseStack transform, MultiBufferSource provider, int light, M model, int color,
+            ResourceLocation texture, int overlay, boolean visible, boolean glowing) {
         RenderType layer = getRenderLayer(texture, visible, isTranslucent(), glowing);
-        if (layer == null) return;
+        if (layer == null)
+            return;
         VertexConsumer buffer = provider.getBuffer(layer);
         model.renderToBuffer(transform, buffer, light, overlay, color);
     }

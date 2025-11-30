@@ -12,6 +12,14 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.world.entity.LivingEntity;
+import net.conczin.mca.client.render.wildfire.WildfireBreastRenderer;
+import net.conczin.mca.client.physics.BreastPhysics;
+import net.conczin.mca.entity.ai.Genetics;
+import net.conczin.mca.entity.ai.relationship.Gender;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 
 public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> extends VillagerEntityBaseModelMCA<T> {
     protected static final String BREASTPLATE = "breastplate";
@@ -39,14 +47,16 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
     //
     // body - 0 (body.body 0.0)
     // face - 0 (body.head 0.01)
-    //  clothing - 1 (clothing.body 0.075)
-    //   hair - 2 (hair.body 0.1) + (hair.hat 0.1 + 0.3 = 0.4)
-    //    hood - 3 (clothing.hat 0.075 + 0.5 = 0.575)
+    // clothing - 1 (clothing.body 0.075)
+    // hair - 2 (hair.body 0.1) + (hair.hat 0.1 + 0.3 = 0.4)
+    // hood - 3 (clothing.hat 0.075 + 0.5 = 0.575)
 
     public static MeshDefinition hairData(CubeDeformation dilation) {
         MeshDefinition modelData = bodyData(dilation);
         PartDefinition root = modelData.getRoot();
-        root.addOrReplaceChild(PartNames.HAT, CubeListBuilder.create().texOffs(32, 0).addBox(-4, -8, -4, 8, 8, 8, dilation.extend(0.3F)), PartPose.ZERO);
+        root.addOrReplaceChild(PartNames.HAT,
+                CubeListBuilder.create().texOffs(32, 0).addBox(-4, -8, -4, 8, 8, 8, dilation.extend(0.3F)),
+                PartPose.ZERO);
         return modelData;
     }
 
@@ -71,7 +81,8 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
 
     @Override
     protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg, bodyWear, leftLegwear, rightLegwear, leftArmwear, rightArmwear);
+        return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg, bodyWear, leftLegwear, rightLegwear,
+                leftArmwear, rightArmwear);
     }
 
     @Override
@@ -80,7 +91,14 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
     }
 
     @Override
-    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
+            int color) {
+        super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
+    }
+
+    @Override
+    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw,
+            float headPitch) {
         super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
         leftLegwear.copyFrom(leftLeg);
         rightLegwear.copyFrom(rightLeg);
@@ -88,6 +106,39 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
         rightArmwear.copyFrom(rightArm);
         bodyWear.copyFrom(body);
         breastsWear.copyFrom(breasts);
+
+        this.breasts.visible = false;
+        this.breastsWear.visible = false;
+
+        // Physics Tick (Moved logic here)
+        if (villager.level().isClientSide) {
+            var state = net.conczin.mca.client.physics.PhysicsState.get(villager);
+            var config = createPhysicsConfig(villager);
+            var armor = net.conczin.mca.client.render.wildfire.IGenderArmor
+                    .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST));
+            // Only tick once per tick?
+            // We can check last tick time or just update.
+            // For now, update every frame (might be too fast) or check tick count.
+            // Better: check if (villager.tickCount != lastTick) in PhysicsState.
+            // But PhysicsState doesn't store lastTick.
+            // Let's just update. It might be slightly faster than 20tps if framerate is
+            // Physics Tick
+            // We rely on the fact that setupAnim is called every frame, but we only want to
+            // update physics
+            // if we can approximate a tick or if we accept per-frame updates with delta.
+            // However, BreastPhysics.update uses fixed steps.
+            // For now, let's update every frame but with a small time step or rely on the
+            // internal logic.
+            // Actually, the best way is to check the entity's tick count.
+
+            // Physics Tick
+            // Only update once per game tick to ensure consistent motion calculation
+            if (state.lastTick != villager.tickCount) {
+                state.lastTick = villager.tickCount;
+                state.leftPhysics.update(villager, armor, config);
+                state.rightPhysics.update(villager, armor, config);
+            }
+        }
     }
 
     @Override
@@ -134,8 +185,8 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
         hat.visible = model.head.visible;
         body.visible = model.body.visible;
         bodyWear.visible = model.body.visible;
-        breasts.visible = model.body.visible;
-        breastsWear.visible = model.body.visible;
+        breasts.visible = false; // model.body.visible;
+        breastsWear.visible = false; // model.body.visible;
         leftArm.visible = model.leftArm.visible;
         leftArmwear.visible = model.leftArm.visible;
         rightArm.visible = model.rightArm.visible;
