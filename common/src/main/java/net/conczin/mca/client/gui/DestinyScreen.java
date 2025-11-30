@@ -52,11 +52,12 @@ public class DestinyScreen extends VillagerEditorScreen {
         if (Config.getInstance().allowBodyCustomizationInDestiny) {
             pages.add("body");
             pages.add("head");
+            pages.add("physics");
         }
         if (Config.getInstance().allowTraitCustomizationInDestiny) {
             pages.add("traits");
         }
-        return pages.toArray(new String[]{});
+        return pages.toArray(new String[] {});
     }
 
     private void drawScaledText(GuiGraphics context, Component text, int x, int y, float scale) {
@@ -82,7 +83,8 @@ public class DestinyScreen extends VillagerEditorScreen {
 
         switch (page) {
             case "general" -> {
-                drawScaledText(context, Component.translatable("gui.destiny.whoareyou"), width / 2, height / 2 - 24, 1.5f);
+                drawScaledText(context, Component.translatable("gui.destiny.whoareyou"), width / 2, height / 2 - 24,
+                        1.5f);
                 matrices.pushPose();
                 matrices.scale(0.25f, 0.25f, 0.25f);
                 RenderSystem.enableBlend();
@@ -92,7 +94,8 @@ public class DestinyScreen extends VillagerEditorScreen {
                 matrices.popPose();
             }
             case "destiny" ->
-                    drawScaledText(context, Component.translatable("gui.destiny.journey"), width / 2, height / 2 - 48, 1.5f);
+                drawScaledText(context, Component.translatable("gui.destiny.journey"), width / 2, height / 2 - 48,
+                        1.5f);
             case "story" -> {
                 List<Component> text = FlowingText.wrap(story.getFirst(), 256);
                 int y = (int) (height / 2.0 - 20 - 7.5f * text.size());
@@ -122,7 +125,7 @@ public class DestinyScreen extends VillagerEditorScreen {
             super.onClose();
             return;
         } else if (page.equals("destiny")) {
-            //there is only one entry
+            // there is only one entry
             if (Config.getServerConfig().destinySpawnLocations.size() == 1) {
                 selectStory(Config.getServerConfig().destinySpawnLocations.getFirst());
                 return;
@@ -143,27 +146,31 @@ public class DestinyScreen extends VillagerEditorScreen {
 
                 addModelSelectionWidgets(width / 2 - DATA_WIDTH / 2, height / 2 + 24 + 22);
 
-                acceptWidget = addRenderableWidget(new ButtonWidget(width / 2 - 32, height / 2 + 60 + 22, 64, 20, Component.translatable("gui.button.accept"), sender -> {
-                    if (Config.getInstance().allowBodyCustomizationInDestiny) {
-                        setPage("body");
-                    } else if (Config.getInstance().allowTraitCustomizationInDestiny) {
-                        setPage("traits");
-                    } else {
-                        setPage("destiny");
-                    }
-                }));
+                acceptWidget = addRenderableWidget(new ButtonWidget(width / 2 - 32, height / 2 + 60 + 22, 64, 20,
+                        Component.translatable("gui.button.accept"), sender -> {
+                            if (Config.getInstance().allowBodyCustomizationInDestiny) {
+                                setPage("body");
+                            } else if (Config.getInstance().allowTraitCustomizationInDestiny) {
+                                setPage("traits");
+                            } else {
+                                setPage("destiny");
+                            }
+                        }));
             }
             case "destiny" -> {
                 int x = 0;
                 int y = 0;
                 for (String location : Config.getServerConfig().destinySpawnLocations) {
                     int rows = (int) Math.ceil(Config.getServerConfig().destinySpawnLocations.size() / 3.0f);
-                    float offsetX = (y + 1) == rows ? (2 - (Config.getServerConfig().destinySpawnLocations.size() - 1) % 3) / 2.0f : 0;
+                    float offsetX = (y + 1) == rows
+                            ? (2 - (Config.getServerConfig().destinySpawnLocations.size() - 1) % 3) / 2.0f
+                            : 0;
                     float offsetY = Math.max(0, 3 - rows) / 2.0f;
                     MutableComponent name = Component.translatable("gui.destiny." + getPath(location));
-                    addRenderableWidget(new ButtonWidget((int) (width / 2.0f - 96 * 1.5f + (x + offsetX) * 96), (int) (height / 2.0f + (y + offsetY) * 20 - 16), 96, 20, name, sender -> {
-                        selectStory(location);
-                    }));
+                    addRenderableWidget(new ButtonWidget((int) (width / 2.0f - 96 * 1.5f + (x + offsetX) * 96),
+                            (int) (height / 2.0f + (y + offsetY) * 20 - 16), 96, 20, name, sender -> {
+                                selectStory(location);
+                            }));
                     x++;
                     if (x >= 3) {
                         x = 0;
@@ -172,20 +179,21 @@ public class DestinyScreen extends VillagerEditorScreen {
                 }
             }
             case "story" ->
-                    addRenderableWidget(new ButtonWidget(width / 2 - 48, height / 2 + 32, 96, 20, Component.translatable("gui.destiny.next"), sender -> {
-                        //we teleport early here to avoid initial flickering
-                        if (!teleported) {
-                            Network.sendToServer(new DestinyMessage(location, false));
-                            MCAClient.getDestinyManager().allowClosing();
-                            teleported = true;
-                        }
-                        if (story.size() > 1) {
-                            story.removeFirst();
-                        } else {
-                            Network.sendToServer(new DestinyMessage("", true));
-                            super.onClose();
-                        }
-                    }));
+                addRenderableWidget(new ButtonWidget(width / 2 - 48, height / 2 + 32, 96, 20,
+                        Component.translatable("gui.destiny.next"), sender -> {
+                            // we teleport early here to avoid initial flickering
+                            if (!teleported) {
+                                Network.sendToServer(new DestinyMessage(location, false));
+                                MCAClient.getDestinyManager().allowClosing();
+                                teleported = true;
+                            }
+                            if (story.size() > 1) {
+                                story.removeFirst();
+                            } else {
+                                Network.sendToServer(new DestinyMessage("", true));
+                                super.onClose();
+                            }
+                        }));
             default -> super.setPage(page);
         }
     }

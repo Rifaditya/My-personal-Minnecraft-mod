@@ -58,31 +58,73 @@ public class WildfireBreastRenderer {
             new UVQuad(24, 37, 28, 42) // NORTH
     );
 
+    private static final UVLayout LEFT_ARMOR_BREAST_UV_LAYOUT = new UVLayout(
+            new UVQuad(24, 21, 28, 26), // EAST
+            new UVQuad(16, 21, 20, 26), // WEST
+            new UVQuad(20, 17, 24, 21), // DOWN
+            new UVQuad(20, 25, 24, 27), // UP
+            new UVQuad(20, 21, 24, 26) // NORTH
+    );
+
+    private static final UVLayout RIGHT_ARMOR_BREAST_UV_LAYOUT = new UVLayout(
+            new UVQuad(28, 21, 32, 26), // EAST
+            new UVQuad(20, 21, 24, 26), // WEST
+            new UVQuad(24, 17, 28, 21), // DOWN
+            new UVQuad(24, 25, 28, 27), // UP
+            new UVQuad(24, 21, 28, 26) // NORTH
+    );
+
     private static final float DEG_TO_RAD = (float) (Math.PI / 180);
 
     private BreastModelBox lBreast, rBreast;
     private OverlayModelBox lBreastWear, rBreastWear;
+
+    // Armor Breast Boxes
+    private BreastModelBox lArmorBreast, rArmorBreast;
 
     private UVLayout prevLeftBreastUVLayout;
     private UVLayout prevRightBreastUVLayout;
     private UVLayout prevLeftBreastOverlayUVLayout;
     private UVLayout prevRightBreastOverlayUVLayout;
 
+    protected float breastOffsetX, breastOffsetY, breastOffsetZ, lPhysPositionY, lPhysPositionX, rPhysPositionY,
+            rPhysPositionX,
+            lPhysBounceRotation, rPhysBounceRotation, breastSize, zOffset, outwardAngle;
+
     private boolean isUniboob;
     protected ItemStack armorStack;
     protected IGenderArmor genderArmor;
     protected boolean isChestplateOccupied, bounceEnabled, breathingAnimation;
-    protected float breastOffsetX, breastOffsetY, breastOffsetZ, lPhysPositionY, lPhysPositionX, rPhysPositionY,
-            rPhysPositionX,
-            lPhysBounceRotation, rPhysBounceRotation, breastSize, zOffset, outwardAngle;
+
+    private boolean isArmor;
+    private float dilation = 0.0f;
     private float currentPartialTicks;
     private LivingEntity currentEntity;
 
-    // Removed unused render method that caused texture issues
+    private int texHeight = 64;
+    private int lastTexHeight = -1;
+
+    public void setDilation(float dilation) {
+        if (this.dilation != dilation) {
+            this.dilation = dilation;
+            this.lArmorBreast = null;
+            this.rArmorBreast = null;
+        }
+    }
 
     // Overloaded render to accept VertexConsumer directly (better for integration)
     public void render(PoseStack matrixStack, VertexConsumer vertexConsumer, int light, int overlay, int color,
-            LivingEntity entity, ModelPart body, float partialTicks, BreastPhysics.PhysicsConfig config) {
+            LivingEntity entity, ModelPart body, float partialTicks, BreastPhysics.PhysicsConfig config,
+            int texHeight) {
+        render(matrixStack, vertexConsumer, light, overlay, color, entity, body, partialTicks, config, false,
+                texHeight);
+    }
+
+    public void render(PoseStack matrixStack, VertexConsumer vertexConsumer, int light, int overlay, int color,
+            LivingEntity entity, ModelPart body, float partialTicks, BreastPhysics.PhysicsConfig config,
+            boolean isArmor, int texHeight) {
+        this.texHeight = texHeight;
+        this.isArmor = isArmor;
         if (!setupRender(entity, config, partialTicks))
             return;
 
@@ -111,16 +153,21 @@ public class WildfireBreastRenderer {
         BreastPhysics leftPhysics = physicsState.leftPhysics;
         BreastPhysics rightPhysics = physicsState.rightPhysics;
 
-        // Update physics (this should ideally be done in a tick handler, but for now we
-        // do it here or assume it's done)
-        // We'll assume tick is called elsewhere or we might need to call it here if we
-        // can't hook tick.
-        // For safety, let's just read the interpolated values.
-        // Note: The `update` method in BreastPhysics is for ticking. We need getters
-        // for interpolated values.
-        // I added getPositionY() etc to BreastPhysics which return the current value,
-        // but we need interpolation logic.
-        // The ported BreastPhysics has getPrePositionY and getPositionY.
+        // Populate physics positions and rotations with interpolation
+        lPhysPositionX = Mth.lerp(partialTicks, leftPhysics.prePositionX, leftPhysics.positionX);
+        lPhysPositionY = Mth.lerp(partialTicks, leftPhysics.prePositionY, leftPhysics.positionY);
+        lPhysBounceRotation = Mth.lerp(partialTicks, leftPhysics.wfg_preBounceRotation, leftPhysics.wfg_bounceRotation);
+
+        rPhysPositionX = Mth.lerp(partialTicks, rightPhysics.prePositionX, rightPhysics.positionX);
+        rPhysPositionY = Mth.lerp(partialTicks, rightPhysics.prePositionY, rightPhysics.positionY);
+        rPhysBounceRotation = Mth.lerp(partialTicks, rightPhysics.wfg_preBounceRotation,
+                rightPhysics.wfg_bounceRotation);
+
+        if (config.isUniboob()) {
+            rPhysPositionX = lPhysPositionX;
+            rPhysPositionY = lPhysPositionY;
+            rPhysBounceRotation = lPhysBounceRotation;
+        }
 
         breastOffsetX = config.getBreastXOffset();
         breastOffsetY = config.getBreastYOffset();
@@ -133,26 +180,7 @@ public class WildfireBreastRenderer {
         outwardAngle = Math.min(outwardAngle, 10);
 
         // Resize box if needed (UV layouts)
-        // For now, we use default UVs. We need to pass UVs in config if we want them
-        // dynamic.
         resizeBox(config);
-
-        // Interpolation
-        lPhysPositionY = Mth.lerp(partialTicks, leftPhysics.getPrePositionY(), leftPhysics.getPositionY());
-        lPhysPositionX = Mth.lerp(partialTicks, leftPhysics.getPrePositionX(), leftPhysics.getPositionX());
-        lPhysBounceRotation = Mth.lerp(partialTicks, leftPhysics.getPreBounceRotation(),
-                leftPhysics.getBounceRotation());
-
-        if (isUniboob) {
-            rPhysPositionY = lPhysPositionY;
-            rPhysPositionX = lPhysPositionX;
-            rPhysBounceRotation = lPhysBounceRotation;
-        } else {
-            rPhysPositionY = Mth.lerp(partialTicks, rightPhysics.getPrePositionY(), rightPhysics.getPositionY());
-            rPhysPositionX = Mth.lerp(partialTicks, rightPhysics.getPrePositionX(), rightPhysics.getPositionX());
-            rPhysBounceRotation = Mth.lerp(partialTicks, rightPhysics.getPreBounceRotation(),
-                    rightPhysics.getBounceRotation());
-        }
 
         breastSize = Math.min(bSize * 1.5f, 0.7f);
         if (bSize > 0.7f)
@@ -177,13 +205,25 @@ public class WildfireBreastRenderer {
             matrixStack.mulPose(new Quaternionf().rotationZYX(body.zRot, body.yRot, body.xRot));
         }
 
+        if (isArmor) {
+            // Wildfire Armor Scaling Logic
+            // Apply extra scaling for outer armor (jacket layer) if dilation is high
+            // (standard outer armor is 1.0)
+            if (this.dilation > 0.5f) {
+                matrixStack.translate(0, 0, -0.05f);
+                matrixStack.scale(1.07f, 1.07f, 1.07f);
+            }
+            matrixStack.translate(side.isLeft ? 0.002f : -0.002f, 0.015f, -0.1f);
+            matrixStack.scale(1.07f, 1, 1);
+        }
+
         if (bounceEnabled) {
             matrixStack.translate((side.isLeft ? lPhysPositionX : rPhysPositionX) / 32f, 0, 0);
             matrixStack.translate(0, (side.isLeft ? lPhysPositionY : rPhysPositionY) / 32f, 0);
         }
 
-        matrixStack.translate((side.isLeft ? breastOffsetX : -breastOffsetX) * 0.0625f,
-                0.05625f + (breastOffsetY * 0.0625f), zOffset - 0.0625f * 2f + (breastOffsetZ * 0.0425f));
+        matrixStack.translate((side.isLeft ? (breastOffsetX - 0.5f) : -(breastOffsetX - 0.5f)) * 0.25f,
+                0.05625f + ((breastOffsetY - 0.5f) * 0.25f), zOffset - 0.0625f * 2f + ((breastOffsetZ - 0.5f) * 0.2f));
 
         if (!isUniboob) {
             matrixStack.translate(-0.0625f * 2 * (side.isLeft ? 1 : -1), 0, 0);
@@ -224,22 +264,48 @@ public class WildfireBreastRenderer {
     }
 
     private void resizeBox(BreastPhysics.PhysicsConfig config) {
+        // Check if texture height changed, if so force recreation
+        if (this.texHeight != this.lastTexHeight) {
+            this.lBreast = null;
+            this.rBreast = null;
+            this.lBreastWear = null;
+            this.rBreastWear = null;
+            this.lArmorBreast = null;
+            this.rArmorBreast = null;
+            this.lastTexHeight = this.texHeight;
+        }
+
         if (lBreast == null || rBreast == null || lBreastWear == null || rBreastWear == null) {
-            this.lBreast = new BreastModelBox(64, 64, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, LEFT_BREAST_UV_LAYOUT);
-            this.rBreast = new BreastModelBox(64, 64, 0F, 0.0F, 0F, 4, 5, 3, 0.0F, RIGHT_BREAST_UV_LAYOUT);
-            this.lBreastWear = new OverlayModelBox(64, 64, -4F, 0.0F, 0F, 4, 5, 3, 0.25F,
+            this.lBreast = new BreastModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, LEFT_BREAST_UV_LAYOUT);
+            this.rBreast = new BreastModelBox(64, this.texHeight, 0F, 0.0F, 0F, 4, 5, 3, 0.0F, RIGHT_BREAST_UV_LAYOUT);
+            this.lBreastWear = new OverlayModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.25F,
                     LEFT_BREAST_OVERLAY_UV_LAYOUT);
-            this.rBreastWear = new OverlayModelBox(64, 64, 0, 0.0F, 0F, 4, 5, 3, 0.25F, RIGHT_BREAST_OVERLAY_UV_LAYOUT);
+            this.rBreastWear = new OverlayModelBox(64, this.texHeight, 0, 0.0F, 0F, 4, 5, 3, 0.25F,
+                    RIGHT_BREAST_OVERLAY_UV_LAYOUT);
+        }
+
+        if (lArmorBreast == null || rArmorBreast == null) {
+            // Use 0.001F dilation for armor to avoid z-fighting, but NOT the full dilation
+            // (which is handled by scaling)
+            this.lArmorBreast = new BreastModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.001F,
+                    LEFT_ARMOR_BREAST_UV_LAYOUT);
+            this.rArmorBreast = new BreastModelBox(64, this.texHeight, 0F, 0.0F, 0F, 4, 5, 3, 0.001F,
+                    RIGHT_ARMOR_BREAST_UV_LAYOUT);
         }
     }
 
     private void renderBreast(PoseStack matrixStack, VertexConsumer vertexConsumer, int light, int overlay, int color,
             BreastSide side) {
-        var model = side.isLeft ? lBreast : rBreast;
-        renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
+        if (isArmor) {
+            var model = side.isLeft ? lArmorBreast : rArmorBreast;
+            renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
+        } else {
+            var model = side.isLeft ? lBreast : rBreast;
+            renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
 
-        var wearModel = side.isLeft ? lBreastWear : rBreastWear;
-        renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+            var wearModel = side.isLeft ? lBreastWear : rBreastWear;
+            renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+        }
     }
 
     protected void renderSides(PoseStack matrixStack, ModelPart body, Consumer<BreastSide> renderer) {
@@ -289,16 +355,6 @@ public class WildfireBreastRenderer {
                         .setLight(light)
                         .setNormal(normalX, normalY, normalZ);
             }
-        }
-    }
-
-    public enum BreastSide {
-        LEFT(true), RIGHT(false);
-
-        public final boolean isLeft;
-
-        BreastSide(boolean isLeft) {
-            this.isLeft = isLeft;
         }
     }
 }

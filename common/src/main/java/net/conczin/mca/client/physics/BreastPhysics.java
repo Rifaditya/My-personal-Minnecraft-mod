@@ -25,13 +25,13 @@ public class BreastPhysics {
     public static final float TIGHTNESS_REDUCTION_FACTOR = 0.15F;
 
     // X-Axis
-    private float bounceVelX = 0, targetBounceX = 0, velocityX = 0, positionX, prePositionX;
+    public float bounceVelX = 0, targetBounceX = 0, velocityX = 0, positionX, prePositionX;
     // Y-Axis
-    private float bounceVel = 0, targetBounceY = 0, velocity = 0, positionY, prePositionY;
+    public float bounceVel = 0, targetBounceY = 0, velocity = 0, positionY, prePositionY;
     // Rotation
-    private float bounceRotVel = 0, targetRotVel = 0, rotVelocity = 0, wfg_bounceRotation, wfg_preBounceRotation;
+    public float bounceRotVel = 0, targetRotVel = 0, rotVelocity = 0, wfg_bounceRotation, wfg_preBounceRotation;
 
-    private float breastSize = 0, preBreastSize = 0;
+    public float breastSize = 0, preBreastSize = 0;
 
     private Pose lastPose;
     private int lastSwingDuration = 6, lastSwingTick = 0;
@@ -125,7 +125,8 @@ public class BreastPhysics {
         Vec3 motion = entity.position().subtract(this.prePos);
         this.prePos = entity.position();
 
-        float bounceIntensity = (targetBreastSize * 3f) * Math.round((config.getBounceMultiplier() * 3) * 100) / 100f;
+        float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((config.getBounceMultiplier() * 2.5f) * 100)
+                / 100f;
         float resistance = Mth.clamp(armor.physicsResistance(), 0, 1);
         if (config.getArmorPhysicsOverride())
             resistance = 0;
@@ -366,4 +367,5 @@ public class BreastPhysics {
                     : 6;
         }
     }
+
 }

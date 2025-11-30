@@ -37,6 +37,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -853,18 +854,20 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
             return;
         }
 
-        villager.tickCount = (int) (System.currentTimeMillis() / 50L);
+        long time = System.currentTimeMillis();
+        villager.tickCount = (int) (time / 50L);
+        float partialTicks = (time % 50L) / 50.0f;
 
         if (shouldDrawEntity()) {
             int x = width / 2 - DATA_WIDTH;
             int y = height / 2;
             if (villagerUUID.equals(playerUUID) && shouldUsePlayerModel()) {
                 assert Minecraft.getInstance().player != null;
-                InventoryScreen.renderEntityInInventoryFollowsMouse(context, x, y - 75, x + DATA_WIDTH, y + 75, 60, 0,
-                        mouseX, mouseY, Minecraft.getInstance().player);
+                renderEntityInInventory(context, x + DATA_WIDTH / 2, y + 75, 60, mouseX - (x + DATA_WIDTH / 2),
+                        mouseY - y + 75, Minecraft.getInstance().player, partialTicks);
             } else {
-                InventoryScreen.renderEntityInInventoryFollowsMouse(context, x, y - 75, x + DATA_WIDTH, y + 75, 60, 0,
-                        mouseX, mouseY, villager);
+                renderEntityInInventory(context, x + DATA_WIDTH / 2, y + 75, 60, mouseX - (x + DATA_WIDTH / 2),
+                        mouseY - y + 75, villager, partialTicks);
             }
 
             // hint for confused people
@@ -906,8 +909,8 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                             hoveredClothingId = index;
                         }
 
-                        InventoryScreen.renderEntityInInventoryFollowsMouse(context, cx - 20, cy - 25, cx + 20, cy + 40,
-                                (hoveredClothingId == index) ? 35 : 30, 0, mouseX, mouseY, villagerVisualization);
+                        renderEntityInInventory(context, cx, cy + 32, (hoveredClothingId == index) ? 35 : 30,
+                                mouseX - cx, mouseY - cy - 32 + 25, villagerVisualization, partialTicks);
                         i++;
                     } else {
                         break;
@@ -915,6 +918,58 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                 }
             }
         }
+    }
+
+    public static void renderEntityInInventory(GuiGraphics guiGraphics, int x, int y, int scale, float mouseX,
+            float mouseY, LivingEntity entity, float partialTicks) {
+        float f = (float) Math.atan((double) (mouseX / 40.0F));
+        float g = (float) Math.atan((double) (mouseY / 40.0F));
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        poseStack.translate((float) x, (float) y, 1050.0F);
+        poseStack.scale(1.0F, 1.0F, -1.0F);
+        poseStack.translate(0.0F, 0.0F, 1000.0F);
+        poseStack.scale((float) scale, (float) scale, (float) scale);
+        org.joml.Quaternionf quaternionf = (new org.joml.Quaternionf()).rotateZ(3.1415927F);
+        org.joml.Quaternionf quaternionf2 = (new org.joml.Quaternionf()).rotateX(g * 20.0F * 0.017453292F);
+        quaternionf.mul(quaternionf2);
+        poseStack.mulPose(quaternionf);
+        float h = entity.yBodyRot;
+        float i = entity.getYRot();
+        float j = entity.getXRot();
+        float k = entity.yHeadRotO;
+        float l = entity.yHeadRot;
+        entity.yBodyRot = 180.0F - f * 20.0F;
+        entity.setYRot(180.0F - f * 40.0F);
+        entity.setXRot(-g * 20.0F);
+        entity.yHeadRot = entity.getYRot();
+        entity.yHeadRotO = entity.getYRot();
+        // Fix for spinning: Set previous rotation values to match current to prevent
+        // interpolation
+        entity.yRotO = entity.getYRot();
+        entity.xRotO = entity.getXRot();
+        entity.yBodyRotO = entity.yBodyRot;
+
+        net.minecraft.client.renderer.entity.EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance()
+                .getEntityRenderDispatcher();
+        quaternionf2.conjugate();
+        entityRenderDispatcher.overrideCameraOrientation(quaternionf2);
+        entityRenderDispatcher.setRenderShadow(false);
+        com.mojang.blaze3d.systems.RenderSystem.runAsFancy(() -> {
+            entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, poseStack,
+                    guiGraphics.bufferSource(), 15728880);
+        });
+        guiGraphics.flush();
+        entityRenderDispatcher.setRenderShadow(true);
+        entity.yBodyRot = h;
+        entity.setYRot(i);
+        entity.setXRot(j);
+        entity.yHeadRotO = k;
+        entity.yHeadRot = l;
+        // Restore previous rotation values as well (though less critical for GUI)
+        // We don't have the original O values stored, but resetting current should be
+        // enough for next frame
+        poseStack.popPose();
     }
 
     protected boolean shouldDrawEntity() {

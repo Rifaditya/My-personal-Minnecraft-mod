@@ -88,10 +88,9 @@ public abstract class VillagerLayer<T extends LivingEntity, M extends HumanoidMo
         if (model instanceof VillagerEntityBaseModelMCA) {
             // noinspection unchecked,rawtypes
             ((VillagerEntityBaseModelMCA) model).setPhysicsEntity(villager, tickDelta);
-        } else if (model instanceof PlayerEntityExtendedModel) {
-            // noinspection unchecked
-            ((PlayerEntityExtendedModel<T>) model).setPhysicsEntity(villager, tickDelta);
         }
+        // PlayerEntityExtendedModel handles physics in setupAnim, no need to call
+        // setPhysicsEntity
 
         renderFinal(transform, provider, light, villager, tickDelta, visible, glowing);
     }

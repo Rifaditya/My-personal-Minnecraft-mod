@@ -34,12 +34,14 @@ public abstract class MixinHumanoidArmorLayer<T extends LivingEntity, A extends 
 
     @Unique
     private A mca$createModel(float dilation) {
-        //noinspection unchecked
-        return (A) new PlayerArmorExtendedModel<T>(LayerDefinition.create(VillagerEntityModelMCA.armorData(new CubeDeformation(dilation)), 64, 32).bakeRoot());
+        // noinspection unchecked
+        return (A) new PlayerArmorExtendedModel<T>(LayerDefinition
+                .create(VillagerEntityModelMCA.armorData(new CubeDeformation(dilation)), 64, 32).bakeRoot(), dilation);
     }
 
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("HEAD"))
-    public void mca$injectRender(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
+    public void mca$injectRender(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i, T livingEntity,
+            float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
         mca$injectionActive = livingEntity instanceof Player && MCAClient.useGeneticsRenderer(livingEntity.getUUID());
     }
 

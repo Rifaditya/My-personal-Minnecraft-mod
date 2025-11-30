@@ -79,7 +79,7 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
         if (currentEntity != null) {
             wildfireRenderer.render(matrices, vertices, light, overlay, color, currentEntity, this.body,
                     currentPartialTicks,
-                    createPhysicsConfig(currentEntity));
+                    createPhysicsConfig(currentEntity), 64);
         }
     }
 

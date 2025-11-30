@@ -131,7 +131,7 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
 
         if (currentEntity != null && currentEntity.getGenetics().getGender() == Gender.FEMALE) {
             wildfireRenderer.render(matrices, vertices, light, overlay, color, currentEntity, this.body,
-                    currentPartialTicks, createPhysicsConfig(currentEntity));
+                    currentPartialTicks, createPhysicsConfig(currentEntity), 64);
         }
     }
 
@@ -197,6 +197,7 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
         public float getCleavage() {
             return genetics.getGene(Genetics.CLEAVAGE);
         }
+
     }
 
     @Override

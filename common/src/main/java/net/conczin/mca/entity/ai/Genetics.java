@@ -75,6 +75,34 @@ public class Genetics implements Iterable<Genetics.Gene> {
         return getGender() == Gender.FEMALE ? getGene(BREAST) : 0;
     }
 
+    public boolean isUniboob() {
+        return getGene(UNIBOOB) > 0.5f;
+    }
+
+    public float getBreastXOffset() {
+        return getGene(BREAST_X_OFFSET);
+    }
+
+    public float getBreastYOffset() {
+        return getGene(BREAST_Y_OFFSET);
+    }
+
+    public float getBreastZOffset() {
+        return getGene(BREAST_Z_OFFSET);
+    }
+
+    public float getCleavage() {
+        return getGene(CLEAVAGE);
+    }
+
+    public float getBounceMultiplier() {
+        return getGene(BOUNCE_MULTIPLIER);
+    }
+
+    public float getFloppiness() {
+        return getGene(FLOPPINESS);
+    }
+
     @Override
     public Iterator<Gene> iterator() {
         return genes.values().iterator();
@@ -120,9 +148,9 @@ public class Genetics implements Iterable<Genetics.Gene> {
         setGene(EUMELANIN, random.nextFloat());
         setGene(PHEOMELANIN, random.nextFloat());
 
-        // Physics Randomization
-        setGene(BOUNCE_MULTIPLIER, centeredRandom()); // Bell curve for bounce
-        setGene(FLOPPINESS, random.nextFloat()); // Uniform for floppiness
+        // Physics Randomization - reduced defaults to prevent excessive bounce
+        setGene(BOUNCE_MULTIPLIER, 0.2f + random.nextFloat() * 0.2f); // Range: 0.2-0.4 (was 0-1 with bell curve)
+        setGene(FLOPPINESS, 0.2f + random.nextFloat() * 0.3f); // Range: 0.2-0.5 (was 0-1)
         setGene(CLEAVAGE, random.nextFloat() * 0.5f); // Skew towards less cleavage
         setGene(UNIBOOB, random.nextFloat() > 0.8f ? 1.0f : 0.0f); // 20% chance of uniboob (synced physics)
 
