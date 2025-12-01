@@ -125,7 +125,7 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
 
         @Override
         public boolean getArmorPhysicsOverride() {
-            return false;
+            return genetics.getArmorPhysicsOverride();
         }
 
         @Override

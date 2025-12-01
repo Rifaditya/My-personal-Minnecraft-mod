@@ -175,7 +175,7 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
 
         @Override
         public boolean getArmorPhysicsOverride() {
-            return false;
+            return genetics.getArmorPhysicsOverride();
         }
 
         @Override

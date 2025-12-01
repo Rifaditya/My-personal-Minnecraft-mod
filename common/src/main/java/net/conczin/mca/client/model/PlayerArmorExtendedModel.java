@@ -126,8 +126,9 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
         // breasts
         if (currentEntity != null && CommonVillagerModel.getVillager(currentEntity).getGenetics()
                 .getGender() == net.conczin.mca.entity.ai.relationship.Gender.FEMALE) {
-            wildfireRenderer.render(matrices, vertices, light, overlay, color, currentEntity, this.body,
-                    currentPartialTicks, createPhysicsConfig(currentEntity), true, 32);
+            // wildfireRenderer.render(matrices, vertices, light, overlay, color,
+            // currentEntity, this.body,
+            // currentPartialTicks, createPhysicsConfig(currentEntity), true, 64);
         }
     }
 

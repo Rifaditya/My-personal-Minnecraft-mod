@@ -61,16 +61,16 @@ public class WildfireBreastRenderer {
     private static final UVLayout LEFT_ARMOR_BREAST_UV_LAYOUT = new UVLayout(
             new UVQuad(24, 21, 28, 26), // EAST
             new UVQuad(16, 21, 20, 26), // WEST
-            new UVQuad(20, 17, 24, 21), // DOWN
-            new UVQuad(20, 25, 24, 27), // UP
+            new UVQuad(20, 22, 24, 26), // DOWN (Shifted to solid body area)
+            new UVQuad(20, 22, 24, 26), // UP (Shifted to solid body area - Bottom Face)
             new UVQuad(20, 21, 24, 26) // NORTH
     );
 
     private static final UVLayout RIGHT_ARMOR_BREAST_UV_LAYOUT = new UVLayout(
             new UVQuad(28, 21, 32, 26), // EAST
             new UVQuad(20, 21, 24, 26), // WEST
-            new UVQuad(24, 17, 28, 21), // DOWN
-            new UVQuad(24, 25, 28, 27), // UP
+            new UVQuad(24, 22, 28, 26), // DOWN (Shifted to solid body area)
+            new UVQuad(24, 22, 28, 26), // UP (Shifted to solid body area - Bottom Face)
             new UVQuad(24, 21, 28, 26) // NORTH
     );
 
@@ -123,10 +123,20 @@ public class WildfireBreastRenderer {
     public void render(PoseStack matrixStack, VertexConsumer vertexConsumer, int light, int overlay, int color,
             LivingEntity entity, ModelPart body, float partialTicks, BreastPhysics.PhysicsConfig config,
             boolean isArmor, int texHeight) {
+
+        // FORCE texHeight to 64 for armor to ensure correct UV mapping
+        if (isArmor) {
+            texHeight = 64;
+        }
+
         this.texHeight = texHeight;
         this.isArmor = isArmor;
-        if (!setupRender(entity, config, partialTicks))
+
+        if (!setupRender(entity, config, partialTicks)) {
+            // If setupRender failed, but it's armor, we might want to force it?
+            // But setupRender handles physics updates too.
             return;
+        }
 
         renderSides(matrixStack, body, side -> {
             renderBreast(matrixStack, vertexConsumer, light, overlay, color, side);
@@ -136,17 +146,20 @@ public class WildfireBreastRenderer {
     protected boolean setupRender(LivingEntity entity, BreastPhysics.PhysicsConfig config, float partialTicks) {
         this.currentPartialTicks = partialTicks;
         this.currentEntity = entity;
-        if (!config.canHaveBreasts())
+        if (config == null)
             return false;
+
+        // Force visibility check to pass for debugging
+        // if (!config.canHaveBreasts()) return false;
 
         armorStack = entity.getItemBySlot(EquipmentSlot.CHEST);
         genderArmor = IGenderArmor.getArmorConfig(armorStack);
         isChestplateOccupied = genderArmor.coversBreasts() && !config.getArmorPhysicsOverride();
 
-        // Simplified visibility check
-        if (genderArmor.alwaysHidesBreasts()) {
-            return false;
-        }
+        // Bypass hiding check
+        // if (genderArmor.alwaysHidesBreasts()) {
+        // return false;
+        // }
 
         // Get Physics State
         PhysicsState physicsState = PhysicsState.get(entity);
@@ -185,7 +198,15 @@ public class WildfireBreastRenderer {
         breastSize = Math.min(bSize * 1.5f, 0.7f);
         if (bSize > 0.7f)
             breastSize = bSize;
-        if (breastSize < 0.02f)
+
+        // Force breast size for players if it's too small (fix for missing breasts bug)
+        if (entity instanceof net.minecraft.world.entity.player.Player && config.canHaveBreasts()
+                && breastSize < 0.1f) {
+            breastSize = 0.5f;
+        }
+
+        // Lower threshold for debugging
+        if (breastSize < 0.001f)
             return false;
 
         zOffset = 0.0625f - (bSize * 0.0625f);
@@ -196,6 +217,11 @@ public class WildfireBreastRenderer {
         boolean isBreathing = true;
         breathingAnimation = ((config.getArmorPhysicsOverride() || resistance <= 0.5F) && isBreathing);
         bounceEnabled = (!isChestplateOccupied || resistance < 1);
+
+        // Force armor to follow physics state ("glued" to body)
+        if (isArmor) {
+            bounceEnabled = true;
+        }
 
         return true;
     }

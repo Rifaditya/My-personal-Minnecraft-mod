@@ -17,7 +17,7 @@ import java.util.*;
  * Villagerized Genetic Diversity.
  */
 public class Genetics implements Iterable<Genetics.Gene> {
-    private static final Set<GeneType> GENOMES = new HashSet<>();
+    private static final Set<GeneType> GENOMES = new LinkedHashSet<>();
 
     public static final GeneType SIZE = new GeneType("Size");
     public static final GeneType WIDTH = new GeneType("Width");
@@ -39,6 +39,7 @@ public class Genetics implements Iterable<Genetics.Gene> {
     public static final GeneType BREAST_X_OFFSET = new GeneType("BreastXOffset");
     public static final GeneType BREAST_Y_OFFSET = new GeneType("BreastYOffset");
     public static final GeneType BREAST_Z_OFFSET = new GeneType("BreastZOffset");
+    public static final GeneType ARMOR_PHYSICS_OVERRIDE = new GeneType("ArmorPhysicsOverride");
 
     private static final CEnumParameter<Gender> GENDER = CParameter.create("Gender", Gender.UNASSIGNED);
 
@@ -72,11 +73,22 @@ public class Genetics implements Iterable<Genetics.Gene> {
     }
 
     public float getBreastSize() {
-        return getGender() == Gender.FEMALE ? getGene(BREAST) : 0;
+        if (getGender() != Gender.FEMALE)
+            return 0;
+        float size = getGene(BREAST);
+        if (size == 0.0f) {
+            size = 0.5f;
+            setGene(BREAST, size);
+        }
+        return size;
     }
 
     public boolean isUniboob() {
         return getGene(UNIBOOB) > 0.5f;
+    }
+
+    public boolean getArmorPhysicsOverride() {
+        return getGene(ARMOR_PHYSICS_OVERRIDE) > 0.5f;
     }
 
     public float getBreastXOffset() {
@@ -129,6 +141,7 @@ public class Genetics implements Iterable<Genetics.Gene> {
         // size is more centered
         setGene(SIZE, centeredRandom());
         setGene(WIDTH, centeredRandom());
+        setGene(BREAST, centeredRandom());
 
         // temperature
         float temp = entity.asEntity().level().getBiome(entity.asEntity().blockPosition()).value().getBaseTemperature();
@@ -153,6 +166,7 @@ public class Genetics implements Iterable<Genetics.Gene> {
         setGene(FLOPPINESS, 0.2f + random.nextFloat() * 0.3f); // Range: 0.2-0.5 (was 0-1)
         setGene(CLEAVAGE, random.nextFloat() * 0.5f); // Skew towards less cleavage
         setGene(UNIBOOB, random.nextFloat() > 0.8f ? 1.0f : 0.0f); // 20% chance of uniboob (synced physics)
+        setGene(ARMOR_PHYSICS_OVERRIDE, 0.0f); // Default to false
 
         // Offsets - center around 0.5 (which maps to 0 offset)
         setGene(BREAST_X_OFFSET, centeredRandom());

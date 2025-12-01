@@ -7,6 +7,7 @@ import net.conczin.mca.client.model.CommonVillagerModel;
 import net.conczin.mca.client.model.PlayerEntityExtendedModel;
 import net.conczin.mca.client.model.VillagerEntityModelMCA;
 import net.conczin.mca.client.render.layer.*;
+import net.conczin.mca.client.render.wildfire.WildfireArmorLayer;
 import net.conczin.mca.entity.ai.relationship.AgeState;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -29,7 +30,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerRenderer.class)
-public abstract class MixinPlayerRenderer extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
+public abstract class MixinPlayerRenderer
+        extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
     @Unique
     SkinLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> mca$skinLayer;
     @Unique
@@ -39,7 +41,8 @@ public abstract class MixinPlayerRenderer extends LivingEntityRenderer<AbstractC
     @Unique
     private PlayerModel<AbstractClientPlayer> mca$vanillaModel;
 
-    public MixinPlayerRenderer(EntityRendererProvider.Context ctx, PlayerModel<AbstractClientPlayer> model, float shadowRadius) {
+    public MixinPlayerRenderer(EntityRendererProvider.Context ctx, PlayerModel<AbstractClientPlayer> model,
+            float shadowRadius) {
         super(ctx, model, shadowRadius);
     }
 
@@ -57,13 +60,20 @@ public abstract class MixinPlayerRenderer extends LivingEntityRenderer<AbstractC
             mca$villagerModel = mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.0F), slim));
             mca$vanillaModel = model;
 
-            mca$skinLayer = new SkinLayer<>(this, mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.0F))));
+            mca$skinLayer = new SkinLayer<>(this,
+                    mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.0F))));
             addLayer(mca$skinLayer);
-            addLayer(new FaceLayer<>(this, mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.01F))), "normal"));
+            addLayer(new FaceLayer<>(this, mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.01F))),
+                    "normal"));
 
-            mca$clothingLayer = new ClothingLayer<>(this, mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.0625F))), "normal");
+            mca$clothingLayer = new ClothingLayer<>(this,
+                    mca$createModel(VillagerEntityModelMCA.bodyData(new CubeDeformation(0.0625F))), "normal");
             addLayer(mca$clothingLayer);
-            addLayer(new HairLayer<>(this, mca$createModel(VillagerEntityModelMCA.hairData(new CubeDeformation(0.125F)))));
+            addLayer(new HairLayer<>(this,
+                    mca$createModel(VillagerEntityModelMCA.hairData(new CubeDeformation(0.125F)))));
+
+            // Add Wildfire Armor Layer
+            addLayer(new WildfireArmorLayer<>(this));
         }
     }
 
@@ -87,25 +97,33 @@ public abstract class MixinPlayerRenderer extends LivingEntityRenderer<AbstractC
     }
 
     @Inject(method = "renderRightHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/player/AbstractClientPlayer;)V", at = @At("HEAD"), cancellable = true)
-    public void mca$injectRenderRightArm(PoseStack matrices, MultiBufferSource vertexConsumers, int light, AbstractClientPlayer player, CallbackInfo ci) {
+    public void mca$injectRenderRightArm(PoseStack matrices, MultiBufferSource vertexConsumers, int light,
+            AbstractClientPlayer player, CallbackInfo ci) {
         if (MCAClient.renderArms(player.getUUID(), "right_arm")) {
-            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$skinLayer.model.rightArm, mca$skinLayer.model.rightSleeve, mca$skinLayer);
-            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$clothingLayer.model.rightArm, mca$clothingLayer.model.rightSleeve, mca$clothingLayer);
+            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$skinLayer.model.rightArm,
+                    mca$skinLayer.model.rightSleeve, mca$skinLayer);
+            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$clothingLayer.model.rightArm,
+                    mca$clothingLayer.model.rightSleeve, mca$clothingLayer);
             ci.cancel();
         }
     }
 
     @Inject(method = "renderLeftHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/player/AbstractClientPlayer;)V", at = @At("HEAD"), cancellable = true)
-    public void mca$injectRenderLeftArm(PoseStack matrices, MultiBufferSource vertexConsumers, int light, AbstractClientPlayer player, CallbackInfo ci) {
+    public void mca$injectRenderLeftArm(PoseStack matrices, MultiBufferSource vertexConsumers, int light,
+            AbstractClientPlayer player, CallbackInfo ci) {
         if (MCAClient.renderArms(player.getUUID(), "left_arm")) {
-            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$skinLayer.model.leftArm, mca$skinLayer.model.leftSleeve, mca$skinLayer);
-            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$clothingLayer.model.leftArm, mca$clothingLayer.model.leftSleeve, mca$clothingLayer);
+            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$skinLayer.model.leftArm,
+                    mca$skinLayer.model.leftSleeve, mca$skinLayer);
+            mca$renderCustomArm(matrices, vertexConsumers, light, player, mca$clothingLayer.model.leftArm,
+                    mca$clothingLayer.model.leftSleeve, mca$clothingLayer);
             ci.cancel();
         }
     }
 
     @Unique
-    private void mca$renderCustomArm(PoseStack matrices, MultiBufferSource vertexConsumers, int light, AbstractClientPlayer player, ModelPart arm, ModelPart sleeve, VillagerLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> layer) {
+    private void mca$renderCustomArm(PoseStack matrices, MultiBufferSource vertexConsumers, int light,
+            AbstractClientPlayer player, ModelPart arm, ModelPart sleeve,
+            VillagerLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> layer) {
         PlayerEntityExtendedModel<AbstractClientPlayer> model = (PlayerEntityExtendedModel<AbstractClientPlayer>) layer.model;
         setModelProperties(player);
 

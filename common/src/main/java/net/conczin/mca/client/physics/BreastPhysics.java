@@ -290,16 +290,42 @@ public class BreastPhysics {
         this.velocity = Mth.lerp(bounceAmount, this.velocity, (this.targetBounceY - this.bounceVel) * delta);
         this.bounceVel += this.velocity * percent * 1.1625f;
 
+        // Clamp Velocity
+        this.bounceVel = Mth.clamp(this.bounceVel, -3.0f, 3.0f);
+
         // X
         this.velocityX = Mth.lerp(bounceAmount, this.velocityX, (this.targetBounceX - this.bounceVelX) * delta);
         this.bounceVelX += this.velocityX * percent;
 
+        // Clamp X Velocity
+        this.bounceVelX = Mth.clamp(this.bounceVelX, -2.0f, 2.0f);
+
         this.rotVelocity = Mth.lerp(bounceAmount, this.rotVelocity, (this.targetRotVel - this.bounceRotVel) * delta);
         this.bounceRotVel += this.rotVelocity * percent;
+
+        // Clamp Rotation Velocity
+        this.bounceRotVel = Mth.clamp(this.bounceRotVel, -45f, 45f);
 
         this.wfg_bounceRotation = this.bounceRotVel;
         this.positionX = this.bounceVelX;
         this.positionY = this.bounceVel;
+
+        // Safety checks for NaN
+        if (Float.isNaN(this.positionX) || Float.isInfinite(this.positionX)) {
+            this.positionX = 0;
+            this.bounceVelX = 0;
+            this.velocityX = 0;
+        }
+        if (Float.isNaN(this.positionY) || Float.isInfinite(this.positionY)) {
+            this.positionY = 0;
+            this.bounceVel = 0;
+            this.velocity = 0;
+        }
+        if (Float.isNaN(this.wfg_bounceRotation) || Float.isInfinite(this.wfg_bounceRotation)) {
+            this.wfg_bounceRotation = 0;
+            this.bounceRotVel = 0;
+            this.rotVelocity = 0;
+        }
 
         if (this.positionY < -0.5f)
             this.positionY = -0.5f;
