@@ -71,8 +71,10 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
 
     @Override
     public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-        // Idk anymore
-        breastsWear.visible = jacket.visible;
+        // Ensure static breasts are hidden so we don't double render or render static
+        // ones
+        this.breasts.visible = false;
+        this.breastsWear.visible = false;
 
         super.renderToBuffer(matrices, vertices, light, overlay, color);
 

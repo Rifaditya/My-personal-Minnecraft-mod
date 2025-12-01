@@ -88,7 +88,9 @@ public class BreastPhysics {
             }
         }
 
-        return -((entity.yBodyRot - entity.yBodyRotO) / 15f) * bounceIntensity;
+        float delta = Mth.wrapDegrees(entity.yBodyRot - entity.yBodyRotO);
+        delta = Mth.clamp(delta, -20f, 20f); // Clamp max rotation speed per tick to prevent snapping
+        return -(delta / 15f) * bounceIntensity;
     }
 
     public void update(LivingEntity entity, IGenderArmor armor, PhysicsConfig config) {
@@ -123,6 +125,11 @@ public class BreastPhysics {
                 : -Math.abs(breastSize - targetBreastSize) / 2f;
 
         Vec3 motion = entity.position().subtract(this.prePos);
+        // Clamp motion to prevent teleportation or massive speed spikes from breaking
+        // physics
+        if (motion.lengthSqr() > 1.0) {
+            motion = motion.normalize();
+        }
         this.prePos = entity.position();
 
         float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((config.getBounceMultiplier() * 2.5f) * 100)
@@ -299,6 +306,16 @@ public class BreastPhysics {
         if (this.positionY > 1.5f) {
             this.positionY = 1.5f;
             this.velocity = 0;
+        }
+
+        // Clamp X to prevent flying off sideways
+        if (this.positionX < -1.0f) {
+            this.positionX = -1.0f;
+            this.velocityX = 0;
+        }
+        if (this.positionX > 1.0f) {
+            this.positionX = 1.0f;
+            this.velocityX = 0;
         }
     }
 
