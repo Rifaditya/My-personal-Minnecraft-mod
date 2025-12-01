@@ -89,7 +89,7 @@ public class BreastPhysics {
         }
 
         float delta = Mth.wrapDegrees(entity.yBodyRot - entity.yBodyRotO);
-        delta = Mth.clamp(delta, -10f, 10f); // Stricter clamp for rotation speed
+        delta = Mth.clamp(delta, -20f, 20f); // Clamp max rotation speed per tick to prevent snapping
         return -(delta / 15f) * bounceIntensity;
     }
 
@@ -249,10 +249,9 @@ public class BreastPhysics {
 
             int everyNthTick = Mth.clamp(swingDuration - 1, 1, 5);
             if (entity.swinging && entity.tickCount % everyNthTick == 0) {
-                // Reduced arm swing influence
-                this.targetBounceY += (Math.random() > 0.5 ? -0.15f : 0.15f) * amplifier * bounceIntensity;
+                this.targetBounceY += (Math.random() > 0.5 ? -0.25f : 0.25f) * amplifier * bounceIntensity;
                 var xAmp = Mth.clamp(1 + (rawAmplifier * (rawAmplifier < 0 ? 1.625f : 0.8f)), 0.25f, 1.225f);
-                this.targetBounceX = (0.2f * xAmp * bounceIntensity) * (swingingArm == HumanoidArm.RIGHT ? -1f : 1f);
+                this.targetBounceX = (0.325f * xAmp * bounceIntensity) * (swingingArm == HumanoidArm.RIGHT ? -1f : 1f);
             }
 
             if (swingTickDelta < 0 && lastSwingTick != lastSwingDuration - 1) {
@@ -285,7 +284,7 @@ public class BreastPhysics {
             targetBounceY -= distanceFromMax;
         }
 
-        targetBounceY = Mth.clamp(targetBounceY, -0.5f, 1.0f); // Stricter Y clamp
+        targetBounceY = Mth.clamp(targetBounceY, -1.5f, 2.5f);
         targetRotVel = Mth.clamp(targetRotVel, -25f, 25f);
 
         this.velocity = Mth.lerp(bounceAmount, this.velocity, (this.targetBounceY - this.bounceVel) * delta);
@@ -309,13 +308,13 @@ public class BreastPhysics {
             this.velocity = 0;
         }
 
-        // Clamp X to prevent flying off sideways (Stricter)
-        if (this.positionX < -0.3f) {
-            this.positionX = -0.3f;
+        // Clamp X to prevent flying off sideways
+        if (this.positionX < -1.0f) {
+            this.positionX = -1.0f;
             this.velocityX = 0;
         }
-        if (this.positionX > 0.3f) {
-            this.positionX = 0.3f;
+        if (this.positionX > 1.0f) {
+            this.positionX = 1.0f;
             this.velocityX = 0;
         }
     }
