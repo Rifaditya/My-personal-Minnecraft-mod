@@ -84,13 +84,15 @@ public class BreastPhysics {
                 return 0f;
             } else if (shouldUseVehicleYaw(entity, vehicle)) {
                 float previous = vehicle instanceof LivingEntity living ? living.yBodyRotO : vehicle.yRotO;
-                return -((vehicle.getYRot() - previous) / 15f) * bounceIntensity;
+                return -((vehicle.getYRot() - previous) / 25f) * bounceIntensity;
             }
         }
 
         float delta = Mth.wrapDegrees(entity.yBodyRot - entity.yBodyRotO);
-        delta = Mth.clamp(delta, -20f, 20f); // Clamp max rotation speed per tick to prevent snapping
-        return -(delta / 15f) * bounceIntensity;
+        if (Float.isNaN(delta))
+            delta = 0;
+        delta = Mth.clamp(delta, -15f, 15f); // Clamp max rotation speed per tick to prevent snapping
+        return -(delta / 25f) * bounceIntensity;
     }
 
     public void update(LivingEntity entity, IGenderArmor armor, PhysicsConfig config) {
@@ -115,7 +117,8 @@ public class BreastPhysics {
         if (!config.canHaveBreasts()) {
             targetBreastSize = 0;
         } else {
-            float tightness = Mth.clamp(armor.tightness(), 0, 1);
+            // Cap tightness effect so breasts don't disappear completely with armor
+            float tightness = Mth.clamp(armor.tightness(), 0, 0.8f); // Was 1.0f
             if (config.getArmorPhysicsOverride())
                 tightness = 0;
             targetBreastSize *= 1 - TIGHTNESS_REDUCTION_FACTOR * tightness;
@@ -123,6 +126,9 @@ public class BreastPhysics {
 
         breastSize += (breastSize < targetBreastSize) ? Math.abs(breastSize - targetBreastSize) / 2f
                 : -Math.abs(breastSize - targetBreastSize) / 2f;
+
+        if (Float.isNaN(breastSize))
+            breastSize = targetBreastSize;
 
         Vec3 motion = entity.position().subtract(this.prePos);
         // Clamp motion to prevent teleportation or massive speed spikes from breaking
@@ -132,9 +138,11 @@ public class BreastPhysics {
         }
         this.prePos = entity.position();
 
-        float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((config.getBounceMultiplier() * 2.5f) * 100)
+        float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((config.getBounceMultiplier() * 3.5f) * 100)
                 / 100f;
-        float resistance = Mth.clamp(armor.physicsResistance(), 0, 1);
+
+        // Cap resistance so physics isn't fully disabled
+        float resistance = Mth.clamp(armor.physicsResistance(), 0, 0.5f); // Was 1.0f
         if (config.getArmorPhysicsOverride())
             resistance = 0;
 
@@ -284,8 +292,16 @@ public class BreastPhysics {
             targetBounceY -= distanceFromMax;
         }
 
-        targetBounceY = Mth.clamp(targetBounceY, -1.5f, 2.5f);
-        targetRotVel = Mth.clamp(targetRotVel, -25f, 25f);
+        if (Float.isNaN(targetBounceY))
+            targetBounceY = 0;
+        if (Float.isNaN(targetRotVel))
+            targetRotVel = 0;
+        if (Float.isNaN(targetBounceX))
+            targetBounceX = 0;
+
+        targetBounceY = Mth.clamp(targetBounceY, -3.0f, 3.0f);
+        targetRotVel = Mth.clamp(targetRotVel, -35f, 35f);
+        targetBounceX = Mth.clamp(targetBounceX, -1.5f, 1.5f);
 
         this.velocity = Mth.lerp(bounceAmount, this.velocity, (this.targetBounceY - this.bounceVel) * delta);
         this.bounceVel += this.velocity * percent * 1.1625f;
@@ -298,34 +314,13 @@ public class BreastPhysics {
         this.bounceVelX += this.velocityX * percent;
 
         // Clamp X Velocity
-        this.bounceVelX = Mth.clamp(this.bounceVelX, -2.0f, 2.0f);
+        this.bounceVelX = Mth.clamp(this.bounceVelX, -1.5f, 1.5f);
 
         this.rotVelocity = Mth.lerp(bounceAmount, this.rotVelocity, (this.targetRotVel - this.bounceRotVel) * delta);
         this.bounceRotVel += this.rotVelocity * percent;
 
         // Clamp Rotation Velocity
-        this.bounceRotVel = Mth.clamp(this.bounceRotVel, -45f, 45f);
-
-        this.wfg_bounceRotation = this.bounceRotVel;
-        this.positionX = this.bounceVelX;
-        this.positionY = this.bounceVel;
-
-        // Safety checks for NaN
-        if (Float.isNaN(this.positionX) || Float.isInfinite(this.positionX)) {
-            this.positionX = 0;
-            this.bounceVelX = 0;
-            this.velocityX = 0;
-        }
-        if (Float.isNaN(this.positionY) || Float.isInfinite(this.positionY)) {
-            this.positionY = 0;
-            this.bounceVel = 0;
-            this.velocity = 0;
-        }
-        if (Float.isNaN(this.wfg_bounceRotation) || Float.isInfinite(this.wfg_bounceRotation)) {
-            this.wfg_bounceRotation = 0;
-            this.bounceRotVel = 0;
-            this.rotVelocity = 0;
-        }
+        this.bounceRotVel = Mth.clamp(this.bounceRotVel, -35f, 35f);
 
         if (this.positionY < -0.5f)
             this.positionY = -0.5f;
@@ -335,14 +330,15 @@ public class BreastPhysics {
         }
 
         // Clamp X to prevent flying off sideways
-        if (this.positionX < -1.0f) {
-            this.positionX = -1.0f;
-            this.velocityX = 0;
-        }
         if (this.positionX > 1.0f) {
             this.positionX = 1.0f;
             this.velocityX = 0;
         }
+
+        // CRITICAL FIX: Sync simulation variables to exposed variables
+        this.positionY = this.bounceVel;
+        this.positionX = this.bounceVelX;
+        this.wfg_bounceRotation = this.bounceRotVel;
     }
 
     public float getPrePositionY() {

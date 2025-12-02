@@ -19,7 +19,7 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         if (MCAClient.fallbackVillager == null) {
             MCAClient.fallbackVillager = EntitiesMCA.MALE_VILLAGER.create(world);
         }
-        return MCAClient.playerData.getOrDefault(uuid, MCAClient.fallbackVillager);
+        return MCAClient.getPlayerData(uuid).orElse(MCAClient.fallbackVillager);
     }
 
     static VillagerLike<?> getVillager(Entity villager) {
@@ -47,7 +47,7 @@ public interface CommonVillagerModel<T extends LivingEntity> {
     void setBreastSize(float getBreastSize);
 
     default void renderCommon(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-        //head
+        // head
         float headSize = getDimensions().getHead();
 
         matrices.pushPose();
@@ -55,7 +55,7 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         getCommonHeadParts().forEach(a -> a.render(matrices, vertices, light, overlay, color));
         matrices.popPose();
 
-        //body
+        // body
         getCommonBodyParts().forEach(a -> a.render(matrices, vertices, light, overlay, color));
 
         if (getBreastPart().visible && getBodyPart().visible) {
@@ -87,7 +87,8 @@ public interface CommonVillagerModel<T extends LivingEntity> {
                 cz = 1.5f;
             }
 
-            part.setPos(0.25f, (float) (5.0f - Math.pow(getBreastSize(), 0.5) * 2.5f + cy), -1.5f + getBreastSize() * 0.25f + cz);
+            part.setPos(0.25f, (float) (5.0f - Math.pow(getBreastSize(), 0.5) * 2.5f + cy),
+                    -1.5f + getBreastSize() * 0.25f + cz);
         }
     }
 

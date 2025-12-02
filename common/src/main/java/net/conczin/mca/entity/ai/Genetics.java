@@ -161,9 +161,9 @@ public class Genetics implements Iterable<Genetics.Gene> {
         setGene(EUMELANIN, random.nextFloat());
         setGene(PHEOMELANIN, random.nextFloat());
 
-        // Physics Randomization - reduced defaults to prevent excessive bounce
-        setGene(BOUNCE_MULTIPLIER, 0.2f + random.nextFloat() * 0.2f); // Range: 0.2-0.4 (was 0-1 with bell curve)
-        setGene(FLOPPINESS, 0.2f + random.nextFloat() * 0.3f); // Range: 0.2-0.5 (was 0-1)
+        // Physics Randomization - increased defaults for better visibility
+        setGene(BOUNCE_MULTIPLIER, 0.5f + random.nextFloat() * 0.5f); // Range: 0.5-1.0
+        setGene(FLOPPINESS, 0.4f + random.nextFloat() * 0.4f); // Range: 0.4-0.8
         setGene(CLEAVAGE, random.nextFloat() * 0.5f); // Skew towards less cleavage
         setGene(UNIBOOB, random.nextFloat() > 0.8f ? 1.0f : 0.0f); // 20% chance of uniboob (synced physics)
         setGene(ARMOR_PHYSICS_OVERRIDE, 0.0f); // Default to false

@@ -61,7 +61,7 @@ public class WildfireArmorLayer<T extends LivingEntity, M extends HumanoidModel<
 
         // Render with forced height 64
         wildfireRenderer.render(matrixStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, color, entity,
-                this.getParentModel().body, partialTicks, createPhysicsConfig(villager), true, 64);
+                this.getParentModel().body, partialTicks, createPhysicsConfig(villager), true, 32);
     }
 
     private ResourceLocation getArmorTexture(ItemStack stack, ArmorItem item) {
@@ -72,7 +72,7 @@ public class WildfireArmorLayer<T extends LivingEntity, M extends HumanoidModel<
         String path = key.getPath();
         String namespace = key.getNamespace();
 
-        String material = path.replace("_chestplate", "");
+        String material = path.replace("_chestplate", "").replace("golden", "gold");
 
         // Handle special cases if needed, but this covers standard armor
         return ResourceLocation.fromNamespaceAndPath(namespace, "textures/models/armor/" + material + "_layer_1.png");

@@ -125,9 +125,9 @@ public class WildfireBreastRenderer {
             boolean isArmor, int texHeight) {
 
         // FORCE texHeight to 64 for armor to ensure correct UV mapping
-        if (isArmor) {
-            texHeight = 64;
-        }
+        // if (isArmor) {
+        // texHeight = 64;
+        // }
 
         this.texHeight = texHeight;
         this.isArmor = isArmor;
@@ -149,12 +149,39 @@ public class WildfireBreastRenderer {
         if (config == null)
             return false;
 
+        // DEBUG: Always allow players to attempt render
+        boolean isPlayer = entity instanceof net.minecraft.world.entity.player.Player;
+
         // Force visibility check to pass for debugging
         // if (!config.canHaveBreasts()) return false;
 
         armorStack = entity.getItemBySlot(EquipmentSlot.CHEST);
         genderArmor = IGenderArmor.getArmorConfig(armorStack);
+
+        // If it's not an armor render pass, we shouldn't care about chestplate
+        // occupancy for rendering *this* pass
+        // But we do care for physics (bounceEnabled).
         isChestplateOccupied = genderArmor.coversBreasts() && !config.getArmorPhysicsOverride();
+
+        // If we are rendering the body (isArmor = false), we ALWAYS want to render
+        // unless hidden by armor
+        // But the renderer is called manually by the model, so if we are here, we
+        // should render.
+        // The issue might be that bounceEnabled is false if chestplate is occupied, but
+        // we still want to render the static mesh?
+        // Actually, if isArmor is false, we are rendering the skin.
+
+        // Force bounceEnabled to true if not armor, so it follows the body physics?
+        // No, if armor is tight, the body should also be tight.
+
+        // Wait, if isArmor is false, we are rendering the skin.
+        // If isChestplateOccupied is true, usually the body is hidden by the armor
+        // model anyway?
+        // But for "Missing Breasts (No Armor)", isChestplateOccupied should be false.
+
+        if (!isArmor && armorStack.isEmpty()) {
+            isChestplateOccupied = false;
+        }
 
         // Bypass hiding check
         // if (genderArmor.alwaysHidesBreasts()) {
@@ -200,13 +227,13 @@ public class WildfireBreastRenderer {
             breastSize = bSize;
 
         // Force breast size for players if it's too small (fix for missing breasts bug)
-        if (entity instanceof net.minecraft.world.entity.player.Player && config.canHaveBreasts()
-                && breastSize < 0.1f) {
-            breastSize = 0.5f;
+        if (entity instanceof net.minecraft.world.entity.player.Player && config.canHaveBreasts()) {
+            if (breastSize < 0.2f)
+                breastSize = 0.5f;
         }
 
-        // Lower threshold for debugging
-        if (breastSize < 0.001f)
+        // Lower threshold for debugging - REMOVED for players
+        if (!(entity instanceof net.minecraft.world.entity.player.Player) && breastSize < 0.001f)
             return false;
 
         zOffset = 0.0625f - (bSize * 0.0625f);
@@ -216,7 +243,12 @@ public class WildfireBreastRenderer {
         // Assuming breathing is always enabled for now, or we could add it to config
         boolean isBreathing = true;
         breathingAnimation = ((config.getArmorPhysicsOverride() || resistance <= 0.5F) && isBreathing);
-        bounceEnabled = (!isChestplateOccupied || resistance < 1);
+
+        // Enable bounce if resistance is not total, even if chestplate is occupied
+        // RELAXED: Trust the physics engine to handle damping.
+        // Only disable if the config explicitly says to override physics (which usually
+        // means "static" or "vanilla" behavior).
+        bounceEnabled = (!isChestplateOccupied || !config.getArmorPhysicsOverride());
 
         // Force armor to follow physics state ("glued" to body)
         if (isArmor) {
