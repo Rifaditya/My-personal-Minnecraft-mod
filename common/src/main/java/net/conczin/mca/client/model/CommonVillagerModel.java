@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.mca.MCAClient;
 import net.conczin.mca.entity.VillagerLike;
 import net.conczin.mca.entity.ai.relationship.Gender;
+import net.conczin.mca.entity.ai.Genetics;
 import net.conczin.mca.entity.ai.relationship.VillagerDimensions;
 import net.conczin.mca.registry.EntitiesMCA;
 import net.minecraft.client.model.geom.ModelPart;
@@ -17,9 +18,7 @@ import java.util.UUID;
 public interface CommonVillagerModel<T extends LivingEntity> {
     static VillagerLike<?> getVillager(Level world, UUID uuid) {
         if (MCAClient.fallbackVillager == null) {
-            MCAClient.fallbackVillager = EntitiesMCA.MALE_VILLAGER.create(world);
-            MCAClient.fallbackVillager.getGenetics().setGender(Gender.FEMALE);
-            MCAClient.fallbackVillager.getGenetics().setGene(Genetics.BREAST, 0.5f);
+            MCAClient.fallbackVillager = EntitiesMCA.FEMALE_VILLAGER.create(world);
         }
         return MCAClient.getPlayerData(uuid).orElse(MCAClient.fallbackVillager);
     }
@@ -48,6 +47,51 @@ public interface CommonVillagerModel<T extends LivingEntity> {
 
     void setBreastSize(float getBreastSize);
 
+    // Accessors for shared logic
+    net.conczin.mca.client.render.wildfire.WildfireBreastRenderer getWildfireRenderer();
+
+    void setCurrentEntity(T entity);
+
+    T getCurrentEntity();
+
+    void setCurrentPartialTicks(float partialTicks);
+
+    float getCurrentPartialTicks();
+
+    net.conczin.mca.client.physics.BreastPhysics.PhysicsConfig makePhysicsConfig(T entity);
+
+    default void updatePhysics(T villager, float partialTicks) {
+        setCurrentEntity(villager);
+        setCurrentPartialTicks(partialTicks);
+
+        for (ModelPart part : getBreastParts()) {
+            part.visible = false;
+        }
+
+        // Physics Tick
+        if (villager.level().isClientSide) {
+            net.conczin.mca.client.physics.PhysicsState state = net.conczin.mca.client.physics.PhysicsState
+                    .get(villager);
+            if (state.lastTick != villager.tickCount) {
+                state.lastTick = villager.tickCount;
+                var armor = net.conczin.mca.client.render.wildfire.IGenderArmor
+                        .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST));
+                var config = makePhysicsConfig(villager);
+                state.leftPhysics.update(villager, armor, config);
+                state.rightPhysics.update(villager, armor, config);
+            }
+        }
+    }
+
+    default void renderBreasts(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
+            int color) {
+        T entity = getCurrentEntity();
+        if (entity != null && getVillager(entity).getGenetics().getGender() == Gender.FEMALE) {
+            getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity, getBodyPart(),
+                    getCurrentPartialTicks(), makePhysicsConfig(entity), 64);
+        }
+    }
+
     default void renderCommon(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         // head
         float headSize = getDimensions().getHead();
@@ -60,24 +104,16 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         // body
         getCommonBodyParts().forEach(a -> a.render(matrices, vertices, light, overlay, color));
 
-        if (getBreastPart().visible && getBodyPart().visible) {
-            float breastSize = getBreastSize() * getDimensions().getBreasts();
-
-            if (breastSize > 0) {
-                matrices.pushPose();
-                matrices.scale(breastSize * 0.2f + 1.05f, breastSize * 0.75f + 0.75f, breastSize * 0.75f + 0.75f);
-                for (ModelPart part : getBreastParts()) {
-                    part.render(matrices, vertices, light, overlay, color);
-                }
-                matrices.popPose();
-            }
-        }
+        // Render breasts using the unified logic
+        renderBreasts(matrices, vertices, light, overlay, color);
     }
 
     default void applyVillagerDimensions(VillagerLike<?> villager, boolean isSneaking) {
         getDimensions().set(villager.getVillagerDimensions());
         setBreastSize(villager.getGenetics().getBreastSize());
-        getBreastPart().visible = villager.getGenetics().getGender() == Gender.FEMALE;
+        // Visibility handled by updatePhysics/renderBreasts now
+        // getBreastPart().visible = villager.getGenetics().getGender() ==
+        // Gender.FEMALE;
 
         for (ModelPart part : getBreastParts()) {
             part.xRot = (float) Math.PI * 0.3f + getBodyPart().xRot;

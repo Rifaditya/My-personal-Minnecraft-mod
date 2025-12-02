@@ -82,8 +82,33 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
 
     // Wildfire Renderer Integration
     private final net.conczin.mca.client.render.wildfire.WildfireBreastRenderer wildfireRenderer = new net.conczin.mca.client.render.wildfire.WildfireBreastRenderer();
-    private LivingEntity currentEntity;
+    private T currentEntity;
     private float currentPartialTicks;
+
+    @Override
+    public net.conczin.mca.client.render.wildfire.WildfireBreastRenderer getWildfireRenderer() {
+        return wildfireRenderer;
+    }
+
+    @Override
+    public void setCurrentEntity(T entity) {
+        this.currentEntity = entity;
+    }
+
+    @Override
+    public T getCurrentEntity() {
+        return currentEntity;
+    }
+
+    @Override
+    public void setCurrentPartialTicks(float partialTicks) {
+        this.currentPartialTicks = partialTicks;
+    }
+
+    @Override
+    public float getCurrentPartialTicks() {
+        return currentPartialTicks;
+    }
 
     @Override
     public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw,
@@ -132,7 +157,8 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
         }
     }
 
-    private net.conczin.mca.client.physics.BreastPhysics.PhysicsConfig createPhysicsConfig(LivingEntity entity) {
+    @Override
+    public net.conczin.mca.client.physics.BreastPhysics.PhysicsConfig makePhysicsConfig(T entity) {
         return new net.conczin.mca.client.physics.BreastPhysics.PhysicsConfig() {
             private final net.conczin.mca.entity.VillagerLike<?> villager = CommonVillagerModel.getVillager(entity);
 

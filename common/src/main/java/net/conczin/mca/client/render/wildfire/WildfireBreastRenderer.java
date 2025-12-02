@@ -58,29 +58,10 @@ public class WildfireBreastRenderer {
             new UVQuad(24, 37, 28, 42) // NORTH
     );
 
-    private static final UVLayout LEFT_ARMOR_BREAST_UV_LAYOUT = new UVLayout(
-            new UVQuad(24, 21, 28, 26), // EAST
-            new UVQuad(16, 21, 20, 26), // WEST
-            new UVQuad(20, 22, 24, 26), // DOWN (Shifted to solid body area)
-            new UVQuad(20, 22, 24, 26), // UP (Shifted to solid body area - Bottom Face)
-            new UVQuad(20, 21, 24, 26) // NORTH
-    );
-
-    private static final UVLayout RIGHT_ARMOR_BREAST_UV_LAYOUT = new UVLayout(
-            new UVQuad(28, 21, 32, 26), // EAST
-            new UVQuad(20, 21, 24, 26), // WEST
-            new UVQuad(24, 22, 28, 26), // DOWN (Shifted to solid body area)
-            new UVQuad(24, 22, 28, 26), // UP (Shifted to solid body area - Bottom Face)
-            new UVQuad(24, 21, 28, 26) // NORTH
-    );
-
     private static final float DEG_TO_RAD = (float) (Math.PI / 180);
 
     private BreastModelBox lBreast, rBreast;
     private OverlayModelBox lBreastWear, rBreastWear;
-
-    // Armor Breast Boxes
-    private BreastModelBox lArmorBreast, rArmorBreast;
 
     private UVLayout prevLeftBreastUVLayout;
     private UVLayout prevRightBreastUVLayout;
@@ -105,11 +86,7 @@ public class WildfireBreastRenderer {
     private int lastTexHeight = -1;
 
     public void setDilation(float dilation) {
-        if (this.dilation != dilation) {
-            this.dilation = dilation;
-            this.lArmorBreast = null;
-            this.rArmorBreast = null;
-        }
+        this.dilation = dilation;
     }
 
     // Overloaded render to accept VertexConsumer directly (better for integration)
@@ -149,35 +126,9 @@ public class WildfireBreastRenderer {
         if (config == null)
             return false;
 
-        // DEBUG: Always allow players to attempt render
-        boolean isPlayer = entity instanceof net.minecraft.world.entity.player.Player;
-
-        // Force visibility check to pass for debugging
-        // if (!config.canHaveBreasts()) return false;
-
         armorStack = entity.getItemBySlot(EquipmentSlot.CHEST);
         genderArmor = IGenderArmor.getArmorConfig(armorStack);
-
-        // If it's not an armor render pass, we shouldn't care about chestplate
-        // occupancy for rendering *this* pass
-        // But we do care for physics (bounceEnabled).
         isChestplateOccupied = genderArmor.coversBreasts() && !config.getArmorPhysicsOverride();
-
-        // If we are rendering the body (isArmor = false), we ALWAYS want to render
-        // unless hidden by armor
-        // But the renderer is called manually by the model, so if we are here, we
-        // should render.
-        // The issue might be that bounceEnabled is false if chestplate is occupied, but
-        // we still want to render the static mesh?
-        // Actually, if isArmor is false, we are rendering the skin.
-
-        // Force bounceEnabled to true if not armor, so it follows the body physics?
-        // No, if armor is tight, the body should also be tight.
-
-        // Wait, if isArmor is false, we are rendering the skin.
-        // If isChestplateOccupied is true, usually the body is hidden by the armor
-        // model anyway?
-        // But for "Missing Breasts (No Armor)", isChestplateOccupied should be false.
 
         if (!isArmor && armorStack.isEmpty()) {
             isChestplateOccupied = false;
@@ -222,22 +173,19 @@ public class WildfireBreastRenderer {
         // Resize box if needed (UV layouts)
         resizeBox(config);
 
-        breastSize = Math.min(bSize * 1.5f, 0.7f);
-        if (bSize > 0.7f)
-            breastSize = bSize;
-
-        // Force breast size for players if it's too small (fix for missing breasts bug)
-        if (entity instanceof net.minecraft.world.entity.player.Player && config.canHaveBreasts()) {
-            if (breastSize < 0.2f)
-                breastSize = 0.5f;
-        }
+        // Simplified scaling: Linear growth based on gene value.
+        // Multiplier 2.5f allows for very large sizes at max gene value.
+        breastSize = bSize * 2.5f;
 
         // Lower threshold for debugging - REMOVED for players
-        if (!(entity instanceof net.minecraft.world.entity.player.Player) && breastSize < 0.001f)
-            return false;
+        // if (!(entity instanceof net.minecraft.world.entity.player.Player) &&
+        // breastSize < 0.001f)
+        // return false;
 
-        zOffset = 0.0625f - (bSize * 0.0625f);
-        breastSize += 0.5f * Math.abs(bSize - 0.7f) * 2f;
+        // Adjust Z offset to push breasts outward as they grow
+        // 0.0625f is base offset. Larger breasts need to move forward (negative Z)
+        // more.
+        zOffset = 0.0625f - (bSize * 0.25f);
 
         float resistance = Mth.clamp(genderArmor.physicsResistance(), 0, 1);
         // Assuming breathing is always enabled for now, or we could add it to config
@@ -296,7 +244,8 @@ public class WildfireBreastRenderer {
 
         float rotation = breastSize;
         if (bounceEnabled) {
-            matrixStack.translate(0, -0.035f * breastSize, 0);
+            // REMOVED: This was causing breasts to move UP as they got bigger.
+            // matrixStack.translate(0, -0.035f * breastSize, 0);
             rotation -= (side.isLeft ? lPhysPositionY : rPhysPositionY) / 12f;
         }
 
@@ -328,8 +277,6 @@ public class WildfireBreastRenderer {
             this.rBreast = null;
             this.lBreastWear = null;
             this.rBreastWear = null;
-            this.lArmorBreast = null;
-            this.rArmorBreast = null;
             this.lastTexHeight = this.texHeight;
         }
 
@@ -341,26 +288,16 @@ public class WildfireBreastRenderer {
             this.rBreastWear = new OverlayModelBox(64, this.texHeight, 0, 0.0F, 0F, 4, 5, 3, 0.25F,
                     RIGHT_BREAST_OVERLAY_UV_LAYOUT);
         }
-
-        if (lArmorBreast == null || rArmorBreast == null) {
-            // Use 0.001F dilation for armor to avoid z-fighting, but NOT the full dilation
-            // (which is handled by scaling)
-            this.lArmorBreast = new BreastModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.001F,
-                    LEFT_ARMOR_BREAST_UV_LAYOUT);
-            this.rArmorBreast = new BreastModelBox(64, this.texHeight, 0F, 0.0F, 0F, 4, 5, 3, 0.001F,
-                    RIGHT_ARMOR_BREAST_UV_LAYOUT);
-        }
     }
 
     private void renderBreast(PoseStack matrixStack, VertexConsumer vertexConsumer, int light, int overlay, int color,
             BreastSide side) {
-        if (isArmor) {
-            var model = side.isLeft ? lArmorBreast : rArmorBreast;
-            renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
-        } else {
-            var model = side.isLeft ? lBreast : rBreast;
-            renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
+        // Always use the standard breast model (reused for armor)
+        var model = side.isLeft ? lBreast : rBreast;
+        renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
 
+        // Only render wear layer if NOT armor
+        if (!isArmor) {
             var wearModel = side.isLeft ? lBreastWear : rBreastWear;
             renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
         }

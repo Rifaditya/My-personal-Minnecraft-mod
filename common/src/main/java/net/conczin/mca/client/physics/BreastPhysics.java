@@ -92,7 +92,15 @@ public class BreastPhysics {
         if (Float.isNaN(delta))
             delta = 0;
         delta = Mth.clamp(delta, -15f, 15f); // Clamp max rotation speed per tick to prevent snapping
-        return -(delta / 25f) * bounceIntensity;
+
+        float rotation = -(delta / 25f) * bounceIntensity;
+
+        // Dampen rotation for players to prevent "going nuts" when turning
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            rotation *= 0.5f; // Relaxed from 0.25f to 0.5f
+        }
+
+        return rotation;
     }
 
     public void update(LivingEntity entity, IGenderArmor armor, PhysicsConfig config) {
@@ -152,6 +160,11 @@ public class BreastPhysics {
             bounceIntensity = bounceIntensity * randFloat(0.5f, 1.5f);
         }
 
+        if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
+            bounceIntensity *= 1.25f; // Slight boost for villagers (was 1.5f which caused static, 1.25f should be
+                                      // safe)
+        }
+
         tickMovement(entity, motion, bounceIntensity, breastWeight);
         tickPose(entity, bounceIntensity);
         tickVehicle(entity, bounceIntensity, breastWeight);
@@ -181,21 +194,48 @@ public class BreastPhysics {
         }
         lastVerticalMoveVelocity = vertVelocity;
 
-        this.targetBounceY = (float) motion.y * bounceIntensity;
+        // Boost vertical bounce (jumping) significantly
+        float verticalMultiplier = 2.0f;
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            verticalMultiplier = 0.2f; // Reduced from 0.5f to 0.2f to prevent crazy jumping
+        }
+        this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
         // Add horizontal movement influence (Step Bounce)
         // Simulate walking rhythm: fast sine wave based on tickCount scaled by
         // horizontal speed
         double horizontalSpeed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+
+        boolean isPlayer = entity instanceof net.minecraft.world.entity.player.Player;
+
+        if (isPlayer) {
+            // Clamp horizontal speed to prevent massive bounce when running (players move
+            // fast)
+            // TUNED: Reduced from 0.15 to 0.1 to tame chaos
+            horizontalSpeed = Math.min(horizontalSpeed, 0.1);
+        } else {
+            // Villagers move slower, allow more speed influence
+            horizontalSpeed = Math.min(horizontalSpeed, 0.5);
+        }
+
         if (horizontalSpeed > 0.01) {
-            float stepBounce = (float) (Math.sin(entity.tickCount * 0.8f) * horizontalSpeed * bounceIntensity * 2.0f);
+            // Tuned: 0.35f for players (subtle), 2.0f for villagers (more bounce as
+            // requested)
+            float multiplier = isPlayer ? 0.35f : 2.0f;
+            float stepBounce = (float) (Math.sin(entity.tickCount * 0.8f) * horizontalSpeed * bounceIntensity
+                    * multiplier);
             this.targetBounceY += stepBounce;
         }
 
         this.targetBounceY += breastWeight;
 
         this.targetRotVel = calcRotation(entity, bounceIntensity);
-        this.targetRotVel += (float) motion.y * bounceIntensity * randomB;
+
+        float verticalRotInfluence = (float) motion.y * bounceIntensity * randomB;
+        if (isPlayer) {
+            verticalRotInfluence *= 0.2f; // Dampen vertical rotation for players
+        }
+        this.targetRotVel += verticalRotInfluence;
 
         this.targetBounceX = -calcRotation(entity, bounceIntensity) / 10f;
 
@@ -221,8 +261,6 @@ public class BreastPhysics {
         Entity vehicle = entity.getVehicle();
         if (vehicle instanceof Boat boat) {
             // Boat logic simplified or mapped
-            // Assuming lerpPaddlePhase is not easily accessible or mapped differently,
-            // skipping precise boat paddle sync for now
             this.targetBounceY = bounceIntensity / 3.25f;
         } else if (vehicle instanceof Minecart cart) {
             float speed = (float) cart.getDeltaMovement().lengthSqr();
@@ -259,6 +297,11 @@ public class BreastPhysics {
             }
             float amplifier = Mth.clamp(1 + rawAmplifier, 0.6f, 1.3f);
 
+            // Reduce amplifier significantly for players to prevent "going nuts"
+            if (entity instanceof net.minecraft.world.entity.player.Player) {
+                amplifier *= 0.25f;
+            }
+
             HumanoidArm swingingArm = entity.getMainArm(); // Simplified, assuming main hand swing
             int swingTickDelta = entity.swingTime - lastSwingTick;
             float swingProgress = distanceFromMedian(0, lastSwingDuration,
@@ -269,12 +312,21 @@ public class BreastPhysics {
             if (entity.swinging && entity.tickCount % everyNthTick == 0) {
                 this.targetBounceY += (Math.random() > 0.5 ? -0.25f : 0.25f) * amplifier * bounceIntensity;
                 var xAmp = Mth.clamp(1 + (rawAmplifier * (rawAmplifier < 0 ? 1.625f : 0.8f)), 0.25f, 1.225f);
-                this.targetBounceX = (0.325f * xAmp * bounceIntensity) * (swingingArm == HumanoidArm.RIGHT ? -1f : 1f);
+
+                float xBounce = (0.325f * xAmp * bounceIntensity) * (swingingArm == HumanoidArm.RIGHT ? -1f : 1f);
+                if (entity instanceof net.minecraft.world.entity.player.Player) {
+                    xBounce *= 0.6f; // Relaxed from 0.25f to 0.6f
+                }
+                this.targetBounceX = xBounce;
             }
 
             if (swingTickDelta < 0 && lastSwingTick != lastSwingDuration - 1) {
                 this.targetRotVel += (swingingArm == HumanoidArm.RIGHT ? -4f : 4f) * Math.abs(swingProgress)
                         * bounceIntensity;
+                // Reduce rotation velocity for players specifically
+                if (entity instanceof net.minecraft.world.entity.player.Player) {
+                    this.targetRotVel *= 0.5f; // Relaxed from 0.25f to 0.5f
+                }
             } else if (entity.swinging && swingDuration > 1) {
                 this.targetRotVel += (swingingToward == HumanoidArm.RIGHT ? -0.2f : 0.2f) * amplifier * bounceIntensity;
             }
@@ -287,6 +339,18 @@ public class BreastPhysics {
     }
 
     private void finishTick(PhysicsConfig config) {
+        // Safety check for NaNs to prevent model disappearance
+        if (Float.isNaN(bounceVel))
+            bounceVel = 0;
+        if (Float.isNaN(bounceVelX))
+            bounceVelX = 0;
+        if (Float.isNaN(bounceRotVel))
+            bounceRotVel = 0;
+        if (Float.isNaN(positionY))
+            positionY = 0;
+        if (Float.isNaN(positionX))
+            positionX = 0;
+
         float percent = config.getFloppiness();
         float bounceAmount = 0.45f * (1f - percent) + 0.15f;
         bounceAmount = Mth.clamp(bounceAmount, 0.15f, 0.6f);
@@ -314,22 +378,39 @@ public class BreastPhysics {
         targetBounceX = Mth.clamp(targetBounceX, -1.5f, 1.5f);
 
         this.velocity = Mth.lerp(bounceAmount, this.velocity, (this.targetBounceY - this.bounceVel) * delta);
+
+        // CRITICAL FIX: Clamp velocity to prevent explosion
+        this.velocity = Mth.clamp(this.velocity, -1.0f, 1.0f);
+
+        // Add damping to prevent infinite oscillation
+        this.velocity *= 0.9f;
+
         this.bounceVel += this.velocity * percent * 1.1625f;
 
-        // Clamp Velocity
+        // Clamp Velocity (Position)
         this.bounceVel = Mth.clamp(this.bounceVel, -3.0f, 3.0f);
 
         // X
         this.velocityX = Mth.lerp(bounceAmount, this.velocityX, (this.targetBounceX - this.bounceVelX) * delta);
+        // CRITICAL FIX: Clamp X velocity
+        this.velocityX = Mth.clamp(this.velocityX, -0.5f, 0.5f);
+
+        // Add damping
+        this.velocityX *= 0.9f;
+
         this.bounceVelX += this.velocityX * percent;
 
-        // Clamp X Velocity
+        // Clamp X Velocity (Position)
         this.bounceVelX = Mth.clamp(this.bounceVelX, -1.5f, 1.5f);
 
         this.rotVelocity = Mth.lerp(bounceAmount, this.rotVelocity, (this.targetRotVel - this.bounceRotVel) * delta);
+
+        // Add damping
+        this.rotVelocity *= 0.9f;
+
         this.bounceRotVel += this.rotVelocity * percent;
 
-        // Clamp Rotation Velocity
+        // Clamp Rotation Velocity (Position)
         this.bounceRotVel = Mth.clamp(this.bounceRotVel, -35f, 35f);
 
         if (this.positionY < -0.5f)
@@ -342,6 +423,10 @@ public class BreastPhysics {
         // Clamp X to prevent flying off sideways
         if (this.positionX > 1.0f) {
             this.positionX = 1.0f;
+            this.velocityX = 0;
+        }
+        if (this.positionX < -1.0f) {
+            this.positionX = -1.0f;
             this.velocityX = 0;
         }
 

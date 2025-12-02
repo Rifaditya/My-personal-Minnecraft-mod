@@ -91,12 +91,6 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
-            int color) {
-        super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
-    }
-
-    @Override
     public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw,
             float headPitch) {
         super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
@@ -112,32 +106,7 @@ public class VillagerEntityModelMCA<T extends LivingEntity & VillagerLike<T>> ex
 
         // Physics Tick (Moved logic here)
         if (villager.level().isClientSide) {
-            var state = net.conczin.mca.client.physics.PhysicsState.get(villager);
-            var config = createPhysicsConfig(villager);
-            var armor = net.conczin.mca.client.render.wildfire.IGenderArmor
-                    .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST));
-            // Only tick once per tick?
-            // We can check last tick time or just update.
-            // For now, update every frame (might be too fast) or check tick count.
-            // Better: check if (villager.tickCount != lastTick) in PhysicsState.
-            // But PhysicsState doesn't store lastTick.
-            // Let's just update. It might be slightly faster than 20tps if framerate is
-            // Physics Tick
-            // We rely on the fact that setupAnim is called every frame, but we only want to
-            // update physics
-            // if we can approximate a tick or if we accept per-frame updates with delta.
-            // However, BreastPhysics.update uses fixed steps.
-            // For now, let's update every frame but with a small time step or rely on the
-            // internal logic.
-            // Actually, the best way is to check the entity's tick count.
-
-            // Physics Tick
-            // Only update once per game tick to ensure consistent motion calculation
-            if (state.lastTick != villager.tickCount) {
-                state.lastTick = villager.tickCount;
-                state.leftPhysics.update(villager, armor, config);
-                state.rightPhysics.update(villager, armor, config);
-            }
+            updatePhysics(villager, animationProgress - villager.tickCount);
         }
     }
 

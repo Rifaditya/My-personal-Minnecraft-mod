@@ -53,6 +53,8 @@ public class WildfireArmorLayer<T extends LivingEntity, M extends HumanoidModel<
                     .get(net.minecraft.core.component.DataComponents.DYED_COLOR);
             if (dyedColor != null) {
                 color = 0xFF000000 | dyedColor.rgb();
+            } else {
+                color = 0xFFA06540; // Default Leather Brown
             }
         }
 

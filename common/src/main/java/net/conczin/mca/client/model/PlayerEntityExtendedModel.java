@@ -78,15 +78,37 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
 
         super.renderToBuffer(matrices, vertices, light, overlay, color);
 
-        if (currentEntity != null) {
-            wildfireRenderer.render(matrices, vertices, light, overlay, color, currentEntity, this.body,
-                    currentPartialTicks,
-                    createPhysicsConfig(currentEntity), 64);
-        }
+        renderBreasts(matrices, vertices, light, overlay, color);
     }
 
-    private BreastPhysics.PhysicsConfig createPhysicsConfig(T entity) {
+    @Override
+    public BreastPhysics.PhysicsConfig makePhysicsConfig(T entity) {
         return new PlayerPhysicsConfig(entity);
+    }
+
+    @Override
+    public net.conczin.mca.client.render.wildfire.WildfireBreastRenderer getWildfireRenderer() {
+        return wildfireRenderer;
+    }
+
+    @Override
+    public void setCurrentEntity(T entity) {
+        this.currentEntity = entity;
+    }
+
+    @Override
+    public T getCurrentEntity() {
+        return currentEntity;
+    }
+
+    @Override
+    public void setCurrentPartialTicks(float partialTicks) {
+        this.currentPartialTicks = partialTicks;
+    }
+
+    @Override
+    public float getCurrentPartialTicks() {
+        return currentPartialTicks;
     }
 
     private class PlayerPhysicsConfig implements BreastPhysics.PhysicsConfig {
@@ -192,39 +214,26 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
     @Override
     public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw,
             float headPitch) {
-        if (CommonVillagerModel.getVillager(villager).getAgeState() == AgeState.BABY && !villager.isPassenger()) {
-            limbDistance = (float) Math.sin(villager.tickCount / 12F);
-            limbAngle = (float) Math.cos(villager.tickCount / 9F) * 3;
-            headYaw += (float) Math.sin(villager.tickCount / 2F);
+
+        try {
+            if (CommonVillagerModel.getVillager(villager).getAgeState() == AgeState.BABY && !villager.isPassenger()) {
+                limbDistance = (float) Math.sin(villager.tickCount / 12F);
+                limbAngle = (float) Math.cos(villager.tickCount / 9F) * 3;
+                headYaw += (float) Math.sin(villager.tickCount / 2F);
+            }
+
+            super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
+            applyVillagerDimensions(CommonVillagerModel.getVillager(villager), villager.isCrouching());
+
+            setPhysicsEntity(villager, animationProgress - villager.tickCount);
+        } catch (Exception e) {
+            System.err.println("MCA ERROR: Error in PlayerEntityExtendedModel.setupAnim");
+            e.printStackTrace();
         }
-
-        super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
-        applyVillagerDimensions(CommonVillagerModel.getVillager(villager), villager.isCrouching());
-
-        setPhysicsEntity(villager, animationProgress - villager.tickCount);
     }
 
     public void setPhysicsEntity(T villager, float partialTicks) {
-        this.currentEntity = villager;
-        this.currentPartialTicks = partialTicks;
-
-        // Hide default breasts
-        this.breasts.visible = false;
-        this.breastsWear.visible = false;
-
-        // Physics Tick
-        net.conczin.mca.client.physics.PhysicsState state = net.conczin.mca.client.physics.PhysicsState.get(villager);
-        if (villager.level().isClientSide && state.lastTick != villager.tickCount) {
-            state.lastTick = villager.tickCount;
-            state.leftPhysics.update(villager,
-                    net.conczin.mca.client.render.wildfire.IGenderArmor
-                            .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
-                    createPhysicsConfig(villager));
-            state.rightPhysics.update(villager,
-                    net.conczin.mca.client.render.wildfire.IGenderArmor
-                            .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
-                    createPhysicsConfig(villager));
-        }
+        updatePhysics(villager, partialTicks);
     }
 
     public <M extends HumanoidModel<T>> void copyVisibility(M model) {

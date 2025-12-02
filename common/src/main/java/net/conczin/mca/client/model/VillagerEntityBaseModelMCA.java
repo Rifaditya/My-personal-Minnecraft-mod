@@ -105,37 +105,47 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
         setPhysicsEntity(villager, animationProgress - villager.tickCount);
     }
 
-    public void setPhysicsEntity(T villager, float partialTicks) {
-        this.currentEntity = villager;
-        this.currentPartialTicks = partialTicks;
-        this.breasts.visible = false;
+    public void updatePhysics(T villager, float partialTicks) {
+        CommonVillagerModel.super.updatePhysics(villager, partialTicks);
+    }
 
-        // Physics Tick
-        net.conczin.mca.client.physics.PhysicsState state = net.conczin.mca.client.physics.PhysicsState.get(villager);
-        if (villager.level().isClientSide && state.lastTick != villager.tickCount) {
-            state.lastTick = villager.tickCount;
-            state.leftPhysics.update(villager,
-                    net.conczin.mca.client.render.wildfire.IGenderArmor
-                            .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
-                    createPhysicsConfig(villager));
-            state.rightPhysics.update(villager,
-                    net.conczin.mca.client.render.wildfire.IGenderArmor
-                            .getArmorConfig(villager.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST)),
-                    createPhysicsConfig(villager));
-        }
+    // Deprecated: Use updatePhysics
+    public void setPhysicsEntity(T villager, float partialTicks) {
+        updatePhysics(villager, partialTicks);
+    }
+
+    @Override
+    public net.conczin.mca.client.render.wildfire.WildfireBreastRenderer getWildfireRenderer() {
+        return wildfireRenderer;
+    }
+
+    @Override
+    public void setCurrentEntity(T entity) {
+        this.currentEntity = entity;
+    }
+
+    @Override
+    public T getCurrentEntity() {
+        return currentEntity;
+    }
+
+    @Override
+    public void setCurrentPartialTicks(float partialTicks) {
+        this.currentPartialTicks = partialTicks;
+    }
+
+    @Override
+    public float getCurrentPartialTicks() {
+        return currentPartialTicks;
     }
 
     @Override
     public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
         renderCommon(matrices, vertices, light, overlay, color);
-
-        if (currentEntity != null && currentEntity.getGenetics().getGender() == Gender.FEMALE) {
-            wildfireRenderer.render(matrices, vertices, light, overlay, color, currentEntity, this.body,
-                    currentPartialTicks, createPhysicsConfig(currentEntity), 64);
-        }
     }
 
-    protected BreastPhysics.PhysicsConfig createPhysicsConfig(T entity) {
+    @Override
+    public BreastPhysics.PhysicsConfig makePhysicsConfig(T entity) {
         return new VillagerPhysicsConfig(entity);
     }
 
