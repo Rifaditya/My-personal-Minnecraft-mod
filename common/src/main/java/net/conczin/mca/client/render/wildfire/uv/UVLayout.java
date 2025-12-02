@@ -22,6 +22,15 @@ public class UVLayout {
         quads.put(UVDirection.NORTH, north);
     }
 
+    public UVLayout(UVQuad east, UVQuad west, UVQuad down, UVQuad up, UVQuad north, UVQuad south) {
+        quads.put(UVDirection.EAST, east);
+        quads.put(UVDirection.WEST, west);
+        quads.put(UVDirection.DOWN, down);
+        quads.put(UVDirection.UP, up);
+        quads.put(UVDirection.NORTH, north);
+        quads.put(UVDirection.SOUTH, south);
+    }
+
     public UVLayout() {
         this(Collections.emptyMap());
     }
@@ -32,6 +41,7 @@ public class UVLayout {
         quads.putIfAbsent(UVDirection.DOWN, null);
         quads.putIfAbsent(UVDirection.UP, null);
         quads.putIfAbsent(UVDirection.NORTH, null);
+        quads.putIfAbsent(UVDirection.SOUTH, null);
     }
 
     public void put(UVDirection dir, UVQuad quad) {

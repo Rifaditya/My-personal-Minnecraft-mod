@@ -14,7 +14,8 @@ public enum UVDirection implements StringRepresentable {
     WEST("west", "", "W", 0xFF00FF00, new Vec3i(-1, 0, 0)),
     DOWN("down", "wildfire_gender.uv_editor.faces.bottom", "D", 0xFF0000FF, new Vec3i(0, -1, 0)),
     UP("up", "wildfire_gender.uv_editor.faces.top", "U", 0xFF00FFFF, new Vec3i(0, 1, 0)),
-    NORTH("north", "wildfire_gender.uv_editor.faces.front", "N", 0xFFFF00FF, new Vec3i(0, 0, -1));
+    NORTH("north", "wildfire_gender.uv_editor.faces.front", "N", 0xFFFF00FF, new Vec3i(0, 0, -1)),
+    SOUTH("south", "wildfire_gender.uv_editor.faces.back", "S", 0xFFFFFF00, new Vec3i(0, 0, 1));
 
     private final String unlocalizedName;
     private final String shortName;

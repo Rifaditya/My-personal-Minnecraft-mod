@@ -92,14 +92,14 @@ public final class WildfireModelRenderer {
     public static class OverlayModelBox extends ModelBox {
         public OverlayModelBox(int tW, int tH, float x, float y, float z, int dx, int dy, int dz, float delta,
                 UVLayout dynamicUvLayouts) {
-            super(tW, tH, x, y, z, dx, dy, dz, delta, 5, dynamicUvLayouts);
+            super(tW, tH, x, y, z, dx, dy, dz, delta, 6, dynamicUvLayouts);
         }
     }
 
     public static class BreastModelBox extends ModelBox {
         public BreastModelBox(int tW, int tH, float x, float y, float z, int dx, int dy, int dz, float delta,
                 UVLayout dynamicUvLayouts) {
-            super(tW, tH, x, y, z, dx, dy, dz, delta, 5, dynamicUvLayouts);
+            super(tW, tH, x, y, z, dx, dy, dz, delta, 6, dynamicUvLayouts);
         }
     }
 

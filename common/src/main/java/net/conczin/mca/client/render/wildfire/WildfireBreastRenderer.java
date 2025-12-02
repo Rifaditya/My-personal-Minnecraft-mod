@@ -31,7 +31,8 @@ public class WildfireBreastRenderer {
             new UVQuad(16, 21, 20, 26), // WEST
             new UVQuad(20, 17, 24, 21), // DOWN
             new UVQuad(20, 25, 24, 27), // UP
-            new UVQuad(20, 21, 24, 26) // NORTH
+            new UVQuad(20, 21, 24, 26), // NORTH
+            new UVQuad(20, 21, 24, 26) // SOUTH (Reusing NORTH)
     );
 
     private static final UVLayout RIGHT_BREAST_UV_LAYOUT = new UVLayout(
@@ -39,7 +40,8 @@ public class WildfireBreastRenderer {
             new UVQuad(21, 21, 24, 26), // WEST
             new UVQuad(24, 17, 28, 21), // DOWN
             new UVQuad(24, 25, 28, 27), // UP
-            new UVQuad(24, 21, 28, 26) // NORTH
+            new UVQuad(24, 21, 28, 26), // NORTH
+            new UVQuad(24, 21, 28, 26) // SOUTH (Reusing NORTH)
     );
 
     private static final UVLayout LEFT_BREAST_OVERLAY_UV_LAYOUT = new UVLayout(
@@ -47,7 +49,8 @@ public class WildfireBreastRenderer {
             new UVQuad(17, 37, 20, 42), // WEST
             new UVQuad(20, 34, 24, 37), // DOWN
             new UVQuad(20, 42, 24, 45), // UP
-            new UVQuad(20, 37, 24, 42) // NORTH
+            new UVQuad(20, 37, 24, 42), // NORTH
+            new UVQuad(20, 37, 24, 42) // SOUTH
     );
 
     private static final UVLayout RIGHT_BREAST_OVERLAY_UV_LAYOUT = new UVLayout(
@@ -55,7 +58,8 @@ public class WildfireBreastRenderer {
             new UVQuad(0, 0, 0, 0), // WEST (not used)
             new UVQuad(24, 34, 28, 37), // DOWN
             new UVQuad(24, 42, 28, 45), // UP
-            new UVQuad(24, 37, 28, 42) // NORTH
+            new UVQuad(24, 37, 28, 42), // NORTH
+            new UVQuad(24, 37, 28, 42) // SOUTH
     );
 
     private static final float DEG_TO_RAD = (float) (Math.PI / 180);
@@ -258,7 +262,7 @@ public class WildfireBreastRenderer {
 
         Quaternionf rotationTransform = new Quaternionf()
                 .rotationY((side.isLeft ? outwardAngle : -outwardAngle) * DEG_TO_RAD)
-                .rotateX(-35f * rotation * DEG_TO_RAD);
+                .rotateX(-37f * rotation * DEG_TO_RAD);
 
         if (breathingAnimation) {
             float age = currentEntity.tickCount + currentPartialTicks;
@@ -267,6 +271,13 @@ public class WildfireBreastRenderer {
         }
 
         matrixStack.mulPose(rotationTransform);
+
+        // Apply physical scaling based on breast size
+        // Quadratic curve for "slow start, fast finish" growth
+        // TUNED: Reduced from 0.4f to 0.2f to further reduce max size
+        float physicalScale = 1.0f + (breastSize * breastSize * 0.2f);
+        matrixStack.scale(physicalScale, physicalScale, physicalScale);
+
         matrixStack.scale(0.9995f, 1f, 1f);
     }
 
