@@ -182,6 +182,16 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         this.targetBounceY = (float) motion.y * bounceIntensity;
+
+        // Add horizontal movement influence (Step Bounce)
+        // Simulate walking rhythm: fast sine wave based on tickCount scaled by
+        // horizontal speed
+        double horizontalSpeed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        if (horizontalSpeed > 0.01) {
+            float stepBounce = (float) (Math.sin(entity.tickCount * 0.8f) * horizontalSpeed * bounceIntensity * 2.0f);
+            this.targetBounceY += stepBounce;
+        }
+
         this.targetBounceY += breastWeight;
 
         this.targetRotVel = calcRotation(entity, bounceIntensity);
