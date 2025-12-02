@@ -19,6 +19,7 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         if (MCAClient.fallbackVillager == null) {
             MCAClient.fallbackVillager = EntitiesMCA.MALE_VILLAGER.create(world);
             MCAClient.fallbackVillager.getGenetics().setGender(Gender.FEMALE);
+            MCAClient.fallbackVillager.getGenetics().setGene(Genetics.BREAST, 0.5f);
         }
         return MCAClient.getPlayerData(uuid).orElse(MCAClient.fallbackVillager);
     }
