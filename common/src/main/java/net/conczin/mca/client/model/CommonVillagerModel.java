@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.mca.MCAClient;
 import net.conczin.mca.entity.VillagerLike;
 import net.conczin.mca.entity.ai.relationship.Gender;
-import net.conczin.mca.entity.ai.Genetics;
+
 import net.conczin.mca.entity.ai.relationship.VillagerDimensions;
 import net.conczin.mca.registry.EntitiesMCA;
 import net.minecraft.client.model.geom.ModelPart;

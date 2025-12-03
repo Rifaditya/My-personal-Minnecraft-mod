@@ -105,11 +105,6 @@ public class WildfireBreastRenderer {
             LivingEntity entity, ModelPart body, float partialTicks, BreastPhysics.PhysicsConfig config,
             boolean isArmor, int texHeight) {
 
-        // FORCE texHeight to 64 for armor to ensure correct UV mapping
-        // if (isArmor) {
-        // texHeight = 64;
-        // }
-
         this.texHeight = texHeight;
         this.isArmor = isArmor;
 
@@ -137,11 +132,6 @@ public class WildfireBreastRenderer {
         if (!isArmor && armorStack.isEmpty()) {
             isChestplateOccupied = false;
         }
-
-        // Bypass hiding check
-        // if (genderArmor.alwaysHidesBreasts()) {
-        // return false;
-        // }
 
         // Get Physics State
         PhysicsState physicsState = PhysicsState.get(entity);
@@ -181,11 +171,6 @@ public class WildfireBreastRenderer {
         // Multiplier 2.5f allows for very large sizes at max gene value.
         breastSize = bSize * 2.5f;
 
-        // Lower threshold for debugging - REMOVED for players
-        // if (!(entity instanceof net.minecraft.world.entity.player.Player) &&
-        // breastSize < 0.001f)
-        // return false;
-
         // Adjust Z offset to push breasts outward as they grow
         // 0.0625f is base offset. Larger breasts need to move forward (negative Z)
         // more.
@@ -200,7 +185,7 @@ public class WildfireBreastRenderer {
         // RELAXED: Trust the physics engine to handle damping.
         // Only disable if the config explicitly says to override physics (which usually
         // means "static" or "vanilla" behavior).
-        bounceEnabled = (!isChestplateOccupied || !config.getArmorPhysicsOverride());
+        bounceEnabled = true;
 
         // Force armor to follow physics state ("glued" to body)
         if (isArmor) {
@@ -248,8 +233,7 @@ public class WildfireBreastRenderer {
 
         float rotation = breastSize;
         if (bounceEnabled) {
-            // REMOVED: This was causing breasts to move UP as they got bigger.
-            // matrixStack.translate(0, -0.035f * breastSize, 0);
+
             rotation -= (side.isLeft ? lPhysPositionY : rPhysPositionY) / 12f;
         }
 

@@ -97,7 +97,7 @@ public class BreastPhysics {
 
         // Dampen rotation for players to prevent "going nuts" when turning
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            rotation *= 0.5f; // Relaxed from 0.25f to 0.5f
+            rotation *= 0.2f; // User requested 0.2
         }
 
         return rotation;
@@ -161,15 +161,14 @@ public class BreastPhysics {
         }
 
         if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
-            bounceIntensity *= 1.25f; // Slight boost for villagers (was 1.5f which caused static, 1.25f should be
-                                      // safe)
+            bounceIntensity *= 1.75f; // Increased from 1.25f to 1.75f for villagers
         }
 
         tickMovement(entity, motion, bounceIntensity, breastWeight);
         tickPose(entity, bounceIntensity);
         tickVehicle(entity, bounceIntensity, breastWeight);
         tickArmSwing(entity, bounceIntensity);
-        finishTick(config);
+        finishTick(entity, config);
     }
 
     private void simplifiedTick(IGenderArmor armor, PhysicsConfig config) {
@@ -195,9 +194,9 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         // Boost vertical bounce (jumping) significantly
-        float verticalMultiplier = 2.0f;
+        float verticalMultiplier = 2.5f; // Increased from 2.0f for villagers
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            verticalMultiplier = 0.2f; // Reduced from 0.5f to 0.2f to prevent crazy jumping
+            verticalMultiplier = 0.09f; // User requested 0.09
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
@@ -211,7 +210,6 @@ public class BreastPhysics {
         if (isPlayer) {
             // Clamp horizontal speed to prevent massive bounce when running (players move
             // fast)
-            // TUNED: Reduced from 0.15 to 0.1 to tame chaos
             horizontalSpeed = Math.min(horizontalSpeed, 0.1);
         } else {
             // Villagers move slower, allow more speed influence
@@ -219,8 +217,6 @@ public class BreastPhysics {
         }
 
         if (horizontalSpeed > 0.01) {
-            // Tuned: 0.35f for players (subtle), 2.0f for villagers (more bounce as
-            // requested)
             float multiplier = isPlayer ? 0.35f : 2.0f;
             float stepBounce = (float) (Math.sin(entity.tickCount * 0.8f) * horizontalSpeed * bounceIntensity
                     * multiplier);
@@ -233,7 +229,7 @@ public class BreastPhysics {
 
         float verticalRotInfluence = (float) motion.y * bounceIntensity * randomB;
         if (isPlayer) {
-            verticalRotInfluence *= 0.2f; // Dampen vertical rotation for players
+            verticalRotInfluence *= 0.05f; // Dampen vertical rotation for players
         }
         this.targetRotVel += verticalRotInfluence;
 
@@ -325,7 +321,7 @@ public class BreastPhysics {
                         * bounceIntensity;
                 // Reduce rotation velocity for players specifically
                 if (entity instanceof net.minecraft.world.entity.player.Player) {
-                    this.targetRotVel *= 0.5f; // Relaxed from 0.25f to 0.5f
+                    this.targetRotVel *= 0.1f; // Reduced from 0.5f to 0.1f
                 }
             } else if (entity.swinging && swingDuration > 1) {
                 this.targetRotVel += (swingingToward == HumanoidArm.RIGHT ? -0.2f : 0.2f) * amplifier * bounceIntensity;
@@ -338,7 +334,7 @@ public class BreastPhysics {
         lastSwingDuration = Math.max(swingDuration, 1);
     }
 
-    private void finishTick(PhysicsConfig config) {
+    private void finishTick(LivingEntity entity, PhysicsConfig config) {
         // Safety check for NaNs to prevent model disappearance
         if (Float.isNaN(bounceVel))
             bounceVel = 0;
@@ -373,9 +369,16 @@ public class BreastPhysics {
         if (Float.isNaN(targetBounceX))
             targetBounceX = 0;
 
-        targetBounceY = Mth.clamp(targetBounceY, -3.0f, 3.0f);
-        targetRotVel = Mth.clamp(targetRotVel, -35f, 35f);
-        targetBounceX = Mth.clamp(targetBounceX, -1.5f, 1.5f);
+        // Strict clamping for players
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            targetBounceY = Mth.clamp(targetBounceY, -2.5f, 2.5f);
+            targetRotVel = Mth.clamp(targetRotVel, -15f, 15f);
+            targetBounceX = Mth.clamp(targetBounceX, -1.0f, 1.0f);
+        } else {
+            targetBounceY = Mth.clamp(targetBounceY, -3.0f, 3.0f);
+            targetRotVel = Mth.clamp(targetRotVel, -35f, 35f);
+            targetBounceX = Mth.clamp(targetBounceX, -1.5f, 1.5f);
+        }
 
         this.velocity = Mth.lerp(bounceAmount, this.velocity, (this.targetBounceY - this.bounceVel) * delta);
 
@@ -383,7 +386,11 @@ public class BreastPhysics {
         this.velocity = Mth.clamp(this.velocity, -1.0f, 1.0f);
 
         // Add damping to prevent infinite oscillation
-        this.velocity *= 0.9f;
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            this.velocity *= 0.85f; // Relaxed damping (was 0.75f, originally 0.9f)
+        } else {
+            this.velocity *= 0.9f;
+        }
 
         this.bounceVel += this.velocity * percent * 1.1625f;
 
@@ -396,7 +403,11 @@ public class BreastPhysics {
         this.velocityX = Mth.clamp(this.velocityX, -0.5f, 0.5f);
 
         // Add damping
-        this.velocityX *= 0.9f;
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            this.velocityX *= 0.85f; // Relaxed damping
+        } else {
+            this.velocityX *= 0.9f;
+        }
 
         this.bounceVelX += this.velocityX * percent;
 
@@ -406,7 +417,11 @@ public class BreastPhysics {
         this.rotVelocity = Mth.lerp(bounceAmount, this.rotVelocity, (this.targetRotVel - this.bounceRotVel) * delta);
 
         // Add damping
-        this.rotVelocity *= 0.9f;
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            this.rotVelocity *= 0.85f; // Relaxed damping
+        } else {
+            this.rotVelocity *= 0.9f;
+        }
 
         this.bounceRotVel += this.rotVelocity * percent;
 

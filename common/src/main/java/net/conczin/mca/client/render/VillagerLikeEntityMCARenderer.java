@@ -20,20 +20,22 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>> extends HumanoidMobRenderer<T, VillagerEntityModelMCA<T>> {
+public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
+        extends HumanoidMobRenderer<T, VillagerEntityModelMCA<T>> {
     private static final ResourceLocation TEXTURE = ResourceLocation.parse("textures/entity/steve.png");
 
     public VillagerLikeEntityMCARenderer(EntityRendererProvider.Context ctx, VillagerEntityModelMCA<T> model) {
         super(ctx, model, 0.5F);
-        addLayer(new HumanoidArmorLayer<>(this, createArmorModel(0.3f), createArmorModel(0.55f), ctx.getModelManager()));
+        addLayer(
+                new HumanoidArmorLayer<>(this, createArmorModel(0.3f), createArmorModel(0.55f), ctx.getModelManager()));
+        addLayer(new net.conczin.mca.client.render.wildfire.WildfireArmorLayer<>(this));
     }
 
     private VillagerEntityBaseModelMCA<T> createArmorModel(float modelSize) {
         return new VillagerEntityBaseModelMCA<>(
                 LayerDefinition.create(
-                                VillagerEntityBaseModelMCA.getModelData(new CubeDeformation(modelSize)), 64, 32)
-                        .bakeRoot()
-        );
+                        VillagerEntityBaseModelMCA.getModelData(new CubeDeformation(modelSize)), 64, 32)
+                        .bakeRoot());
     }
 
     @Override
@@ -49,8 +51,8 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>> exte
     @Nullable
     @Override
     protected RenderType getRenderType(T entity, boolean showBody, boolean translucent, boolean showOutlines) {
-        //setting the type to null prevents it from rendering
-        //we need a skin layer anyway because of the color
+        // setting the type to null prevents it from rendering
+        // we need a skin layer anyway because of the color
         return null;
     }
 
@@ -58,11 +60,11 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>> exte
     protected boolean shouldShowName(T villager) {
         Player player = Minecraft.getInstance().player;
         return villager.getCustomName() != null
-               && !(Minecraft.getInstance().screen instanceof VillagerEditorScreen)
-               && player != null
-               && Config.getInstance().showNameTags
-               && player.distanceToSqr(villager) < Math.pow(Config.getInstance().nameTagDistance, 2.0f)
-               && !villager.isInvisibleTo(player);
+                && !(Minecraft.getInstance().screen instanceof VillagerEditorScreen)
+                && player != null
+                && Config.getInstance().showNameTags
+                && player.distanceToSqr(villager) < Math.pow(Config.getInstance().nameTagDistance, 2.0f)
+                && !villager.isInvisibleTo(player);
     }
 
     @Override
