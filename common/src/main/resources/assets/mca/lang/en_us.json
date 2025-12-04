@@ -974,5 +974,7 @@
   "village.specialization.mining": "Mining Village",
   "village.specialization.farming": "Farming Village",
   "village.specialization.trading": "Trading Village",
-  "server.procreationCooldown": "You must wait %1\\ more days before you can procreate again."
+  "server.procreationCooldown": "You must wait %1\\ more days before you can procreate again.",
+  "village.info.specialization": "Specialization: %s",
+  "command.village.specialization": "This village specializes in: %s"
 }

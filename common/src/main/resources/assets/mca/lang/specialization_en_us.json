@@ -1,6 +1,0 @@
-{
-    "village.specialization.none": "No Specialization",
-    "village.specialization.mining": "Mining Village",
-    "village.info.specialization": "Specialization: %s",
-    "command.village.specialization": "This village specializes in: %s"
-}
