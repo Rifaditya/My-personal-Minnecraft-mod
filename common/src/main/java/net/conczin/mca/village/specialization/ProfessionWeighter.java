@@ -7,6 +7,7 @@ import net.conczin.mca.MCA;
 import net.conczin.mca.server.world.data.Village;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.VillagerProfession;
 
 import java.io.InputStream;
@@ -64,12 +65,12 @@ public class ProfessionWeighter {
      * Get the spawn weight for a profession in this village.
      * Higher weight = more likely to spawn.
      */
-    public static float getWeight(Village village, VillagerProfession profession) {
+    public static float getWeight(Village village, VillagerProfession profession, ServerLevel world) {
         VillageSpecialization spec = village.getSpecialization();
 
         // Ensure minimum farmers
         if (profession == VillagerProfession.FARMER) {
-            float farmerPercent = getFarmerPercentage(village);
+            float farmerPercent = getFarmerPercentage(village, world);
             if (farmerPercent < DEFAULT_FARMER_MINIMUM) {
                 return 5.0f; // High priority to reach minimum
             }
@@ -83,10 +84,21 @@ public class ProfessionWeighter {
         return 1.0f; // Default weight
     }
 
-    private static float getFarmerPercentage(Village village) {
-        // Note: Actual profession counting requires ServerLevel context
-        // For static weight calculation, we return a conservative estimate
-        // The spawning system will boost farmer priority dynamically if needed
-        return 0.15f; // Assume 15% farmers as baseline
+    private static float getFarmerPercentage(Village village, ServerLevel world) {
+        if (village == null || world == null) {
+            return 0.15f; // Fallback when no context available
+        }
+
+        int totalVillagers = village.getPopulation();
+        if (totalVillagers == 0) {
+            return 0.0f;
+        }
+
+        // Count farmers among loaded villagers
+        long farmerCount = village.getResidents(world).stream()
+                .filter(v -> v.getVillagerData().getProfession() == VillagerProfession.FARMER)
+                .count();
+
+        return (float) farmerCount / totalVillagers;
     }
 }

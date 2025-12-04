@@ -122,7 +122,8 @@ public class VillagerFactory {
             selectedProfession = profession.get();
         } else if (world instanceof ServerLevel serverLevel) {
             Village village = Village.findNearest(villager).orElse(null);
-            selectedProfession = WeightedProfessionSelector.selectProfession(villager.getRandom(), village);
+            selectedProfession = WeightedProfessionSelector.selectProfession(villager.getRandom(), village,
+                    serverLevel);
         } else {
             selectedProfession = VillagerProfession.NONE;
         }

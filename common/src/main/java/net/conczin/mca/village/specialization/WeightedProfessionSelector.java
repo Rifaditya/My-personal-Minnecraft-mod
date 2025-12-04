@@ -2,6 +2,7 @@ package net.conczin.mca.village.specialization;
 
 import net.conczin.mca.server.world.data.Village;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.npc.VillagerProfession;
 
@@ -19,7 +20,7 @@ public class WeightedProfessionSelector {
      * Select a random profession, weighted by village specialization.
      * If no village, returns random profession.
      */
-    public static VillagerProfession selectProfession(RandomSource random, Village village) {
+    public static VillagerProfession selectProfession(RandomSource random, Village village, ServerLevel world) {
         if (village == null || village.getSpecialization() == VillageSpecialization.NONE) {
             // No specialization - return truly random
             return getRandomVanillaProfession(random);
@@ -34,7 +35,7 @@ public class WeightedProfessionSelector {
                 continue; // Skip NONE and NITWIT
             }
 
-            float weight = ProfessionWeighter.getWeight(village, prof);
+            float weight = ProfessionWeighter.getWeight(village, prof, world);
             options.add(prof);
             weights.add(weight);
         }
