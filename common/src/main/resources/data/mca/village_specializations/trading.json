@@ -1,20 +1,12 @@
 {
-    "_comment": "Trading village specialization. Villages with libraries and markets focus on commerce and knowledge.",
+    "_comment": "Trading village specialization. Detected when village has 3+ trading professions (librarian, cartographer, cleric).",
     "trading": {
-        "buildings": [
-            "mca:library",
-            "mca:inn"
-        ],
-        "biomes": [],
-        "score_per_building": 5,
-        "score_per_biome_match": 0,
-        "threshold": 10,
+        "threshold": 3,
         "profession_weights": {
-            "minecraft:librarian": 3.0,
-            "minecraft:cartographer": 2.5,
-            "minecraft:cleric": 1.5
+            "minecraft:librarian": 2.5,
+            "minecraft:cartographer": 2.0,
+            "minecraft:cleric": 2.0
         },
-        "minimum_farmer_percentage": 0.20,
-        "productivity_multiplier": 1.25
+        "minimum_farmer_percentage": 0.20
     }
 }

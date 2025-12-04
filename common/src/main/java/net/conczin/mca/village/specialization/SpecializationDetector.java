@@ -3,20 +3,17 @@ package net.conczin.mca.village.specialization;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.conczin.mca.MCA;
-import net.conczin.mca.server.world.data.Building;
+import net.conczin.mca.entity.VillagerEntityMCA;
 import net.conczin.mca.server.world.data.Village;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.entity.npc.VillagerProfession;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
 /**
- * Detects and assigns village specializations based on buildings and biomes.
+ * Detects and assigns village specializations based on villager professions.
  * 
  * ADDON-FRIENDLY: Uses data-driven configs, can be extracted to separate mod.
  */
@@ -46,12 +43,15 @@ public class SpecializationDetector {
     }
 
     /**
-     * Detect and assign specialization to a village based on buildings and biome.
+     * Detect and assign specialization to a village based on villager professions.
      */
     public static VillageSpecialization detectSpecialization(Village village, ServerLevel world) {
         if (!village.isVillage()) {
             return VillageSpecialization.NONE;
         }
+
+        // Count professions by category
+        Map<VillageSpecialization, Integer> professionCounts = countProfessions(village, world);
 
         // Calculate scores for each specialization
         Map<VillageSpecialization, Integer> scores = new HashMap<>();
@@ -64,9 +64,9 @@ public class SpecializationDetector {
             if (config == null)
                 continue;
 
-            int score = calculateScore(village, world, config);
-            if (score >= config.threshold) {
-                scores.put(spec, score);
+            int count = professionCounts.getOrDefault(spec, 0);
+            if (count >= config.threshold) {
+                scores.put(spec, count);
             }
         }
 
@@ -77,54 +77,59 @@ public class SpecializationDetector {
                 .orElse(VillageSpecialization.NONE);
     }
 
-    private static int calculateScore(Village village, ServerLevel world, SpecializationConfig config) {
-        int score = 0;
+    /**
+     * Count villagers by profession category.
+     */
+    private static Map<VillageSpecialization, Integer> countProfessions(Village village, ServerLevel world) {
+        Map<VillageSpecialization, Integer> counts = new HashMap<>();
+        counts.put(VillageSpecialization.FARMING, 0);
+        counts.put(VillageSpecialization.MINING, 0);
+        counts.put(VillageSpecialization.TRADING, 0);
 
-        // Score based on buildings
-        for (Building building : village) {
-            if (config.buildings.contains(building.getType())) {
-                score += config.scorePerBuilding;
+        for (VillagerEntityMCA villager : village.getResidents(world)) {
+            VillagerProfession prof = villager.getVillagerData().getProfession();
+
+            // Categorize profession
+            if (isFarmingProfession(prof)) {
+                counts.merge(VillageSpecialization.FARMING, 1, Integer::sum);
+            } else if (isMiningProfession(prof)) {
+                counts.merge(VillageSpecialization.MINING, 1, Integer::sum);
+            } else if (isTradingProfession(prof)) {
+                counts.merge(VillageSpecialization.TRADING, 1, Integer::sum);
             }
         }
 
-        // Score based on biome
-        BlockPos center = new BlockPos(village.getCenter());
-        Holder<Biome> biomeHolder = world.getBiome(center);
+        return counts;
+    }
 
-        for (ResourceLocation biomeId : config.biomes) {
-            if (biomeHolder.is(biomeId)) {
-                score += config.scorePerBiome;
-                break; // Only count once
-            }
-        }
+    private static boolean isFarmingProfession(VillagerProfession prof) {
+        return prof == VillagerProfession.FARMER ||
+                prof == VillagerProfession.SHEPHERD ||
+                prof == VillagerProfession.BUTCHER ||
+                prof == VillagerProfession.FISHERMAN;
+    }
 
-        return score;
+    private static boolean isMiningProfession(VillagerProfession prof) {
+        return prof == VillagerProfession.WEAPONSMITH ||
+                prof == VillagerProfession.ARMORER ||
+                prof == VillagerProfession.TOOLSMITH;
+    }
+
+    private static boolean isTradingProfession(VillagerProfession prof) {
+        return prof == VillagerProfession.LIBRARIAN ||
+                prof == VillagerProfession.CARTOGRAPHER ||
+                prof == VillagerProfession.CLERIC;
     }
 
     /**
      * Configuration data for a specialization type.
      */
     private static class SpecializationConfig {
-        final Set<String> buildings;
-        final Set<ResourceLocation> biomes;
-        final int scorePerBuilding;
-        final int scorePerBiome;
         final int threshold;
 
         SpecializationConfig(JsonObject json) {
-            buildings = new HashSet<>();
-            if (json.has("buildings")) {
-                json.getAsJsonArray("buildings").forEach(e -> buildings.add(e.getAsString()));
-            }
-
-            biomes = new HashSet<>();
-            if (json.has("biomes")) {
-                json.getAsJsonArray("biomes").forEach(e -> biomes.add(ResourceLocation.parse(e.getAsString())));
-            }
-
-            scorePerBuilding = json.has("score_per_building") ? json.get("score_per_building").getAsInt() : 3;
-            scorePerBiome = json.has("score_per_biome_match") ? json.get("score_per_biome_match").getAsInt() : 5;
-            threshold = json.has("threshold") ? json.get("threshold").getAsInt() : 10;
+            // Threshold is minimum number of villagers in this category
+            threshold = json.has("threshold") ? json.get("threshold").getAsInt() : 3;
         }
     }
 }
