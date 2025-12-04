@@ -349,8 +349,9 @@ public final class Config {
 
     /**
      * Average breast size (0-1).
+     * Default reduced to 0.225 for more moderate average sizing.
      */
-    public float breastGeneticsMean = 0.3f;
+    public float breastGeneticsMean = 0.225f;
 
     /**
      * Variance of breast size distribution.
