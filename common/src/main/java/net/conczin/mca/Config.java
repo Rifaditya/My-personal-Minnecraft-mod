@@ -614,6 +614,22 @@ public final class Config {
     public float villagerProcreationChancePerMinute = 0.05f;
 
     /**
+     * Enable initial village population boost when player first visits.
+     * Spawns additional villagers with specialization-based professions.
+     */
+    public boolean enableInitialVillagePopulationBoost = true;
+
+    /**
+     * Minimum number of villagers to spawn on first village visit.
+     */
+    public int initialVillagePopulationMin = 5;
+
+    /**
+     * Maximum number of villagers to spawn on first village visit.
+     */
+    public int initialVillagePopulationMax = 10;
+
+    /**
      * Interval (in ticks) at which bounty hunters attack the player if reputation
      * is low.
      */

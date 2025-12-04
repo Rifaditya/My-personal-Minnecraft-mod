@@ -2,6 +2,7 @@ package net.conczin.mca.server.world.data;
 
 import net.conczin.mca.Config;
 import net.conczin.mca.entity.VillagerEntityMCA;
+import net.conczin.mca.entity.VillagerFactory;
 import net.conczin.mca.entity.ai.Memories;
 import net.conczin.mca.resources.API;
 import net.conczin.mca.resources.BuildingTypes;
@@ -18,6 +19,8 @@ import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.player.Player;
@@ -57,6 +60,7 @@ public class Village implements Iterable<Building> {
     private float marriageThreshold = 0.5f;
     private boolean autoScan = Config.getInstance().enableAutoScanByDefault;
     private VillageSpecialization specialization = VillageSpecialization.NONE;
+    private boolean hasReceivedInitialBoost = false;
     private BlockBoxExtended box = new BlockBoxExtended(0, 0, 0, 0, 0, 0);
 
     public Village(int id, ServerLevel world) {
@@ -92,6 +96,10 @@ public class Village implements Iterable<Building> {
 
         if (v.contains("specialization")) {
             specialization = VillageSpecialization.fromId(v.getString("specialization"));
+        }
+
+        if (v.contains("hasReceivedInitialBoost")) {
+            hasReceivedInitialBoost = v.getBoolean("hasReceivedInitialBoost");
         }
 
         ListTag b = v.getList("buildings", Tag.TAG_COMPOUND);
@@ -319,6 +327,47 @@ public class Village implements Iterable<Building> {
 
     public void onEnter(ServerLevel world) {
         villageTaxesManager.deliverTaxes(world);
+
+        // Initial population boost on first player visit
+        if (!hasReceivedInitialBoost && Config.getInstance().enableInitialVillagePopulationBoost) {
+            spawnInitialPopulation(world);
+            hasReceivedInitialBoost = true;
+            markDirty();
+        }
+    }
+
+    private void spawnInitialPopulation(ServerLevel world) {
+        if (!isVillage()) {
+            return; // Only boost actual villages
+        }
+
+        int spawnCount = Config.getInstance().initialVillagePopulationMin +
+                world.random.nextInt(Config.getInstance().initialVillagePopulationMax -
+                        Config.getInstance().initialVillagePopulationMin + 1);
+
+        // Cap at max population minus current population
+        int maxToSpawn = Math.max(0, getMaxPopulation() - getPopulation());
+        spawnCount = Math.min(spawnCount, maxToSpawn);
+
+        if (spawnCount <= 0) {
+            return;
+        }
+
+        BlockPos center = new BlockPos(getCenter());
+
+        for (int i = 0; i < spawnCount; i++) {
+            // Find spawn position near village center
+            BlockPos spawnPos = center.offset(
+                    world.random.nextInt(32) - 16,
+                    0,
+                    world.random.nextInt(32) - 16);
+            spawnPos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, spawnPos);
+
+            // Spawn villager with weighted profession
+            VillagerFactory.newVillager(world)
+                    .withPosition(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5)
+                    .spawn(MobSpawnType.COMMAND);
+        }
     }
 
     public void broadCastMessage(ServerLevel world, String event, VillagerEntityMCA suitor, VillagerEntityMCA mate) {
@@ -405,6 +454,7 @@ public class Village implements Iterable<Building> {
         v.put("buildings", NbtHelper.fromList(buildings.values(), Building::save));
         v.putBoolean("autoScan", autoScan);
         v.putString("specialization", specialization.getId());
+        v.putBoolean("hasReceivedInitialBoost", hasReceivedInitialBoost);
         return v;
     }
 
