@@ -110,7 +110,13 @@ public interface CommonVillagerModel<T extends LivingEntity> {
 
     default void applyVillagerDimensions(VillagerLike<?> villager, boolean isSneaking) {
         getDimensions().set(villager.getVillagerDimensions());
-        setBreastSize(villager.getGenetics().getBreastSize());
+
+        // Apply age-based breast size: genetics size * age multiplier
+        // BABY/TODDLER/CHILD: 0.0 (flat), TEEN: 0.5 (half), ADULT: 1.0 (full)
+        float geneticsBreastSize = villager.getGenetics().getBreastSize();
+        float ageBreastMultiplier = villager.getAgeState().getBreasts();
+        setBreastSize(geneticsBreastSize * ageBreastMultiplier);
+
         // Visibility handled by updatePhysics/renderBreasts now
         // getBreastPart().visible = villager.getGenetics().getGender() ==
         // Gender.FEMALE;
