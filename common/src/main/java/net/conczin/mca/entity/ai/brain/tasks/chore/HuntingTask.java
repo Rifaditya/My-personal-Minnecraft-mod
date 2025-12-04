@@ -22,12 +22,14 @@ public class HuntingTask extends AbstractChoreTask {
     private Animal target = null;
 
     public HuntingTask() {
-        super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.VALUE_ABSENT, MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT));
+        super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.VALUE_ABSENT, MemoryModuleType.WALK_TARGET,
+                MemoryStatus.VALUE_ABSENT));
     }
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel world, VillagerEntityMCA villager) {
-        return villager.getVillagerBrain().getCurrentJob() == Chore.HUNT && super.checkExtraStartConditions(world, villager);
+        return villager.getVillagerBrain().getCurrentJob() == Chore.HUNT
+                && super.checkExtraStartConditions(world, villager);
     }
 
     @Override
@@ -48,7 +50,8 @@ public class HuntingTask extends AbstractChoreTask {
         super.start(world, villager, time);
 
         if (!villager.hasItemInSlot(villager.getDominantSlot())) {
-            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(), stack -> stack.getItem() instanceof SwordItem);
+            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(),
+                    stack -> stack.getItem() instanceof SwordItem);
             if (i == -1) {
                 abandonJobWithMessage("chore.hunting.nosword");
             } else {
@@ -62,10 +65,12 @@ public class HuntingTask extends AbstractChoreTask {
     protected void tick(ServerLevel world, VillagerEntityMCA villager, long time) {
         super.tick(world, villager, time);
 
-        if (!InventoryUtils.contains(villager.getInventory(), SwordItem.class) && !villager.hasItemInSlot(villager.getDominantSlot())) {
+        if (!InventoryUtils.contains(villager.getInventory(), SwordItem.class)
+                && !villager.hasItemInSlot(villager.getDominantSlot())) {
             abandonJobWithMessage("chore.hunting.nosword");
         } else if (!villager.hasItemInSlot(villager.getDominantSlot())) {
-            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(), stack -> stack.getItem() instanceof SwordItem);
+            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(),
+                    stack -> stack.getItem() instanceof SwordItem);
             ItemStack stack = villager.getInventory().getItem(i);
             villager.setItemInHand(villager.getDominantHand(), stack);
         }
@@ -76,7 +81,8 @@ public class HuntingTask extends AbstractChoreTask {
             if (ticks >= nextAction) {
                 ticks = 0;
                 if (villager.level().random.nextFloat() >= 0.0D) {
-                    villager.level().getEntitiesOfClass(Animal.class, villager.getBoundingBox().inflate(15, 3, 15)).stream()
+                    villager.level().getEntitiesOfClass(Animal.class, villager.getBoundingBox().inflate(15, 3, 15))
+                            .stream()
                             .filter(a -> !(a instanceof TamableAnimal))
                             .filter(a -> !a.isBaby())
                             .min(Comparator.comparingDouble(villager::distanceToSqr))
@@ -97,10 +103,11 @@ public class HuntingTask extends AbstractChoreTask {
 
             if (target.isDeadOrDying()) {
                 // search for EntityItems around the target and grab them
-                villager.level().getEntitiesOfClass(ItemEntity.class, villager.getBoundingBox().inflate(15, 3, 15)).forEach(item -> {
-                    villager.getInventory().addItem(item.getItem());
-                    item.discard();
-                });
+                villager.level().getEntitiesOfClass(ItemEntity.class, villager.getBoundingBox().inflate(15, 3, 15))
+                        .forEach(item -> {
+                            villager.getInventory().addItem(item.getItem());
+                            item.discard();
+                        });
                 target = null;
             } else if (villager.distanceToSqr(target) <= 12.25F) {
                 villager.moveTowards(target.blockPosition());

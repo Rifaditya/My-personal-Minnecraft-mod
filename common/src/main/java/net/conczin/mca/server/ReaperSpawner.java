@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReaperSpawner {
-    private static final Direction[] HORIZONTALS = new Direction[]{
+    private static final Direction[] HORIZONTALS = new Direction[] {
             Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST
     };
 
@@ -51,15 +51,15 @@ public class ReaperSpawner {
 
     public ReaperSpawner(VillageManager manager, CompoundTag nbt) {
         this.manager = manager;
-        NbtHelper.toList(nbt.getList("summons", Tag.TAG_COMPOUND), n -> new ActiveSummon((CompoundTag) n)).forEach(summon ->
-                activeSummons.put(summon.position.spawnPosition.asLong(), summon)
-        );
+        NbtHelper.toList(nbt.getList("summons", Tag.TAG_COMPOUND), n -> new ActiveSummon((CompoundTag) n))
+                .forEach(summon -> activeSummons.put(summon.position.spawnPosition.asLong(), summon));
     }
 
     private void warn(Level world, BlockPos pos, String phrase) {
         world.players().stream()
                 .min(Comparator.comparingInt(a -> a.blockPosition().distManhattan(pos)))
-                .ifPresent(p -> p.displayClientMessage(Component.translatable(phrase).withStyle(ChatFormatting.RED), true));
+                .ifPresent(p -> p.displayClientMessage(Component.translatable(phrase).withStyle(ChatFormatting.RED),
+                        true));
     }
 
     public void trySpawnReaper(ServerLevel world, BlockPos pos) {
@@ -99,10 +99,10 @@ public class ReaperSpawner {
         EntityType.LIGHTNING_BOLT.spawn(world, pos, MobSpawnType.TRIGGERED);
 
         world.setBlock(pos, Blocks.SOUL_SOIL.defaultBlockState(), Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS);
-        world.setBlock(pos.above(), BlocksMCA.INFERNAL_FLAME.defaultBlockState(), Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS);
-        totems.forEach(totem ->
-                world.setBlock(totem, BlocksMCA.INFERNAL_FLAME.defaultBlockState(), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE)
-        );
+        world.setBlock(pos.above(), BlocksMCA.INFERNAL_FLAME.defaultBlockState(),
+                Block.UPDATE_NEIGHBORS | Block.UPDATE_CLIENTS);
+        totems.forEach(totem -> world.setBlock(totem, BlocksMCA.INFERNAL_FLAME.defaultBlockState(),
+                Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE));
     }
 
     private void start(SummonPosition pos) {
@@ -167,7 +167,8 @@ public class ReaperSpawner {
         public SummonPosition(CompoundTag tag) {
             spawnPosition = NbtUtils.readBlockPos(tag, "spawnPosition").orElse(BlockPos.ZERO);
             fire = NbtUtils.readBlockPos(tag, "fire").orElse(BlockPos.ZERO);
-            totems = new HashSet<>(NbtHelper.toList(tag.getCompound("totems"), v -> readBlockPos(((IntArrayTag) v).getAsIntArray())));
+            totems = new HashSet<>(
+                    NbtHelper.toList(tag.getCompound("totems"), v -> readBlockPos(((IntArrayTag) v).getAsIntArray())));
         }
 
         public SummonPosition(BlockPos fire, Set<BlockPos> totems) {
@@ -241,7 +242,8 @@ public class ReaperSpawner {
             }
 
             if (ticks == 0) {
-                GrimReaperEntity reaper = EntitiesMCA.GRIM_REAPER.spawn(world, position.spawnPosition, MobSpawnType.TRIGGERED);
+                GrimReaperEntity reaper = EntitiesMCA.GRIM_REAPER.spawn(world, position.spawnPosition,
+                        MobSpawnType.TRIGGERED);
                 if (reaper != null) {
                     reaper.playSound(SoundsMCA.REAPER_SUMMON, 1.0F, 1.0F);
                 }

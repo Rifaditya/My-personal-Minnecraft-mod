@@ -63,13 +63,11 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
     public static final VoxelShape GRAVELLING_SHAPE = Block.box(1, 0, 1, 15, 1, 15);
     public static final VoxelShape UPRIGHT_SHAPE = Shapes.or(
             Block.box(2, 2, 7, 14, 15, 9),
-            Block.box(1, 0, 6, 15, 2, 10)
-    );
+            Block.box(1, 0, 6, 15, 2, 10));
     public static final MapCodec<TombstoneBlock> CODEC = simpleCodec(TombstoneBlock::new);
     public static final VoxelShape CROSS_SHAPE = Shapes.or(
             Block.box(6, 0, 2, 10, 28, 4),
-            Block.box(-1, 18, 2, 17, 21, 4)
-    );
+            Block.box(-1, 18, 2, 17, 21, 4));
     public static final VoxelShape SLANTED_SHAPE = Block.box(0, 0, 2, 16, 7, 14);
     public static final VoxelShape WALL_SHAPE = Block.box(1, 1, 0, 15, 15, 1);
 
@@ -85,7 +83,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         this(properties, 1, 1, Vec3.ZERO, 0, false, UPRIGHT_SHAPE);
     }
 
-    public TombstoneBlock(Properties properties, int lineWidth, int maxNameHeight, Vec3 nameplateOffset, float rotation, boolean requiresSolid, VoxelShape baseShape) {
+    public TombstoneBlock(Properties properties, int lineWidth, int maxNameHeight, Vec3 nameplateOffset, float rotation,
+            boolean requiresSolid, VoxelShape baseShape) {
         super(properties);
 
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, false));
@@ -99,8 +98,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                 .filter(d -> d.getAxis() != Axis.Y)
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        VoxelShapeUtil.rotator(baseShape))
-                );
+                        VoxelShapeUtil.rotator(baseShape)));
     }
 
     static boolean isRemains(ItemStack stack) {
@@ -162,8 +160,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
     private void updateTombstoneState(Level world, BlockPos pos) {
         if (!world.isClientSide) {
             GraveyardManager.get((ServerLevel) world).setTombstoneState(pos,
-                    hasEntity(world, pos) ? GraveyardManager.TombstoneState.FILLED : GraveyardManager.TombstoneState.EMPTY
-            );
+                    hasEntity(world, pos) ? GraveyardManager.TombstoneState.FILLED
+                            : GraveyardManager.TombstoneState.EMPTY);
         }
     }
 
@@ -184,7 +182,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Override
     @Nullable
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state,
+            BlockEntityType<T> type) {
         if (world.isClientSide) {
             return null;
         }
@@ -198,7 +197,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
 
     @Deprecated
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world,
+            BlockPos pos, BlockPos neighborPos) {
         if (state.getValue(BlockStateProperties.WATERLOGGED)) {
             world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         }
@@ -223,7 +223,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
     @Deprecated
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false)
+                : super.getFluidState(state);
     }
 
     private void updateNeighbors(BlockState state, Level world, BlockPos pos) {
@@ -234,12 +235,14 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
+        return defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING,
+                context.getHorizontalDirection().getOpposite());
     }
 
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
-        return state.setValue(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
+        return state.setValue(BlockStateProperties.HORIZONTAL_FACING,
+                rot.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
     }
 
     @Override
@@ -276,8 +279,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                         pos.getZ() + random.nextFloat(),
                         (random.nextFloat() - 0.5) / 10F,
                         0,
-                        (random.nextFloat() - 0.5) / 10F
-                );
+                        (random.nextFloat() - 0.5) / 10F);
             }
         });
     }
@@ -287,12 +289,14 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         List<ItemStack> stacks = super.getDrops(state, builder);
 
-        Optional<Data> data = Data.of(builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY)).filter(Data::hasEntity);
+        Optional<Data> data = Data.of(builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY))
+                .filter(Data::hasEntity);
 
         data.flatMap(Data::getEntityName)
                 .ifPresent(name -> {
                     stacks.stream().filter(TombstoneBlock::isRemains).forEach(stack -> {
-                        stack.set(DataComponents.CUSTOM_NAME, Component.translatable("block.mca.tombstone.remains", stack.getHoverName(), name));
+                        stack.set(DataComponents.CUSTOM_NAME,
+                                Component.translatable("block.mca.tombstone.remains", stack.getHoverName(), name));
                     });
 
                 });
@@ -339,7 +343,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                 sync();
 
                 if (resurrectionProgress % 30 == 0) {
-                    level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), cure ? SoundEvents.BELL_BLOCK : SoundEvents.POLAR_BEAR_AMBIENT, SoundSource.BLOCKS, 1, 1);
+                    level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                            cure ? SoundEvents.BELL_BLOCK : SoundEvents.POLAR_BEAR_AMBIENT, SoundSource.BLOCKS, 1, 1);
                     level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(getBlockState()));
                 }
 
@@ -354,7 +359,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                         generateLightning();
                         entity.clearFire();
                         entity.setPortalCooldown();
-                        entity.setPos(worldPosition.getX() + 0.5F, worldPosition.getY() + 0.5F, worldPosition.getZ() + 0.5F);
+                        entity.setPos(worldPosition.getX() + 0.5F, worldPosition.getY() + 0.5F,
+                                worldPosition.getZ() + 0.5F);
                         if (entity instanceof LivingEntity l) {
                             l.setHealth(l.getMaxHealth());
                             l.removeAllEffects();
@@ -362,7 +368,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                             l.deathTime = 0;
                         }
 
-                        //enforcing a dimension update
+                        // enforcing a dimension update
                         if (entity instanceof AgeableMob mob) {
                             mob.setAge(mob.getAge());
                         }
@@ -379,8 +385,12 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                         }
 
                         if (entity instanceof Infectable infectable) {
-                            infectable.setInfectionProgress(cure ? 0.0f : Math.max(Mth.lerp(level.random.nextFloat(), Infectable.FEVER_THRESHOLD, Infectable.BABBLING_THRESHOLD), infectable.getInfectionProgress())
-                            );
+                            infectable
+                                    .setInfectionProgress(
+                                            cure ? 0.0f
+                                                    : Math.max(Mth.lerp(level.random.nextFloat(),
+                                                            Infectable.FEVER_THRESHOLD, Infectable.BABBLING_THRESHOLD),
+                                                            infectable.getInfectionProgress()));
                         }
 
                         if (!alreadySpawned) {
@@ -403,21 +413,21 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
             entityData = Optional.ofNullable(entity).map(e -> new EntityData(
                     writeEntityToNbt(e),
                     e.getName().getString(),
-                    EntityRelationship.of(e).map(EntityRelationship::getGender).orElse(Gender.MALE)
-            ));
+                    EntityRelationship.of(e).map(EntityRelationship::getGender).orElse(Gender.MALE)));
             computedName = null;
             setChanged();
 
             if (hasLevel()) {
-                level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 1, 1);
+                level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                        SoundEvents.BELL_BLOCK, SoundSource.BLOCKS, 1, 1);
                 level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, worldPosition, Block.getId(getBlockState()));
                 level.gameEvent(GameEvent.BLOCK_CHANGE, worldPosition, GameEvent.Context.of(getBlockState()));
                 ((TombstoneBlock) getBlockState().getBlock()).updateNeighbors(getBlockState(), level, worldPosition);
 
                 if (!level.isClientSide) {
                     GraveyardManager.get((ServerLevel) level).setTombstoneState(worldPosition,
-                            hasEntity() ? GraveyardManager.TombstoneState.FILLED : GraveyardManager.TombstoneState.EMPTY
-                    );
+                            hasEntity() ? GraveyardManager.TombstoneState.FILLED
+                                    : GraveyardManager.TombstoneState.EMPTY);
                     sync();
                 }
             }
@@ -466,7 +476,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
 
         @Override
         protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-            entityData = tag.contains("EntityData", Tag.TAG_COMPOUND) ? Optional.of(new EntityData(tag)) : Optional.empty();
+            entityData = tag.contains("EntityData", Tag.TAG_COMPOUND) ? Optional.of(new EntityData(tag))
+                    : Optional.empty();
             resurrectionProgress = tag.getInt("ResurrectionProgress");
             cure = tag.getBoolean("Cure");
         }
@@ -518,8 +529,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                 this(
                         nbt.getCompound("EntityData"),
                         nbt.getString("EntityName"),
-                        Gender.byId(nbt.getInt("EntityGender"))
-                );
+                        Gender.byId(nbt.getInt("EntityGender")));
             }
 
             void writeNbt(CompoundTag nbt) {

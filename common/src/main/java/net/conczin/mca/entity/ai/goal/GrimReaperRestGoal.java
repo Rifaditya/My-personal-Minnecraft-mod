@@ -26,7 +26,8 @@ public class GrimReaperRestGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return reaper.tickCount > lastHeal + COOLDOWN && reaper.getHealth() <= (reaper.getMaxHealth() * (1.0f - (healingCount + 1.0f) / (float) MAX_HEALING_COUNT));
+        return reaper.tickCount > lastHeal + COOLDOWN && reaper
+                .getHealth() <= (reaper.getMaxHealth() * (1.0f - (healingCount + 1.0f) / (float) MAX_HEALING_COUNT));
     }
 
     @Override
@@ -68,14 +69,17 @@ public class GrimReaperRestGoal extends Goal {
             // Let's have a light show.
             int dX = reaper.getRandom().nextInt(16) - 8;
             int dZ = reaper.getRandom().nextInt(16) - 8;
-            int y = TaskUtils.getSpawnSafeTopLevel(reaper.level(), (int) reaper.getX() + dX, 256, (int) reaper.getZ() + dZ);
+            int y = TaskUtils.getSpawnSafeTopLevel(reaper.level(), (int) reaper.getX() + dX, 256,
+                    (int) reaper.getZ() + dZ);
 
-            EntityType.LIGHTNING_BOLT.spawn((ServerLevel) reaper.level(), BlockPos.containing(reaper.getX() + dX, y, reaper.getZ() + dZ), MobSpawnType.TRIGGERED);
+            EntityType.LIGHTNING_BOLT.spawn((ServerLevel) reaper.level(),
+                    BlockPos.containing(reaper.getX() + dX, y, reaper.getZ() + dZ), MobSpawnType.TRIGGERED);
 
             if (!reaper.level().isClientSide && healingTime % 100 == 0) {
                 // Also spawn a random enemy
                 EntityType<?> m = reaper.getRandom().nextFloat() < 0.5f ? EntityType.ZOMBIE : EntityType.SKELETON;
-                Entity e = m.spawn((ServerLevel) reaper.level(), BlockPos.containing(reaper.getX() + dX, y, reaper.getZ() + dZ), MobSpawnType.TRIGGERED);
+                Entity e = m.spawn((ServerLevel) reaper.level(),
+                        BlockPos.containing(reaper.getX() + dX, y, reaper.getZ() + dZ), MobSpawnType.TRIGGERED);
 
                 // Equip them
                 if (e instanceof Mob mob) {

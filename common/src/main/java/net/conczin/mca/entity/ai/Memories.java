@@ -29,7 +29,8 @@ public class Memories {
             return null;
         }
 
-        Memories memories = new Memories(villager.getVillagerBrain(), villager.level().getDayTime(), tag.getUUID("playerUUID"));
+        Memories memories = new Memories(villager.getVillagerBrain(), villager.level().getDayTime(),
+                tag.getUUID("playerUUID"));
 
         memories.hearts = tag.getInt("hearts");
         memories.interactionFatigue = tag.getInt("interactionFatigue");

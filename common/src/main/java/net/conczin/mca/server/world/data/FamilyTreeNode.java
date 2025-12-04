@@ -33,8 +33,7 @@ public final class FamilyTreeNode {
             },
             (in) -> {
                 return new FamilyTreeNode(null, ByteBufCodecs.COMPOUND_TAG.decode(in));
-            }
-    );
+            });
     private final boolean isPlayer;
     private final UUID id;
     private final Set<UUID> children = new HashSet<>();
@@ -48,7 +47,8 @@ public final class FamilyTreeNode {
     private RelationshipState relationshipState = RelationshipState.SINGLE;
     private boolean deceased;
 
-    public FamilyTreeNode(FamilyTree rootNode, UUID id, String name, boolean isPlayer, Gender gender, UUID father, UUID mother) {
+    public FamilyTreeNode(FamilyTree rootNode, UUID id, String name, boolean isPlayer, Gender gender, UUID father,
+            UUID mother) {
         this.rootNode = rootNode;
         this.id = id;
         this.name = name;
@@ -66,19 +66,20 @@ public final class FamilyTreeNode {
                 nbt.getBoolean("isPlayer"),
                 Gender.byId(nbt.getInt("gender")),
                 nbt.getUUID("father"),
-                nbt.getUUID("mother")
-        );
-        children.addAll(NbtHelper.toList(nbt.getList("children", Tag.TAG_COMPOUND), c -> ((CompoundTag) c).getUUID("uuid")));
+                nbt.getUUID("mother"));
+        children.addAll(
+                NbtHelper.toList(nbt.getList("children", Tag.TAG_COMPOUND), c -> ((CompoundTag) c).getUUID("uuid")));
         profession = nbt.getString("profession");
         deceased = nbt.getBoolean("isDeceased");
-        
+
         if (nbt.hasUUID("spouse")) {
             partners.add(nbt.getUUID("spouse"));
         }
         if (nbt.contains("partners", Tag.TAG_LIST)) {
-            partners.addAll(NbtHelper.toList(nbt.getList("partners", Tag.TAG_COMPOUND), c -> ((CompoundTag) c).getUUID("uuid")));
+            partners.addAll(NbtHelper.toList(nbt.getList("partners", Tag.TAG_COMPOUND),
+                    c -> ((CompoundTag) c).getUUID("uuid")));
         }
-        
+
         relationshipState = RelationshipState.byId(nbt.getInt("marriageState"));
     }
 
@@ -94,13 +95,14 @@ public final class FamilyTreeNode {
         gather(current, family, depth, FamilyTreeNode::streamChildren);
     }
 
-    private static void gather(@Nullable FamilyTreeNode entry, Set<UUID> output, int depth, Function<FamilyTreeNode, Stream<UUID>> walker) {
+    private static void gather(@Nullable FamilyTreeNode entry, Set<UUID> output, int depth,
+            Function<FamilyTreeNode, Stream<UUID>> walker) {
         if (entry == null || depth <= 0) {
             return;
         }
         walker.apply(entry).forEach(id -> {
             if (!Util.NIL_UUID.equals(id)) {
-                output.add(id); //zero UUIDs are no real members
+                output.add(id); // zero UUIDs are no real members
             }
             if (depth > 1) {
                 entry.getRoot().getOrEmpty(id).ifPresent(e -> gather(e, output, depth - 1, walker));
@@ -150,11 +152,9 @@ public final class FamilyTreeNode {
     }
 
     public String getProfessionName() {
-        String professionName = (
-                getProfessionId().getNamespace().equalsIgnoreCase("minecraft") ?
-                        (getProfessionId().getPath().equals("none") ? "mca.none" : getProfessionId().getPath()) :
-                        getProfessionId().toString()
-        ).replace(":", ".");
+        String professionName = (getProfessionId().getNamespace().equalsIgnoreCase("minecraft")
+                ? (getProfessionId().getPath().equals("none") ? "mca.none" : getProfessionId().getPath())
+                : getProfessionId().toString()).replace(":", ".");
 
         return MCA.isBlankString(professionName) ? "mca.none" : professionName;
     }
@@ -181,13 +181,14 @@ public final class FamilyTreeNode {
 
     /**
      * Id of the last this entity's most recent partner.
+     * 
      * @deprecated Use {@link #partners()} instead.
      */
     @Deprecated
     public UUID partner() {
         return partners.stream().findFirst().orElse(Util.NIL_UUID);
     }
-    
+
     public Set<UUID> partners() {
         return partners;
     }
@@ -196,21 +197,22 @@ public final class FamilyTreeNode {
         return relationshipState;
     }
 
-    //debug usage only
+    // debug usage only
     public void setRelationshipState(RelationshipState relationshipState) {
         this.relationshipState = relationshipState;
     }
 
     public void addPartner(Entity newPartner, RelationshipState state) {
-        if (newPartner == null) return;
-        
+        if (newPartner == null)
+            return;
+
         this.partners.add(newPartner.getUUID());
         this.relationshipState = state; // Update state to married
-        
+
         rootNode.getOrCreate(newPartner);
         rootNode.setDirty();
     }
-    
+
     public void removePartner(UUID partnerId) {
         this.partners.remove(partnerId);
         if (this.partners.isEmpty()) {
@@ -226,12 +228,14 @@ public final class FamilyTreeNode {
     }
 
     public void updatePartner(@Nullable Entity newPartner, @Nullable RelationshipState state) {
-        // Legacy support: if newPartner is null, clear all. If not null, add it (or replace? Plan said add).
+        // Legacy support: if newPartner is null, clear all. If not null, add it (or
+        // replace? Plan said add).
         // But wait, existing code used updatePartner to SET the partner.
-        // For polygamy, we should probably change this to addPartner, but to keep compatibility with existing calls
+        // For polygamy, we should probably change this to addPartner, but to keep
+        // compatibility with existing calls
         // that might expect "set", we need to be careful.
         // However, the plan says "Update updatePartner to addPartner logic".
-        
+
         if (newPartner == null) {
             clearPartners();
         } else {
@@ -241,7 +245,8 @@ public final class FamilyTreeNode {
 
     public void updatePartner(FamilyTreeNode spouse) {
         this.partners.add(spouse.id());
-        this.relationshipState = spouse.isPlayer ? RelationshipState.MARRIED_TO_PLAYER : RelationshipState.MARRIED_TO_VILLAGER;
+        this.relationshipState = spouse.isPlayer ? RelationshipState.MARRIED_TO_PLAYER
+                : RelationshipState.MARRIED_TO_VILLAGER;
         markDirty();
     }
 
@@ -273,11 +278,12 @@ public final class FamilyTreeNode {
     }
 
     // returns indirect relatives like siblings and their respective family
-    // potential slow for large families, getRelatives() is preferred if indirect family members are not relevant
+    // potential slow for large families, getRelatives() is preferred if indirect
+    // family members are not relevant
     public Stream<UUID> getAllRelatives(int depth) {
         Set<UUID> family = new HashSet<>();
 
-        //recursive family fetching
+        // recursive family fetching
         Set<UUID> todo = new HashSet<>();
         todo.add(id);
         for (int d = 0; d < depth; d++) {
@@ -287,7 +293,7 @@ public final class FamilyTreeNode {
                     rootNode.getOrEmpty(uuid).ifPresent(node -> {
                         family.add(uuid);
 
-                        //add parents and children
+                        // add parents and children
                         node.streamParents().forEach(nextTodo::add);
                         node.streamChildren().forEach(nextTodo::add);
                     });
@@ -296,7 +302,7 @@ public final class FamilyTreeNode {
             todo = nextTodo;
         }
 
-        //the caller is not meant
+        // the caller is not meant
         family.remove(id);
 
         return family.stream();
@@ -306,11 +312,11 @@ public final class FamilyTreeNode {
     public Stream<UUID> getRelatives(int parentDepth, int childrenDepth) {
         Set<UUID> family = new HashSet<>();
 
-        //fetch parents and children
+        // fetch parents and children
         gatherParents(this, family, parentDepth);
         gatherChildren(this, family, childrenDepth);
 
-        //and the caller is not meant either
+        // and the caller is not meant either
         family.remove(id);
 
         return family.stream();
@@ -363,14 +369,14 @@ public final class FamilyTreeNode {
         int parents = (isValid(father) ? 1 : 0) + (isValid(mother) ? 1 : 0);
 
         if (parents == 1) {
-            //fill up last slot, independent on gender
+            // fill up last slot, independent on gender
             if (!isValid(father)) {
                 return setFather(parent);
             } else if (!isValid(mother)) {
                 return setMother(parent);
             }
         } else {
-            //fill up gender respective slot
+            // fill up gender respective slot
             if (parent.gender() == Gender.MALE) {
                 return setFather(parent);
             } else {
@@ -423,7 +429,8 @@ public final class FamilyTreeNode {
 
     // entries with these conditions are usually generated
     public boolean probablyGenerated() {
-        return mother.equals(Util.NIL_UUID) && father.equals(Util.NIL_UUID) && children.size() == 1 && deceased && !isPlayer();
+        return mother.equals(Util.NIL_UUID) && father.equals(Util.NIL_UUID) && children.size() == 1 && deceased
+                && !isPlayer();
     }
 
     // true if there is at least one non-generated relative
@@ -455,7 +462,7 @@ public final class FamilyTreeNode {
             n.putUUID("uuid", p);
             return n;
         }));
-        
+
         nbt.putInt("marriageState", relationshipState.ordinal());
         nbt.put("children", NbtHelper.fromList(children, child -> {
             CompoundTag n = new CompoundTag();

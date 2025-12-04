@@ -12,6 +12,7 @@
     "MixinGoat",
     "MixinHorseBase",
     "MixinInventory",
+    "MixinLivingEntity",
     "MixinMemoryModuleType",
     "MixinMilkBucketItem",
     "MixinPlayer",

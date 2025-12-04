@@ -32,9 +32,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerLike<ZombieVillagerEntityMCA>, CompassionateEntity<Relationship<ZombieVillagerEntityMCA>> {
+public class ZombieVillagerEntityMCA extends ZombieVillager
+        implements VillagerLike<ZombieVillagerEntityMCA>, CompassionateEntity<Relationship<ZombieVillagerEntityMCA>> {
 
-    private static final CDataManager<ZombieVillagerEntityMCA> DATA = VillagerEntityMCA.createTrackedData(ZombieVillagerEntityMCA.class).build();
+    private static final CDataManager<ZombieVillagerEntityMCA> DATA = VillagerEntityMCA
+            .createTrackedData(ZombieVillagerEntityMCA.class).build();
 
     private final VillagerBrain<ZombieVillagerEntityMCA> mcaBrain = new VillagerBrain<>(this);
 
@@ -130,7 +132,8 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
     @Override
     public final InteractionResult interactAt(Player player, Vec3 pos, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (hand.equals(InteractionHand.MAIN_HAND) && !stack.is(TagsMCA.Items.ZOMBIE_EGGS) && stack.getItem() != Items.GOLDEN_APPLE) {
+        if (hand.equals(InteractionHand.MAIN_HAND) && !stack.is(TagsMCA.Items.ZOMBIE_EGGS)
+                && stack.getItem() != Items.GOLDEN_APPLE) {
             if (player instanceof ServerPlayer) {
                 String t = new String(new char[getRandom().nextInt(8) + 2]).replace("\0", ". ");
                 sendChatMessage(Component.literal(t), player);
@@ -141,7 +144,8 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty,
+            MobSpawnType spawnReason, @Nullable SpawnGroupData entityData) {
         SpawnGroupData data = super.finalizeSpawn(world, difficulty, spawnReason, entityData);
 
         if (getAgeState() == AgeState.UNASSIGNED) {
@@ -164,7 +168,8 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
 
     @Override
     protected void onOffspringSpawnedFromEgg(Player player, Mob child) {
-        child.finalizeSpawn((ServerLevelAccessor) level(), level().getCurrentDifficultyAt(child.blockPosition()), MobSpawnType.SPAWN_EGG, null);
+        child.finalizeSpawn((ServerLevelAccessor) level(), level().getCurrentDifficultyAt(child.blockPosition()),
+                MobSpawnType.SPAWN_EGG, null);
     }
 
     @Override
@@ -210,7 +215,7 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
         InventoryUtils.readFromNBT(this.registryAccess(), this.inventory, nbt);
     }
 
-    @SuppressWarnings({"unchecked", "RedundantSuppression"})
+    @SuppressWarnings({ "unchecked", "RedundantSuppression" })
     @Override
     @Nullable
     public <T extends Mob> T convertTo(EntityType<T> type, boolean keepInventory) {
@@ -259,7 +264,8 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> par) {
-        if (getTypeDataManager().isParam(AGE_STATE, par) || getTypeDataManager().isParam(Genetics.SIZE.getParam(), par)) {
+        if (getTypeDataManager().isParam(AGE_STATE, par)
+                || getTypeDataManager().isParam(Genetics.SIZE.getParam(), par)) {
             refreshDimensions();
         }
 

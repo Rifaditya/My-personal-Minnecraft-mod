@@ -22,8 +22,7 @@ public enum Chore {
     private static final Chore[] VALUES = values();
     private static final Map<String, Chore> REGISTRY = Stream.of(VALUES).collect(Collectors.toMap(
             c -> c.friendlyName,
-            Function.identity())
-    );
+            Function.identity()));
 
     private final String friendlyName;
 
@@ -55,4 +54,3 @@ public enum Chore {
         return toolType;
     }
 }
-

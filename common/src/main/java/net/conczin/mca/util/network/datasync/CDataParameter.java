@@ -22,8 +22,7 @@ public class CDataParameter<T> implements CParameter<T, T> {
             EntityDataSerializer<T> valueType,
             T defaultValue,
             Decoder<T> load,
-            Encoder<? super T> save
-    ) {
+            Encoder<? super T> save) {
         this.id = id;
         this.defaultValue = defaultValue;
         this.valueType = valueType;

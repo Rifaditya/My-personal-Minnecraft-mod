@@ -25,7 +25,8 @@ public abstract class RelationshipItem extends TooltippedItem implements Special
             response = "interaction.relationship.fail.isparent";
         } else if (Relationship.IS_MARRIED.test(villager, player)) {
             response = "interaction.relationship.fail.marriedtogiver";
-        } else if (villager.getRelationships().isMarried()) {
+        } else if (villager.getGenetics().getGender() == net.conczin.mca.entity.ai.relationship.Gender.FEMALE
+                && villager.getRelationships().isMarried()) {
             response = "interaction.relationship.fail.married";
         } else if (villager.getRelationships().isEngaged() && !Relationship.IS_ENGAGED.test(villager, player)) {
             response = "interaction.relationship.fail.engaged";

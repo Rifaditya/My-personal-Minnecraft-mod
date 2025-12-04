@@ -41,7 +41,9 @@ public interface IGenderArmor {
         if (stack.isEmpty()) {
             return EMPTY;
         }
-        // TODO: Add map for vanilla armor overrides here if needed
+        // For vanilla armor, using DEFAULT config which provides standard coverage and
+        // physics
+        // Custom armor mods can implement IGenderArmor interface for specific behavior
         return DEFAULT;
     }
 }

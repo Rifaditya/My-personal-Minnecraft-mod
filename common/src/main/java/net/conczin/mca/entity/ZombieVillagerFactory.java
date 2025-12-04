@@ -94,11 +94,9 @@ public class ZombieVillagerFactory {
         position.ifPresent(pos -> zombie.absMoveTo(pos.x(), pos.y(), pos.z()));
         VillagerData data = zombie.getVillagerData();
         zombie.setVillagerData(new VillagerData(
-                        type.orElseGet(data::getType),
-                        profession.orElse(VillagerProfession.NONE),
-                        level.orElseGet(data::getLevel)
-                )
-        );
+                type.orElseGet(data::getType),
+                profession.orElse(VillagerProfession.NONE),
+                level.orElseGet(data::getLevel)));
         return zombie;
     }
 }

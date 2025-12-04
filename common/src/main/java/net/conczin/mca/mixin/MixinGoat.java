@@ -30,14 +30,15 @@ public abstract class MixinGoat extends Animal {
         if (!this.level().isClientSide && this.level().isRaining()) {
             long time = this.level().getDayTime() % 24000;
             BlockPos pos = blockPosition();
-            if (time > 16000 && time < 20000 && this.level().getBiome(pos).value().coldEnoughToSnow(pos) && SpawnPlacements.isSpawnPositionOk(EntityType.WITHER_SKELETON, level(), pos)) {
+            if (time > 16000 && time < 20000 && this.level().getBiome(pos).value().coldEnoughToSnow(pos)
+                    && SpawnPlacements.isSpawnPositionOk(EntityType.WITHER_SKELETON, level(), pos)) {
                 WitherSkeleton ancientCultist = EntityType.WITHER_SKELETON.create(level());
                 if (ancientCultist != null) {
-                    //place the ancient boi
+                    // place the ancient boi
                     ancientCultist.setPos(pos.getX(), pos.getY(), pos.getZ());
                     WorldUtils.spawnEntity(level(), ancientCultist, MobSpawnType.EVENT);
 
-                    //drip
+                    // drip
                     ancientCultist.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.GOLDEN_HELMET));
                     ancientCultist.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.GOLDEN_CHESTPLATE));
                     ancientCultist.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.GOLDEN_LEGGINGS));
@@ -48,15 +49,15 @@ public abstract class MixinGoat extends Animal {
 
                     ancientCultist.setCustomName(Component.translatable("entity.mca.ancient_cultist"));
 
-                    //advancement
+                    // advancement
                     ((ServerLevel) this.level()).players().stream().filter(p -> p.distanceTo(this) < 30).forEach(p -> {
                         CriterionMCA.GENERIC_EVENT.trigger(p, "ancient_cultists");
                     });
 
-                    //remove the goat
+                    // remove the goat
                     kill();
 
-                    //extra spiciness
+                    // extra spiciness
                     level().setSkyFlashTime(10);
                     LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level());
                     if (bolt != null) {

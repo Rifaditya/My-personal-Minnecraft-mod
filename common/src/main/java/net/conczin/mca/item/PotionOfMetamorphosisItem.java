@@ -40,7 +40,8 @@ public class PotionOfMetamorphosisItem extends TooltippedItem {
             common(serverPlayer);
 
             // also update players
-            serverPlayer.serverLevel().players().forEach(p -> Network.sendToPlayer(new PlayerDataMessage(player.getUUID(), villagerData), p));
+            serverPlayer.serverLevel().players()
+                    .forEach(p -> Network.sendToPlayer(new PlayerDataMessage(player.getUUID(), villagerData), p));
 
             // remove item
             ItemStack stack = player.getItemInHand(hand);
@@ -50,7 +51,8 @@ public class PotionOfMetamorphosisItem extends TooltippedItem {
         return super.use(world, player, hand);
     }
 
-    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
+    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity,
+            InteractionHand hand) {
         if (entity instanceof VillagerLike<?> villager && !entity.level().isClientSide) {
             villager.getGenetics().setGender(gender);
 

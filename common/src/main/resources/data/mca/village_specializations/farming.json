@@ -1,0 +1,23 @@
+{
+    "_comment": "Farming village specialization. Villages with farms and barns will specialize in agriculture.",
+    "farming": {
+        "buildings": [
+            "mca:barn"
+        ],
+        "biomes": [
+            "minecraft:plains",
+            "minecraft:sunflower_plains",
+            "minecraft:meadow"
+        ],
+        "score_per_building": 3,
+        "score_per_biome_match": 5,
+        "threshold": 10,
+        "profession_weights": {
+            "minecraft:farmer": 3.0,
+            "minecraft:shepherd": 2.0,
+            "minecraft:butcher": 2.0
+        },
+        "minimum_farmer_percentage": 0.30,
+        "productivity_multiplier": 1.5
+    }
+}

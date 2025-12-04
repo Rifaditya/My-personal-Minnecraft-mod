@@ -9,6 +9,8 @@ import net.conczin.mca.server.world.data.villageComponents.*;
 import net.conczin.mca.util.BlockBoxExtended;
 import net.conczin.mca.util.NbtHelper;
 import net.conczin.mca.util.WorldUtils;
+import net.conczin.mca.village.specialization.VillageSpecialization;
+import net.conczin.mca.village.specialization.SpecializationDetector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
@@ -54,6 +56,7 @@ public class Village implements Iterable<Building> {
     private float populationThreshold = 0.75f;
     private float marriageThreshold = 0.5f;
     private boolean autoScan = Config.getInstance().enableAutoScanByDefault;
+    private VillageSpecialization specialization = VillageSpecialization.NONE;
     private BlockBoxExtended box = new BlockBoxExtended(0, 0, 0, 0, 0, 0);
 
     public Village(int id, ServerLevel world) {
@@ -67,11 +70,11 @@ public class Village implements Iterable<Building> {
         name = v.getString("name");
         taxes = v.getFloat("taxesFloat");
         beds = v.getInt("beds");
-        reputation = NbtHelper.toMap(v.getCompound("reputation"), UUID::fromString, i ->
-                NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> ((IntTag) i2).getAsInt())
-        );
+        reputation = NbtHelper.toMap(v.getCompound("reputation"), UUID::fromString,
+                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> ((IntTag) i2).getAsInt()));
         residentNames = NbtHelper.toMap(v.getCompound("residentNames"), UUID::fromString, Tag::getAsString);
-        residentHomes = NbtHelper.toMap(v.getCompound("residentHomes"), UUID::fromString, i -> ((LongTag) i).getAsLong());
+        residentHomes = NbtHelper.toMap(v.getCompound("residentHomes"), UUID::fromString,
+                i -> ((LongTag) i).getAsLong());
 
         if (v.contains("populationThresholdFloat")) {
             populationThreshold = v.getFloat("populationThresholdFloat");
@@ -85,6 +88,10 @@ public class Village implements Iterable<Building> {
             autoScan = v.getBoolean("autoScan");
         } else {
             autoScan = true;
+        }
+
+        if (v.contains("specialization")) {
+            specialization = VillageSpecialization.fromId(v.getString("specialization"));
         }
 
         ListTag b = v.getList("buildings", Tag.TAG_COMPOUND);
@@ -167,7 +174,8 @@ public class Village implements Iterable<Building> {
     public List<String> getResidents(int building) {
         return getBuilding(building).map(value -> residentHomes.entrySet().stream().filter(e -> {
             return value.containsPos(BlockPos.of(e.getValue()));
-        }).map(k -> residentNames.getOrDefault(k.getKey(), "Unknown")).collect(Collectors.toList())).orElseGet(List::of);
+        }).map(k -> residentNames.getOrDefault(k.getKey(), "Unknown")).collect(Collectors.toList()))
+                .orElseGet(List::of);
     }
 
     public float getTaxes() {
@@ -254,7 +262,8 @@ public class Village implements Iterable<Building> {
     public void updateMaxPopulation() {
         if (world != null) {
             Vec3i dimensions = box.getLength();
-            int radius = (int) Math.sqrt(dimensions.getX() * dimensions.getX() + dimensions.getY() * dimensions.getY() + dimensions.getZ() * dimensions.getZ());
+            int radius = (int) Math.sqrt(dimensions.getX() * dimensions.getX() + dimensions.getY() * dimensions.getY()
+                    + dimensions.getZ() * dimensions.getZ());
             beds = (int) world.getPoiManager().findAll(
                     registryEntry -> registryEntry.is(PoiTypes.HOME),
                     this::isPositionValidBed,
@@ -293,9 +302,14 @@ public class Village implements Iterable<Building> {
 
         if (time % 24000 == 0) {
             cleanReputation();
+            // Update specialization once per day
+            if (world != null && Config.getInstance().enableVillageSpecializations) {
+                setSpecialization(SpecializationDetector.detectSpecialization(this, world));
+            }
         }
 
-        if (isVillageUpdateTime && lastMoveIn + MOVE_IN_COOLDOWN < time && WorldUtils.isChunkLoaded(world, getCenter())) {
+        if (isVillageUpdateTime && lastMoveIn + MOVE_IN_COOLDOWN < time
+                && WorldUtils.isChunkLoaded(world, getCenter())) {
             villageGuardsManager.spawnGuards(world);
             villageInnManager.updateInn(world);
             villageMarriageManager.marry(world);
@@ -309,14 +323,19 @@ public class Village implements Iterable<Building> {
 
     public void broadCastMessage(ServerLevel world, String event, VillagerEntityMCA suitor, VillagerEntityMCA mate) {
         world.players().stream().filter(p -> PlayerSaveData.get(p).getLastSeenVillageId().orElse(-2) == getId()
-                                             || suitor.getVillagerBrain().getMemoriesForPlayer(p).getHearts() > Config.getInstance().heartsToBeConsideredAsFriend
-                                             || mate.getVillagerBrain().getMemoriesForPlayer(p).getHearts() > Config.getInstance().heartsToBeConsideredAsFriend)
-                .forEach(player -> player.displayClientMessage(Component.translatable(event, suitor.getName(), mate.getName()), !Config.getInstance().showNotificationsAsChat));
+                || suitor.getVillagerBrain().getMemoriesForPlayer(p)
+                        .getHearts() > Config.getInstance().heartsToBeConsideredAsFriend
+                || mate.getVillagerBrain().getMemoriesForPlayer(p)
+                        .getHearts() > Config.getInstance().heartsToBeConsideredAsFriend)
+                .forEach(player -> player.displayClientMessage(
+                        Component.translatable(event, suitor.getName(), mate.getName()),
+                        !Config.getInstance().showNotificationsAsChat));
     }
 
     public void broadCastMessage(ServerLevel world, String event, String targetName) {
         world.players().stream().filter(p -> PlayerSaveData.get(p).getLastSeenVillageId().orElse(-2) == getId())
-                .forEach(player -> player.displayClientMessage(Component.translatable(event, targetName), !Config.getInstance().showNotificationsAsChat));
+                .forEach(player -> player.displayClientMessage(Component.translatable(event, targetName),
+                        !Config.getInstance().showNotificationsAsChat));
     }
 
     public void markDirty() {
@@ -340,7 +359,8 @@ public class Village implements Iterable<Building> {
     }
 
     public int getReputation(Player player) {
-        return reputation.getOrDefault(player.getUUID(), Collections.emptyMap()).values().stream().mapToInt(i -> i).sum();
+        return reputation.getOrDefault(player.getUUID(), Collections.emptyMap()).values().stream().mapToInt(i -> i)
+                .sum();
     }
 
     public void pushHearts(Player player, int h) {
@@ -375,15 +395,16 @@ public class Village implements Iterable<Building> {
         v.putString("name", name);
         v.putFloat("taxesFloat", taxes);
         v.putInt("beds", beds);
-        v.put("reputation", NbtHelper.fromMap(new CompoundTag(), reputation, UUID::toString, i ->
-                NbtHelper.fromMap(new CompoundTag(), i, UUID::toString, IntTag::valueOf)
-        ));
-        v.put("residentNames", NbtHelper.fromMap(new CompoundTag(), residentNames, Object::toString, StringTag::valueOf));
+        v.put("reputation", NbtHelper.fromMap(new CompoundTag(), reputation, UUID::toString,
+                i -> NbtHelper.fromMap(new CompoundTag(), i, UUID::toString, IntTag::valueOf)));
+        v.put("residentNames",
+                NbtHelper.fromMap(new CompoundTag(), residentNames, Object::toString, StringTag::valueOf));
         v.put("residentHomes", NbtHelper.fromMap(new CompoundTag(), residentHomes, Object::toString, LongTag::valueOf));
         v.putFloat("populationThresholdFloat", populationThreshold);
         v.putFloat("marriageThresholdFloat", marriageThreshold);
         v.put("buildings", NbtHelper.fromList(buildings.values(), Building::save));
         v.putBoolean("autoScan", autoScan);
+        v.putString("specialization", specialization.getId());
         return v;
     }
 
@@ -428,5 +449,14 @@ public class Village implements Iterable<Building> {
 
     public Optional<CivilRegistryManager> getCivilRegistry() {
         return world != null ? Optional.of(CivilRegistryManager.get(world, this)) : Optional.empty();
+    }
+
+    public VillageSpecialization getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(VillageSpecialization specialization) {
+        this.specialization = specialization;
+        markDirty();
     }
 }

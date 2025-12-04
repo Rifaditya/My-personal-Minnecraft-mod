@@ -28,9 +28,11 @@ public class NeedleAndThreadItem extends TooltippedItem {
         return super.use(world, player, hand);
     }
 
-    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
+    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity,
+            InteractionHand hand) {
         if (entity instanceof VillagerLike && !entity.level().isClientSide && player instanceof ServerPlayer) {
-            Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.NEEDLE_AND_THREAD, entity), (ServerPlayer) player);
+            Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.NEEDLE_AND_THREAD, entity),
+                    (ServerPlayer) player);
             return InteractionResult.SUCCESS;
         } else {
             return InteractionResult.CONSUME;

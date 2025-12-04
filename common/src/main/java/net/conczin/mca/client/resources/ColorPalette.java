@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ColorPalette {
-    static final Data EMPTY = new Data(1, 1, new int[]{0xFFFFFF});
+    static final Data EMPTY = new Data(1, 1, new int[] { 0xFFFFFF });
     static final Map<ResourceLocation, ColorPalette> REGISTRY = new HashMap<>();
 
     public static final ColorPalette SKIN = new ColorPalette(MCA.locate("textures/colormap/villager_skin.png"));
@@ -29,8 +29,7 @@ public class ColorPalette {
                 1.0f,
                 Mth.clamp(FastColor.ARGB32.red(color) / 255f * (1.0f - greenShift * 0.3f) - greenShift * 0.1f, 0, 1),
                 Mth.clamp(FastColor.ARGB32.green(color) / 255f * (1.0f + greenShift * 0.3f) + greenShift * 0.1f, 0, 1),
-                Mth.clamp(FastColor.ARGB32.blue(color) / 255f, 0, 1)
-        );
+                Mth.clamp(FastColor.ARGB32.blue(color) / 255f, 0, 1));
     }
 
     private static int clampFloor(float v, int max) {
@@ -53,24 +52,3 @@ public class ColorPalette {
     public record Data(int width, int height, int[] colors) {
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

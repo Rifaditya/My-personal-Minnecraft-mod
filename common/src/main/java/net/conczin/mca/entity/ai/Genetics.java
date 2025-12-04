@@ -40,6 +40,11 @@ public class Genetics implements Iterable<Genetics.Gene> {
     public static final GeneType BREAST_Y_OFFSET = new GeneType("BreastYOffset");
     public static final GeneType BREAST_Z_OFFSET = new GeneType("BreastZOffset");
     public static final GeneType ARMOR_PHYSICS_OVERRIDE = new GeneType("ArmorPhysicsOverride");
+    public static final GeneType ELASTICITY = new GeneType("Elasticity");
+    public static final GeneType MASS = new GeneType("Mass");
+    public static final GeneType SHAPE = new GeneType("Shape");
+    public static final GeneType NIPPLE_SIZE = new GeneType("NippleSize");
+    public static final GeneType AREOLA_COLOR = new GeneType("AreolaColor");
 
     private static final CEnumParameter<Gender> GENDER = CParameter.create("Gender", Gender.UNASSIGNED);
 
@@ -115,6 +120,26 @@ public class Genetics implements Iterable<Genetics.Gene> {
         return getGene(FLOPPINESS);
     }
 
+    public float getElasticity() {
+        return getGene(ELASTICITY);
+    }
+
+    public float getMass() {
+        return getGene(MASS);
+    }
+
+    public float getShape() {
+        return getGene(SHAPE);
+    }
+
+    public float getNippleSize() {
+        return getGene(NIPPLE_SIZE);
+    }
+
+    public float getAreolaColor() {
+        return getGene(AREOLA_COLOR);
+    }
+
     @Override
     public Iterator<Gene> iterator() {
         return genes.values().iterator();
@@ -141,7 +166,12 @@ public class Genetics implements Iterable<Genetics.Gene> {
         // size is more centered
         setGene(SIZE, centeredRandom());
         setGene(WIDTH, centeredRandom());
-        setGene(BREAST, centeredRandom());
+
+        // Breast genetics from config
+        float mean = Config.getInstance().breastGeneticsMean;
+        float variance = Config.getInstance().breastGeneticsVariance;
+        float val = mean + (random.nextFloat() - 0.5f) * variance;
+        setGene(BREAST, Mth.clamp(val, 0, 1));
 
         // temperature
         float temp = entity.asEntity().level().getBiome(entity.asEntity().blockPosition()).value().getBaseTemperature();
@@ -172,6 +202,12 @@ public class Genetics implements Iterable<Genetics.Gene> {
         setGene(BREAST_X_OFFSET, centeredRandom());
         setGene(BREAST_Y_OFFSET, centeredRandom());
         setGene(BREAST_Z_OFFSET, centeredRandom());
+
+        setGene(ELASTICITY, 0.3f + random.nextFloat() * 0.4f); // Range: 0.3-0.7
+        setGene(MASS, 0.5f + random.nextFloat() * 0.5f); // Range: 0.5-1.0
+        setGene(SHAPE, random.nextFloat());
+        setGene(NIPPLE_SIZE, random.nextFloat());
+        setGene(AREOLA_COLOR, random.nextFloat());
     }
 
     /**

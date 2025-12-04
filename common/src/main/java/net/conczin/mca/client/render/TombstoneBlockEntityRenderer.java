@@ -31,7 +31,8 @@ public class TombstoneBlockEntityRenderer implements BlockEntityRenderer<Tombsto
     }
 
     @Override
-    public void render(Data entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+    public void render(Data entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light,
+            int overlay) {
         if (!entity.hasEntity()) {
             return;
         }
@@ -57,11 +58,13 @@ public class TombstoneBlockEntityRenderer implements BlockEntityRenderer<Tombsto
 
         int maxLineWidth = block.getLineWidth();
 
-        float y = drawText(text, text.split(Component.translatable("block.mca.tombstone.header"), maxLineWidth), 0, matrices, vertexConsumers, light);
+        float y = drawText(text, text.split(Component.translatable("block.mca.tombstone.header"), maxLineWidth), 0,
+                matrices, vertexConsumers, light);
 
         y += 5;
 
-        FlowingText name = entity.getOrCreateEntityName(n -> FlowingText.Factory.wrapLines(text, n, maxLineWidth, block.getMaxNameHeight()));
+        FlowingText name = entity.getOrCreateEntityName(
+                n -> FlowingText.Factory.wrapLines(text, n, maxLineWidth, block.getMaxNameHeight()));
 
         matrices.pushPose();
         matrices.scale(name.scale(), name.scale(), name.scale());
@@ -72,16 +75,23 @@ public class TombstoneBlockEntityRenderer implements BlockEntityRenderer<Tombsto
 
         y += 5;
 
-        drawText(text, text.split(Component.translatable("block.mca.tombstone.footer." + entity.getGender().binary().getDataName()), maxLineWidth), y, matrices, vertexConsumers, light);
+        drawText(text,
+                text.split(
+                        Component.translatable(
+                                "block.mca.tombstone.footer." + entity.getGender().binary().getDataName()),
+                        maxLineWidth),
+                y, matrices, vertexConsumers, light);
 
         matrices.popPose();
     }
 
-    private float drawText(Font text, List<FormattedCharSequence> lines, float y, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+    private float drawText(Font text, List<FormattedCharSequence> lines, float y, PoseStack matrices,
+            MultiBufferSource vertexConsumers, int light) {
         for (FormattedCharSequence line : lines) {
             float x = -text.width(line) / 2F;
 
-            text.drawInBatch8xOutline(line, x, y, 0xFFFFFFFF, 0xFF000000, matrices.last().pose(), vertexConsumers, light);
+            text.drawInBatch8xOutline(line, x, y, 0xFFFFFFFF, 0xFF000000, matrices.last().pose(), vertexConsumers,
+                    light);
 
             y += 10;
         }

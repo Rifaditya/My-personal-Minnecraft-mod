@@ -211,6 +211,31 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
             public boolean getArmorPhysicsOverride() {
                 return false; // Or expose this in genetics if needed
             }
+
+            @Override
+            public float getElasticity() {
+                return villager.getGenetics().getElasticity();
+            }
+
+            @Override
+            public float getMass() {
+                return villager.getGenetics().getMass();
+            }
+
+            @Override
+            public float getShape() {
+                return villager.getGenetics().getShape();
+            }
+
+            @Override
+            public float getNippleSize() {
+                return villager.getGenetics().getNippleSize();
+            }
+
+            @Override
+            public float getAreolaColor() {
+                return villager.getGenetics().getAreolaColor();
+            }
         };
     }
 }

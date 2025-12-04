@@ -55,7 +55,8 @@ public final class Config {
     public boolean overwriteAllZombiesWithZombieVillagers = false;
 
     /**
-     * Whitelist of modded zombie villagers to be converted into MCA zombie villagers.
+     * Whitelist of modded zombie villagers to be converted into MCA zombie
+     * villagers.
      */
     public List<String> moddedZombieVillagerWhitelist = List.of();
 
@@ -132,7 +133,8 @@ public final class Config {
     public boolean enableVillagerMailingPlayers = true;
 
     /**
-     * Whether body customization (e.g., height, size) is available in the Destiny editor.
+     * Whether body customization (e.g., height, size) is available in the Destiny
+     * editor.
      */
     public boolean allowBodyCustomizationInDestiny = true;
 
@@ -208,7 +210,8 @@ public final class Config {
     public boolean allowVillagerTeleporting = false;
 
     /**
-     * Minimum squared distance at which teleportation becomes possible for villagers.
+     * Minimum squared distance at which teleportation becomes possible for
+     * villagers.
      */
     public double villagerMinTeleportationDistance = 128;
 
@@ -249,7 +252,8 @@ public final class Config {
     public boolean bypassTraitRestrictions = false;
 
     /**
-     * Fraction (0–1) of villagers who are night owls (awake at night, asleep during the day).
+     * Fraction (0–1) of villagers who are night owls (awake at night, asleep during
+     * the day).
      */
     public float nightOwlChance = 0.5f;
 
@@ -259,7 +263,8 @@ public final class Config {
     public boolean allowAnyNightOwl = false;
 
     /**
-     * For every X hearts, players may hit a villager once without guards attacking them.
+     * For every X hearts, players may hit a villager once without guards attacking
+     * them.
      */
     public int heartsForPardonHit = 30;
 
@@ -343,6 +348,16 @@ public final class Config {
     public boolean enableBoobs = true;
 
     /**
+     * Average breast size (0-1).
+     */
+    public float breastGeneticsMean = 0.3f;
+
+    /**
+     * Variance of breast size distribution.
+     */
+    public float breastGeneticsVariance = 0.5f;
+
+    /**
      * Duration (in ticks) that burned clothing effects remain visible.
      */
     public int burnedClothingTickLength = 3600;
@@ -370,6 +385,26 @@ public final class Config {
      */
     public int procreationCooldown = 72000;
 
+    /**
+     * Time (in ticks) before players can use /mca procreate again.
+     * Set to 0 to disable cooldown. Default is 72000 ticks (3 in-game days).
+     */
+    public int playerProcreationCooldown = 72000;
+
+    /**
+     * Enable automatic village specialization detection and bonuses.
+     */
+    public boolean enableVillageSpecializations = true;
+
+    /**
+     * Heart bonus for a successful affair.
+     */
+    public int affairHeartBonus = 25;
+
+    /**
+     * Heart penalty for a refused affair.
+     */
+    public int affairHeartPenalty = 50;
 
     /////////////
     // Tracker //
@@ -386,18 +421,16 @@ public final class Config {
      */
     public int trackVillagerPositionEveryNTicks = 200;
 
-
     ////////
     // AI //
     /// ////
     @SuppressWarnings("unused")
-    public String _read_this_before_using_villager_ai =
-            "https://github.com/Luke100000/minecraft-comes-alive/wiki/GPT3-based-conversations";
+    public String _read_this_before_using_villager_ai = "https://github.com/Luke100000/minecraft-comes-alive/wiki/GPT3-based-conversations";
 
     /**
      * Enables the AI chat for villagers.
      */
-    public boolean enableVillagerChatAI = false;
+    public boolean enableVillagerChatAI = true;
 
     /**
      * Chat completion endpoint for villager AI chat requests.
@@ -407,12 +440,55 @@ public final class Config {
     /**
      * Villager try to follow commands like "follow me", ...
      */
-    public boolean villagerChatAIUseTools = false;
+    public boolean villagerChatAIUseTools = true;
 
     /**
      * Optional API token.
      */
     public String villagerChatAIToken = "";
+
+    @SuppressWarnings("unused")
+    public String _gemini_help = "To use Gemini: 1. Set aiProvider to GEMINI. 2. Get API key from https://aistudio.google.com/app/apikey. 3. Paste key into geminiApiKey. 4. (Optional) Change geminiModel if needed (default: gemini-1.5-flash).";
+
+    /**
+     * Selects the AI provider to use for villager conversations.
+     * <p>
+     * Options:
+     * <ul>
+     * <li><b>DEFAULT</b>: Uses the standard MCA AI (OpenAI or Conczin
+     * backend).</li>
+     * <li><b>GEMINI</b>: Uses Google's Gemini API. Requires a valid API key.</li>
+     * </ul>
+     */
+    public String aiProvider = "DEFAULT";
+
+    /**
+     * API Key for Google Gemini.
+     * <p>
+     * <b>Tutorial:</b><br>
+     * 1. Go to <a href="https://aistudio.google.com/app/apikey">Google AI
+     * Studio</a>.<br>
+     * 2. Click "Create API key".<br>
+     * 3. Copy the key and paste it here.<br>
+     * <p>
+     * <i>Note: Keep this key secret! Do not share your config file if it contains
+     * this key.</i>
+     */
+    public String geminiApiKey = "";
+
+    /**
+     * The Gemini model to use.
+     * <p>
+     * Available models:
+     * <ul>
+     * <li><b>gemini-1.5-flash</b>: Fast and efficient (Default).</li>
+     * <li><b>gemini-1.5-pro</b>: Balanced performance.</li>
+     * <li><b>gemini-2.5-flash</b>: Faster and smarter than 1.5 Flash.</li>
+     * <li><b>gemini-2.5-pro</b>: Advanced reasoning.</li>
+     * <li><b>gemini-3-pro-preview</b>: Most capable model.</li>
+     * </ul>
+     */
+    public String geminiModel = "gemini-1.5-flash";
 
     /**
      * AI model to use for villager chat.
@@ -427,18 +503,18 @@ public final class Config {
     /**
      * If true, AI uses long-term memory for persistent conversations.
      */
-    public boolean villagerChatAIUseLongTermMemory = false;
+    public boolean villagerChatAIUseLongTermMemory = true;
 
     /**
      * If false, villager will have separate memories per player.
      */
-    public boolean villagerChatAIUseSharedLongTermMemory = false;
+    public boolean villagerChatAIUseSharedLongTermMemory = true;
 
     /**
      * If true, session-specific information is included in AI requests.
      * Only relevant if writing a custom backend.
      */
-    public boolean villagerChatAIIncludeSessionInformation = false;
+    public boolean villagerChatAIIncludeSessionInformation = true;
 
     /**
      * Inworld API token.
@@ -487,8 +563,7 @@ public final class Config {
             "ErXwobaYiN019PkySvjV",
             "VR6AewLTigWG4xSOukaG",
             "onwK4e9ZLuTAKqWW03F9",
-            "onwK4e9ZLuTAKqWW03F9"
-    );
+            "onwK4e9ZLuTAKqWW03F9");
 
     /**
      * List of female voice IDs for ElevenLabs TTS.
@@ -497,8 +572,7 @@ public final class Config {
             "MF3mGyEYCl7XYWbV9V6O",
             "AZnzlk1XvdvUeBnXmlld",
             "pMsXgVXv3BLzUgSXRplE",
-            "AZnzlk1XvdvUeBnXmlld"
-    );
+            "AZnzlk1XvdvUeBnXmlld");
 
     //////////////////////
     // Village behavior //
@@ -540,7 +614,8 @@ public final class Config {
     public float villagerProcreationChancePerMinute = 0.05f;
 
     /**
-     * Interval (in ticks) at which bounty hunters attack the player if reputation is low.
+     * Interval (in ticks) at which bounty hunters attack the player if reputation
+     * is low.
      */
     public int bountyHunterInterval = 48000;
 
@@ -567,16 +642,17 @@ public final class Config {
     /**
      * Fraction (0–1) of villages left as vanilla villages.
      */
-    public float fractionOfVanillaVillages = 0;
+    public float fractionOfVanillaVillages = 0.1f;
 
     /**
      * Fraction (0–1) of vanilla zombie villagers.
      */
-    public float fractionOfVanillaZombies = 0;
+    public float fractionOfVanillaZombies = 0.1f;
 
     /**
      * Minimum number of buildings required to consider an area a village.
-     * Below this, it is considered a settlement and welcome notifications are suppressed.
+     * Below this, it is considered a settlement and welcome notifications are
+     * suppressed.
      */
     public int minimumBuildingsToBeConsideredAVillage = 3;
 
@@ -590,15 +666,13 @@ public final class Config {
      */
     public List<String> allowedSpawnReasons = List.of(
             "natural",
-            "structure"
-    );
+            "structure");
 
     /**
      * List of items that villagers cannot be interacted with for mod compat.
      */
     public List<String> villagerInteractionItemBlacklist = List.of(
-            "minecraft:bucket"
-    );
+            "minecraft:bucket");
 
     /**
      * If true, automatically scan for buildings. High CPU usage.
@@ -611,7 +685,8 @@ public final class Config {
     public String immersiveLibraryUrl = "https://mca.conczin.net";
 
     /**
-     * If true, allows non-ops to add skins from the library to the server wide pool.
+     * If true, allows non-ops to add skins from the library to the server wide
+     * pool.
      */
     public boolean allowEveryoneToAddContentGlobally = false;
 
@@ -631,7 +706,8 @@ public final class Config {
     public double giftDesaturationExponent = 0.85;
 
     /**
-     * Factor multiplying the satisfaction value to determine heart impact from gifts.
+     * Factor multiplying the satisfaction value to determine heart impact from
+     * gifts.
      */
     public double giftSatisfactionFactor = 0.33;
 
@@ -692,8 +768,7 @@ public final class Config {
      */
     public List<String> validTreeSources = List.of(
             "minecraft:grass_block",
-            "minecraft:dirt"
-    );
+            "minecraft:dirt");
 
     //////////////////////////
     // Player customization //
@@ -790,8 +865,7 @@ public final class Config {
             "#minecraft:slabs",
             "#minecraft:stairs",
             "#minecraft:trapdoors",
-            "#minecraft:walls"
-    );
+            "#minecraft:walls");
 
     /**
      * Structures that can be mentioned in Rumors conversation options.
@@ -816,12 +890,12 @@ public final class Config {
             "minecraft:mineshaft",
             "minecraft:jungle_pyramid",
             "minecraft:pillager_outpost",
-            "minecraft:ancient_city"
-    );
+            "minecraft:ancient_city");
 
     /**
      * Locations where the Destiny feature can teleport the player.
-     * <a href="https://github.com/Luke100000/minecraft-comes-alive/wiki/Custom-Rumors-and-Destiny-Structures">Wiki</a>
+     * <a href=
+     * "https://github.com/Luke100000/minecraft-comes-alive/wiki/Custom-Rumors-and-Destiny-Structures">Wiki</a>
      */
     public List<String> destinySpawnLocations = List.of(
             "somewhere",
@@ -831,16 +905,14 @@ public final class Config {
             "minecraft:village_snowy",
             "minecraft:village_plains",
             "minecraft:village_savanna",
-            "minecraft:ancient_city"
-    );
+            "minecraft:ancient_city");
 
     /**
      * Maps Destiny locations to translation keys for UI text.
      */
     public Map<String, String> destinyLocationsToTranslationMap = Map.of(
             "default", "destiny.story.travelling",
-            "minecraft:shipwreck_beached", "destiny.story.sailing"
-    );
+            "minecraft:shipwreck_beached", "destiny.story.sailing");
 
     /**
      * Maps modded professions to MCA professions for clothing conversion.
@@ -849,24 +921,24 @@ public final class Config {
     public Map<String, String> professionConversionsMap = Map.of();
 
     /**
-     * Maps traits to shader locations, applied to players when camera entity has the trait.
+     * Maps traits to shader locations, applied to players when camera entity has
+     * the trait.
      * Requires enablePlayerShaders to be true.
      */
     public Map<String, String> shaderLocationsMap = Map.of(
             "color_blind", "mca:shaders/post/color_blind.json",
-            "sirben", "mca:shaders/post/sirben.json"
-    );
+            "sirben", "mca:shaders/post/sirben.json");
 
     /**
      * Player renderer elements that can be disabled for certain mods.
-     * Supported values: arms, left_arm, right_arm, all, block_player, block_villager
+     * Supported values: arms, left_arm, right_arm, all, block_player,
+     * block_villager
      */
     public Map<String, String> playerRendererBlacklist = Map.of(
             "morph", "arms",
             "firstpersonmod", "arms",
             "firstperson", "arms",
-            "epicfight", "all"
-    );
+            "epicfight", "all");
 
     /**
      * Map of enabled traits. Keys are trait IDs, values are true/false.
@@ -875,14 +947,15 @@ public final class Config {
 
     /**
      * Map of tax items to their value in units.
-     * If item is too expensive, it may not be picked until tax budget is sufficient.
+     * If item is too expensive, it may not be picked until tax budget is
+     * sufficient.
      */
     public Map<String, Float> taxesMap = Map.of(
-            "minecraft:emerald", 1.0f
-    );
+            "minecraft:emerald", 1.0f);
 
     /**
-     * Moves the player's eye height according to their in-game height. Does not change hitbox size.
+     * Moves the player's eye height according to their in-game height. Does not
+     * change hitbox size.
      */
     public boolean scaleEyeHeightWithPlayerHeight = true;
 

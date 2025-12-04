@@ -24,6 +24,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * I know you, you know me, we're all a big happy family.
@@ -34,6 +35,8 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
     private static final CDataParameter<Integer> LAST_PROCREATION = CParameter.create("LastProcreation", 0);
     private final Pregnancy pregnancy;
     private int procreateTick = -1;
+    private UUID procreationPartnerId;
+    private boolean isAffair;
 
     public BreedableRelationship(VillagerEntityMCA entity) {
         super(entity);
@@ -61,10 +64,12 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
         return trackedValue == 0 || delta < 0 || delta > Config.getInstance().procreationCooldown;
     }
 
-    public void startProcreating(long time) {
+    public void startProcreating(long time, Entity partner, boolean affair) {
         procreateTick = 60;
         entity.setTrackedValue(IS_PROCREATING, true);
         entity.setTrackedValue(LAST_PROCREATION, (int) time);
+        this.procreationPartnerId = partner.getUUID();
+        this.isAffair = affair;
     }
 
     public void tick(int age) {
@@ -82,11 +87,29 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
             entity.level().broadcastEntityEvent(entity, Status.VILLAGER_HEARTS);
         } else {
             getFamilyTree().getOrCreate(entity);
-            getPartner().ifPresent(spouse -> {
-                pregnancy.procreate(spouse);
 
+            Entity partner = null;
+            if (procreationPartnerId != null
+                    && entity.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                partner = serverLevel.getEntity(procreationPartnerId);
+            }
+
+            if (partner == null) {
+                Optional<Entity> spouseOpt = getPartner();
+                if (spouseOpt.isPresent())
+                    partner = spouseOpt.get();
+            }
+
+            if (partner != null) {
+                float chance = isAffair ? 0.25f : 0.75f;
+                if (entity.getRandom().nextFloat() < chance) {
+                    pregnancy.procreate(partner);
+                }
                 entity.setTrackedValue(IS_PROCREATING, false);
-            });
+            }
+
+            procreationPartnerId = null;
+            isAffair = false;
         }
     }
 
@@ -110,39 +133,37 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
         }
     }
 
-    //returns estimated values for common item types, which the villager could use
+    // returns estimated values for common item types, which the villager could use
     private Optional<GiftType> handleDynamicGift(ItemStack stack) {
         switch (stack.getItem()) {
             case SwordItem ignored -> {
-                //swords
+                // swords
                 double satisfaction = InventoryUtils.approximateDamage(stack, entity);
                 satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
                 return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate("swords")));
             }
             case ProjectileWeaponItem ranged -> {
-                //ranged weapons
+                // ranged weapons
                 float satisfaction = ranged.getDefaultProjectileRange();
                 satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
                 return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate("archery")));
             }
             case TieredItem tool -> {
-                //tools
+                // tools
                 float satisfaction = tool.getTier().getSpeed();
                 satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
                 return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate(
-                        stack.getItem() instanceof AxeItem ? "swords" :
-                                stack.getItem() instanceof HoeItem ? "hoes" :
-                                        stack.getItem() instanceof ShovelItem ? "shovels" :
-                                                "pickaxes"
-                )));
+                        stack.getItem() instanceof AxeItem ? "swords"
+                                : stack.getItem() instanceof HoeItem ? "hoes"
+                                        : stack.getItem() instanceof ShovelItem ? "shovels" : "pickaxes")));
             }
             case ArmorItem armor -> {
-                //armor
+                // armor
                 int satisfaction = (int) (Math.pow(armor.getDefense(), 1.25) * 1.5 + armor.getToughness() * 5);
                 return Optional.of(new GiftType(stack.getItem(), satisfaction, MCA.locate("armor")));
             }
             default -> {
-                //food
+                // food
                 FoodProperties component = stack.get(DataComponents.FOOD);
                 if (component != null) {
                     int satisfaction = (int) (component.nutrition() + component.saturation() * 3);
@@ -166,7 +187,8 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
 
         // desaturation
         int occurrences = getGiftSaturation().get(stack);
-        int penalty = (int) (occurrences * Config.getInstance().giftDesaturationFactor * Math.pow(Math.max(satisfaction, 0.0), Config.getInstance().giftDesaturationExponent));
+        int penalty = (int) (occurrences * Config.getInstance().giftDesaturationFactor
+                * Math.pow(Math.max(satisfaction, 0.0), Config.getInstance().giftDesaturationExponent));
         if (penalty != 0) {
             analysis.add("desaturation", -penalty);
         }
@@ -188,14 +210,15 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
                 entity.playSurprisedSound();
             }
 
-            //take the gift
+            // take the gift
             getGiftSaturation().add(stack);
             entity.level().broadcastEntityEvent(entity, Status.MCA_VILLAGER_POS_INTERACTION);
             entity.getInventory().addItem(stack.split(1));
         }
 
-        //modify mood and hearts
-        entity.getVillagerBrain().modifyMoodValue((int) (desaturatedSatisfaction * Config.getInstance().giftMoodEffect + Config.getInstance().baseGiftMoodEffect * Mth.sign(desaturatedSatisfaction)));
+        // modify mood and hearts
+        entity.getVillagerBrain().modifyMoodValue((int) (desaturatedSatisfaction * Config.getInstance().giftMoodEffect
+                + Config.getInstance().baseGiftMoodEffect * Mth.sign(desaturatedSatisfaction)));
         CriterionMCA.HEARTS.trigger(player, memory.getHearts(), desaturatedSatisfaction, "gift");
         memory.modHearts(desaturatedSatisfaction);
     }

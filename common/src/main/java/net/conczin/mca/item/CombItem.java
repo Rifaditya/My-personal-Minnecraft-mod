@@ -28,7 +28,8 @@ public class CombItem extends TooltippedItem {
         return super.use(world, player, hand);
     }
 
-    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
+    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity,
+            InteractionHand hand) {
         if (entity instanceof VillagerLike && !entity.level().isClientSide && player instanceof ServerPlayer) {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.COMB, entity), (ServerPlayer) player);
             return InteractionResult.SUCCESS;

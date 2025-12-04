@@ -36,6 +36,12 @@ public class ServerInteractionManager {
      */
     private final Object2LongArrayMap<UUID> procreateMap = new Object2LongArrayMap<>();
 
+    /**
+     * Maps player UUID to the game time of their last successful procreation.
+     * Used for cooldown tracking.
+     */
+    private final Object2LongArrayMap<UUID> lastProcreationTime = new Object2LongArrayMap<>();
+
     private ServerInteractionManager() {
     }
 
@@ -384,11 +390,19 @@ public class ServerInteractionManager {
             return;
         }
 
-        // Ensure we don't already have a baby
-        // todo add cooldown
-        if (false) {
-            failMessage(sender, Component.translatable("server.babyPresent"));
-            return;
+        // Check procreation cooldown
+        long currentTime = sender.getServer().overworld().getGameTime();
+        if (lastProcreationTime.containsKey(sender.getUUID())) {
+            long lastProcreation = lastProcreationTime.getLong(sender.getUUID());
+            long timeSinceLastProcreation = currentTime - lastProcreation;
+            int cooldown = Config.getInstance().playerProcreationCooldown;
+
+            if (cooldown > 0 && timeSinceLastProcreation < cooldown) {
+                long ticksRemaining = cooldown - timeSinceLastProcreation;
+                int daysRemaining = (int) Math.ceil(ticksRemaining / 24000.0);
+                failMessage(sender, Component.translatable("server.procreationCooldown", daysRemaining));
+                return;
+            }
         }
 
         // Ensure the spouse is online.
@@ -405,6 +419,11 @@ public class ServerInteractionManager {
                 successMessage(spouse, Component.translatable("server.procreationSuccessful"));
 
                 spouse.addItem(BabyItem.createItem(spouse, sender, spouse.getRandom().nextLong()));
+
+                // Record procreation time for cooldown tracking
+                long gameTime = sender.getServer().overworld().getGameTime();
+                lastProcreationTime.put(sender.getUUID(), gameTime);
+                lastProcreationTime.put(spouse.getUUID(), gameTime);
             }
         }, () -> failMessage(sender, Component.translatable("server.spouseNotPresent")));
     }

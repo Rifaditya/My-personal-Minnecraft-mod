@@ -1,0 +1,202 @@
+MCA MOD - FEATURE SUGGESTIONS
+==============================
+
+Based on analysis of the codebase, here are feature ideas organized by category:
+
+---
+
+RELATIONSHIPS & SOCIAL
+=======================
+
+High Impact:
+- Divorce System - Allow married couples to divorce based on low hearts/compatibility
+- Jealousy Mechanics - Villagers get jealous if spouse flirts with others
+- Best Friends System - Deep friendships that unlock special dialogues/quests
+- Feuds & Rivalries - Villagers can dislike each other, refuse to work together
+- Anniversary Celebrations - Annual marriage anniversary events with gifts
+
+Medium Impact:
+- Dating Stage - Intermediate step between courting and marriage with unique interactions
+- Love Letters - Villagers can write/send romantic letters to each other
+- Double Dates - Take your spouse and another couple on activities together
+- Breakup Mechanics - End relationships before marriage with relationship penalty
+- Friendship Bracelets - Craftable items to cement friendships
+
+---
+
+GENETICS & APPEARANCE
+======================
+
+High Impact:
+- Eye Color Genetics - Inherit eye color from parents (currently basic)
+- Body Type Variations - Muscular, slender, stocky builds affecting stats
+- Aging Visual Effects - Wrinkles, gray hair as villagers age
+- Scars & Marks - Combat/life events leave visible marks
+- Twins Visual Similarity - Twins look nearly identical
+
+Medium Impact:
+- Freckles Gene - Some villagers spawn with freckles
+- Tattoos - Unlockable cosmetic customization for adults
+- Facial Hair Genetics - Male villagers inherit beard styles
+- Heterochromia Trait - Rare trait for different colored eyes
+- Height Extremes - Very tall/short variants beyond normal range
+
+---
+
+AI & DIALOGUE
+=============
+
+High Impact:
+- Memory System Enhancement - Villagers remember past conversations better
+- Emotional Responses - AI reacts to player's emotional tone
+- Dynamic Quest Generation - AI creates unique quests based on villager needs
+- Context-Aware Responses - AI knows about recent village events
+- Voice Personality Matching - Different AI voices for different personalities
+
+Medium Impact:
+- Gossip System - Villagers share information about other villagers
+- Story Continuation - AI remembers and continues stories across sessions
+- Mood-Based Dialogue - Different responses based on villager's current mood
+- Cultural Knowledge - Villagers know about their profession/background
+- Player Reputation Awareness - AI mentions your standing in village
+
+---
+
+VILLAGE & ECONOMY
+==================
+
+High Impact:
+- Village Festivals - Seasonal events (harvest festival, winter ball, etc.)
+- Economy System - Village-wide currency, shops, markets
+- Village Quests - Collective goals (build library, defeat raid boss)
+- Village Specializations - Villages focus on farming, mining, trading, etc.
+- Dynamic Population - Villagers migrate between villages based on conditions
+
+Medium Impact:
+- Village Council - Democratic voting on village decisions
+- Shared Resources - Village-wide storage and crafting stations
+- Trade Routes - Villages trade with each other automatically
+- Village Reputation Tiers - Unlock perks as village grows (bronze→silver→gold)
+- Village Newspaper - Weekly printed summary of events
+
+---
+
+CHILDREN & FAMILY
+==================
+
+High Impact:
+- Education System - Children attend school to learn professions
+- Teenage Rebellion Phase - Teens occasionally refuse orders
+- Family Heirlooms - Pass down special items through generations
+- Coming of Age Ceremony - Special event when children become adults
+- Adoption System - Adopt orphaned children from other villages
+
+Medium Impact:
+- Sibling Rivalry - Siblings compete for attention/resources
+- Family Portraits - Craftable paintings of your family
+- Chore Allowance - Children earn small rewards for tasks
+- Baby Personality Hints - Babies show early signs of future personality
+- Grandparent Interactions - Special dialogues between grandparents and grandchildren
+
+---
+
+COMBAT & GUARDS
+================
+
+High Impact:
+- Guard Training System - Train guards in different combat styles
+- Village Defense Events - Scheduled raids that require preparation
+- Guard Patrols - Guards walk designated routes
+- Archer Towers - Special defensive structures
+- Combat Formations - Guards fight in coordinated groups
+
+Medium Impact:
+- Guard Equipment Sets - Themed armor sets (knight, samurai, etc.)
+- War Horn - Alert all guards to danger
+- Bounty System - Post bounties on hostile mobs/players
+- Guard Ranks - Guards level up to sergeant, captain, etc.
+- Defense Drills - Scheduled training exercises
+
+---
+
+TRAITS & DISEASES
+==================
+
+High Impact:
+- Seasonal Illnesses - Flu spreads during winter
+- Hereditary Diseases - Some diseases passed to children
+- Mental Traits - Anxiety, confidence, ambition affecting behavior
+- Addiction System - Villagers can become dependent on certain items
+- Disability Representation - Physical disabilities with accommodations
+
+Medium Impact:
+- Allergy Traits - React negatively to specific blocks/biomes
+- Insomnia Trait - Villagers wander at night
+- Claustrophobia - Dislike being in small spaces
+- Perfectionist Trait - Work slower but produce better quality
+- Kleptomania - Occasionally "borrows" items
+
+---
+
+PLAYER EXPERIENCE
+==================
+
+High Impact:
+- Family Tree Viewer - Visual genealogy chart in GUI
+- Relationship Graph - See all relationship connections
+- Photo Album - Take and save screenshots of important moments
+- Achievement System - MCA-specific achievements
+- Tutorial Quest Line - Guided introduction for new players
+
+Medium Impact:
+- Villager Favorites Tracking - See each villager's favorite items
+- Calendar System - Mark important dates (birthdays, anniversaries)
+- Statistics Dashboard - Track births, deaths, marriages, etc.
+- Village Comparison - Compare stats between multiple villages
+- Custom Notifications - Configure what events trigger alerts
+
+---
+
+TECHNICAL IMPROVEMENTS
+=======================
+
+Quality of Life:
+- Config Presets - Easy/Normal/Hard difficulty presets
+- Bulk Villager Commands - Control multiple villagers at once
+- Smart Following - Followers avoid obstacles better
+- Auto-Home Assignment - Villagers auto-claim beds
+- Profession Lock - Prevent accidental profession changes
+
+Performance:
+- Render Distance Optimization - Reduce model complexity at distance
+- AI Task Batching - Process multiple villagers per tick
+- Lazy Loading - Only load villager data when needed
+- Memory Cleanup - Better garbage collection for old data
+
+---
+
+WILD CARD IDEAS
+================
+
+- Pet System - Villagers can have dogs/cats
+- Hobbies - Villagers pursue non-work activities (gardening, painting)
+- Weather Reactions - Villagers comment on/react to weather
+- Musical Instruments - Villagers can play music
+- Sports/Games - Village mini-games (races, archery contest)
+
+---
+
+LOW-HANGING FRUIT (Easy to Implement)
+=======================================
+
+1. Fix duplicate Javadoc - Already implemented ✓
+2. Add AIProvider enum - Already implemented ✓
+3. Implement Coeliac disease effects - Line 30 in Traits.java
+4. Implement Diabetes effects - Line 31 in Traits.java
+5. Implement Vegetarian food restrictions - Line 34 in Traits.java
+6. Add cooldown to affairs - Line 388 in ServerInteractionManager.java
+7. Improve question answer selection - Line 40 in Question.java
+
+---
+
+Total: 80+ feature suggestions across 9 categories

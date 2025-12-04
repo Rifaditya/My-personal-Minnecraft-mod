@@ -56,8 +56,10 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
         EntityRendererRegistry.register(EntitiesMCA.GRIM_REAPER, GrimReaperRenderer::new);
         EntityRendererRegistry.register(EntitiesMCA.CRIB, CribEntityRenderer::new);
 
-        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.NEG_INTERACTION, InteractionParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.POS_INTERACTION, InteractionParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.NEG_INTERACTION,
+                InteractionParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.POS_INTERACTION,
+                InteractionParticle.Factory::new);
 
         BlockEntityRendererRegistry.register(BlockEntityTypesMCA.TOMBSTONE, TombstoneBlockEntityRenderer::new);
 
@@ -70,9 +72,7 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
 
         ModelPredicatesMCA.setup(ItemProperties::register);
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-                MCAClient.onLogin()
-        );
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, server) -> MCAClient.onLogin());
 
         BlockRenderLayerMap.INSTANCE.putBlock(BlocksMCA.INFERNAL_FLAME, RenderType.cutout());
 

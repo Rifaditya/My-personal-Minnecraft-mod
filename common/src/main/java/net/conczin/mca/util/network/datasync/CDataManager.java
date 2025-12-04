@@ -31,19 +31,19 @@ public class CDataManager<E extends Entity> {
         return entry != null && entry.parameter == parameter;
     }
 
-    @SuppressWarnings({"unchecked", "RedundantSuppression"})
+    @SuppressWarnings({ "unchecked", "RedundantSuppression" })
     public <T, TrackedType> T get(E entity, CParameter<T, TrackedType> parameter) {
-        //noinspection RedundantCast
+        // noinspection RedundantCast
         return parameter.get(((Entry<E, T, TrackedType>) forwardLookup.get(parameter)).data, entity.getEntityData());
     }
 
-    @SuppressWarnings({"unchecked", "RedundantSuppression"})
+    @SuppressWarnings({ "unchecked", "RedundantSuppression" })
     public <T, TrackedType> void set(E entity, CParameter<T, TrackedType> parameter, T value) {
-        //noinspection RedundantCast
+        // noinspection RedundantCast
         parameter.set(((Entry<E, T, TrackedType>) forwardLookup.get(parameter)).data, entity.getEntityData(), value);
     }
 
-    //register all entries
+    // register all entries
     public void register(SynchedEntityData.Builder builder) {
         params.forEach(p -> p.register(builder));
     }
@@ -91,7 +91,7 @@ public class CDataManager<E extends Entity> {
             parameter.save(nbt, parameter.get(data, entity.getEntityData()), entity.registryAccess());
         }
 
-        //load entity from nbt
+        // load entity from nbt
         public void load(E entity, CompoundTag nbt) {
             parameter.set(data, entity.getEntityData(), parameter.load(nbt, entity.registryAccess()));
         }

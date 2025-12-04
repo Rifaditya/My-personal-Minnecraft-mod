@@ -208,6 +208,31 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
             return genetics.getGene(Genetics.CLEAVAGE);
         }
 
+        @Override
+        public float getElasticity() {
+            return genetics.getGene(Genetics.ELASTICITY);
+        }
+
+        @Override
+        public float getMass() {
+            return genetics.getGene(Genetics.MASS);
+        }
+
+        @Override
+        public float getShape() {
+            return genetics.getGene(Genetics.SHAPE);
+        }
+
+        @Override
+        public float getNippleSize() {
+            return genetics.getGene(Genetics.NIPPLE_SIZE);
+        }
+
+        @Override
+        public float getAreolaColor() {
+            return genetics.getGene(Genetics.AREOLA_COLOR);
+        }
+
     }
 
     @Override

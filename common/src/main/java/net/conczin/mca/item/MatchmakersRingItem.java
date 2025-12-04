@@ -18,22 +18,11 @@ public class MatchmakersRingItem extends Item implements SpecialCaseGift {
     @Override
     public boolean handle(ServerPlayer player, VillagerEntityMCA villager) {
         // ensure two rings are in the inventory
-        if (player.getMainHandItem().getCount() < 2) {
-            villager.sendChatMessage(player, "interaction.matchmaker.fail.needtwo");
-            return false;
-        }
-
-        // ensure our target isn't married already or young
-        if (villager.getRelationships().isMarried() || villager.getAgeState() != AgeState.ADULT) {
-            villager.sendChatMessage(player, "interaction.matchmaker.fail.married");
-            return false;
-        }
-
-        // look for partner
         Optional<VillagerEntityMCA> target = WorldUtils.getCloseEntities(villager.level(), villager, 5.0).stream()
                 .filter(v -> v != villager && v instanceof VillagerEntityMCA)
                 .map(VillagerEntityMCA.class::cast)
-                .filter(v -> !v.isBaby() && !v.getRelationships().isMarried())
+                .filter(v -> !v.isBaby())
+                .filter(v -> v.getRelationships().canMarry(villager))
                 .filter(v -> !v.getRelationships().getFamilyEntry().isRelative(villager.getUUID()))
                 .filter(villager::canBeAttractedTo)
                 .min(Comparator.comparingDouble(villager::distanceTo));

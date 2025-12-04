@@ -29,8 +29,8 @@ abstract class MixinZombieVillager implements IVillagerEntity {
 
     @Inject(method = "finalizeSpawn", at = @At("HEAD"))
     private void mca$injectFinalizeSpawn(
-            ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir
-    ) {
+            ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType,
+            SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
         mca$reason = spawnType;
     }
 

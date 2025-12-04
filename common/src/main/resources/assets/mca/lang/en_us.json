@@ -969,5 +969,10 @@
   "item.mca.yellow_mangrove_crib": "Yellow Mangrove Crib",
   "item.mca.yellow_oak_crib": "Yellow Oak Crib",
   "item.mca.yellow_spruce_crib": "Yellow Spruce Crib",
-  "item.mca.yellow_warped_crib": "Yellow Warped Crib"
+  "item.mca.yellow_warped_crib": "Yellow Warped Crib",
+  "village.specialization.none": "No Specialization",
+  "village.specialization.mining": "Mining Village",
+  "village.specialization.farming": "Farming Village",
+  "village.specialization.trading": "Trading Village",
+  "server.procreationCooldown": "You must wait %1\\ more days before you can procreate again."
 }

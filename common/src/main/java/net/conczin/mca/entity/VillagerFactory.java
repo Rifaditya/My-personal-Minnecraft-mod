@@ -4,8 +4,11 @@ import net.conczin.mca.MCA;
 import net.conczin.mca.entity.ai.relationship.AgeState;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.resources.Names;
+import net.conczin.mca.server.world.data.Village;
 import net.conczin.mca.util.WorldUtils;
+import net.conczin.mca.village.specialization.WeightedProfessionSelector;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.npc.VillagerData;
@@ -107,16 +110,27 @@ public class VillagerFactory {
         VillagerEntityMCA villager = gender.getVillagerType().create(world);
         assert villager != null;
         villager.getGenetics().setGender(gender);
-        villager.setAge(age.orElseGet(() -> villager.getRandom().nextInt(AgeState.getMaxAge() * 3) - AgeState.getMaxAge()));
+        villager.setAge(
+                age.orElseGet(() -> villager.getRandom().nextInt(AgeState.getMaxAge() * 3) - AgeState.getMaxAge()));
         position.ifPresent(pos -> villager.absMoveTo(pos.x(), pos.y(), pos.z()));
         villager.setCustomName(Component.literal(name.orElseGet(() -> Names.pickCitizenName(gender, villager))));
         VillagerData data = villager.getVillagerData();
+
+        // Determine profession with village specialization weighting
+        VillagerProfession selectedProfession;
+        if (profession.isPresent()) {
+            selectedProfession = profession.get();
+        } else if (world instanceof ServerLevel serverLevel) {
+            Village village = Village.findNearest(villager).orElse(null);
+            selectedProfession = WeightedProfessionSelector.selectProfession(villager.getRandom(), village);
+        } else {
+            selectedProfession = VillagerProfession.NONE;
+        }
+
         villager.setVillagerData(new VillagerData(
-                        type.orElseGet(data::getType),
-                        profession.orElse(VillagerProfession.NONE),
-                        level.orElseGet(data::getLevel)
-                )
-        );
+                type.orElseGet(data::getType),
+                selectedProfession,
+                level.orElseGet(data::getLevel)));
         offers.ifPresent(villager::setOffers);
         return villager;
     }

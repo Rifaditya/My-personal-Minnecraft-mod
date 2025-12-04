@@ -51,7 +51,8 @@ public class BabyItem extends Item {
 
     public static ItemStack createItem(Entity mother, Entity father, long seed) {
         Gender gender = Gender.getRandom();
-        ItemStack stack = (gender.binary() == Gender.MALE ? ItemsMCA.BABY_BOY : ItemsMCA.BABY_GIRL).getDefaultInstance();
+        ItemStack stack = (gender.binary() == Gender.MALE ? ItemsMCA.BABY_BOY : ItemsMCA.BABY_GIRL)
+                .getDefaultInstance();
 
         VillagerLike<?> motherVillager = VillagerLike.toVillager(mother);
         VillagerLike<?> fatherVillager = VillagerLike.toVillager(father);
@@ -67,8 +68,7 @@ public class BabyItem extends Item {
         child.getGenetics().combine(
                 motherVillager.getGenetics(),
                 fatherVillager.getGenetics(),
-                seed
-        );
+                seed);
 
         // Inherit traits
         child.getTraits().inherit(motherVillager.getTraits(), seed);
@@ -83,8 +83,7 @@ public class BabyItem extends Item {
                 mother.getUUID(),
                 father.getUUID(),
                 mother.getName().getString(),
-                father.getName().getString()
-        ));
+                father.getName().getString()));
 
         // Make sure family tree entries exist
         FamilyTree tree = FamilyTree.get((ServerLevel) mother.level());
@@ -250,10 +249,12 @@ public class BabyItem extends Item {
         // Name
         Component name = stack.get(DataComponents.CUSTOM_NAME);
         if (name != null) {
-            tooltip.add(Component.translatable("item.mca.baby.name", name.copy().withColor(gender.getColor())).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("item.mca.baby.name", name.copy().withColor(gender.getColor()))
+                    .withStyle(ChatFormatting.GRAY));
 
             if (age > 0) {
-                tooltip.add(Component.translatable("item.mca.baby.age", StringUtil.formatTickDuration(age, 20)).withStyle(ChatFormatting.GRAY));
+                tooltip.add(Component.translatable("item.mca.baby.age", StringUtil.formatTickDuration(age, 20))
+                        .withStyle(ChatFormatting.GRAY));
             }
         } else {
             tooltip.add(Component.translatable("item.mca.baby.give_name").withStyle(ChatFormatting.YELLOW));
@@ -265,14 +266,14 @@ public class BabyItem extends Item {
             tooltip.add(Component.translatable("item.mca.baby.mother",
                     player != null && parents.mother().equals(player.getUUID())
                             ? Component.translatable("item.mca.baby.owner.you")
-                            : parents.motherName()
-            ).withStyle(ChatFormatting.GRAY));
+                            : parents.motherName())
+                    .withStyle(ChatFormatting.GRAY));
 
             tooltip.add(Component.translatable("item.mca.baby.father",
                     player != null && parents.father().equals(player.getUUID())
                             ? Component.translatable("item.mca.baby.owner.you")
-                            : parents.fatherName()
-            ).withStyle(ChatFormatting.GRAY));
+                            : parents.fatherName())
+                    .withStyle(ChatFormatting.GRAY));
         }
 
         // Ready to yeet

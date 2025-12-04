@@ -60,6 +60,16 @@ public class BreastPhysics {
         float getBreastZOffset();
 
         float getCleavage();
+
+        float getElasticity();
+
+        float getMass();
+
+        float getShape();
+
+        float getNippleSize();
+
+        float getAreolaColor();
     }
 
     public BreastPhysics() {
@@ -119,7 +129,7 @@ public class BreastPhysics {
             return;
         }
 
-        float breastWeight = config.getBustSize() * 1.25f;
+        float breastWeight = config.getBustSize() * (0.5f + config.getMass());
         float targetBreastSize = config.getBustSize();
 
         if (!config.canHaveBreasts()) {
@@ -348,7 +358,8 @@ public class BreastPhysics {
             positionX = 0;
 
         float percent = config.getFloppiness();
-        float bounceAmount = 0.45f * (1f - percent) + 0.15f;
+        float elasticity = config.getElasticity();
+        float bounceAmount = 0.45f * (1f - percent) * elasticity + 0.15f;
         bounceAmount = Mth.clamp(bounceAmount, 0.15f, 0.6f);
         float delta = 2.25f - bounceAmount;
 

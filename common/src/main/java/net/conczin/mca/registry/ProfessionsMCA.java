@@ -27,18 +27,29 @@ public interface ProfessionsMCA {
     Set<VillagerProfession> IS_IMPORTANT = new HashSet<>();
     Set<VillagerProfession> NEEDS_NO_HOME = new HashSet<>();
 
-    VillagerProfession OUTLAW = register("outlaw", false, true, true, PoiType.NONE, VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FARMER);
-    VillagerProfession GUARD = register("guard", false, true, false, PoiType.NONE, VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_ARMORER);
-    VillagerProfession ARCHER = register("archer", false, true, false, PoiType.NONE, VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
-    VillagerProfession ADVENTURER = register("adventurer", true, true, true, PoiType.NONE, VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
-    VillagerProfession MERCENARY = register("mercenary", false, true, true, PoiType.NONE, VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
-    VillagerProfession CULTIST = register("cultist", true, true, true, PoiType.NONE, VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
+    VillagerProfession OUTLAW = register("outlaw", false, true, true, PoiType.NONE,
+            VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FARMER);
+    VillagerProfession GUARD = register("guard", false, true, false, PoiType.NONE,
+            VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_ARMORER);
+    VillagerProfession ARCHER = register("archer", false, true, false, PoiType.NONE,
+            VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
+    VillagerProfession ADVENTURER = register("adventurer", true, true, true, PoiType.NONE,
+            VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
+    VillagerProfession MERCENARY = register("mercenary", false, true, true, PoiType.NONE,
+            VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
+    VillagerProfession CULTIST = register("cultist", true, true, true, PoiType.NONE,
+            VillagerProfession.ALL_ACQUIRABLE_JOBS, SoundEvents.VILLAGER_WORK_FLETCHER);
 
-    static VillagerProfession register(String name, boolean canTradeWith, boolean important, boolean needsNoHome, Predicate<Holder<PoiType>> heldWorkstation, Predicate<Holder<PoiType>> acquirableWorkstation, @Nullable SoundEvent workSound) {
-        return register(name, canTradeWith, important, needsNoHome, heldWorkstation, acquirableWorkstation, ImmutableSet.of(), ImmutableSet.of(), workSound);
+    static VillagerProfession register(String name, boolean canTradeWith, boolean important, boolean needsNoHome,
+            Predicate<Holder<PoiType>> heldWorkstation, Predicate<Holder<PoiType>> acquirableWorkstation,
+            @Nullable SoundEvent workSound) {
+        return register(name, canTradeWith, important, needsNoHome, heldWorkstation, acquirableWorkstation,
+                ImmutableSet.of(), ImmutableSet.of(), workSound);
     }
 
-    static VillagerProfession register(String name, boolean canTradeWith, boolean important, boolean needsNoHome, ResourceKey<PoiType> heldWorkstation, ImmutableSet<Item> gatherableItems, ImmutableSet<Block> secondaryJobSites, @Nullable SoundEvent workSound) {
+    static VillagerProfession register(String name, boolean canTradeWith, boolean important, boolean needsNoHome,
+            ResourceKey<PoiType> heldWorkstation, ImmutableSet<Item> gatherableItems,
+            ImmutableSet<Block> secondaryJobSites, @Nullable SoundEvent workSound) {
         return register(name, canTradeWith, important, needsNoHome, (entry) -> {
             return entry.is(heldWorkstation);
         }, (entry) -> {
@@ -46,11 +57,13 @@ public interface ProfessionsMCA {
         }, gatherableItems, secondaryJobSites, workSound);
     }
 
-    static VillagerProfession register(String name, boolean canTradeWith, boolean important, boolean needsNoHome, Predicate<Holder<PoiType>> heldWorkstation, Predicate<Holder<PoiType>> acquirableWorkstation, ImmutableSet<Item> gatherableItems, ImmutableSet<Block> secondaryJobSites, @Nullable SoundEvent workSound) {
+    static VillagerProfession register(String name, boolean canTradeWith, boolean important, boolean needsNoHome,
+            Predicate<Holder<PoiType>> heldWorkstation, Predicate<Holder<PoiType>> acquirableWorkstation,
+            ImmutableSet<Item> gatherableItems, ImmutableSet<Block> secondaryJobSites, @Nullable SoundEvent workSound) {
         ResourceLocation id = MCA.locate(name);
         VillagerProfession result = MixinVillagerProfession.init(
-                id.toString().replace(':', '.'), heldWorkstation, acquirableWorkstation, gatherableItems, secondaryJobSites, workSound
-        );
+                id.toString().replace(':', '.'), heldWorkstation, acquirableWorkstation, gatherableItems,
+                secondaryJobSites, workSound);
         if (!canTradeWith) {
             CAN_NOT_TRADE.add(result);
         }
@@ -65,7 +78,8 @@ public interface ProfessionsMCA {
     }
 
     static String getFavoredBuilding(VillagerProfession profession) {
-        if (VillagerProfession.CARTOGRAPHER == profession || VillagerProfession.LIBRARIAN == profession || VillagerProfession.CLERIC == profession) {
+        if (VillagerProfession.CARTOGRAPHER == profession || VillagerProfession.LIBRARIAN == profession
+                || VillagerProfession.CLERIC == profession) {
             return "library";
         } else if (GUARD == profession || ARCHER == profession) {
             return "inn";

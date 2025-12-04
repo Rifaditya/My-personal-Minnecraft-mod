@@ -22,12 +22,14 @@ public class HairLayer<T extends LivingEntity, M extends HumanoidModel<T>> exten
     }
 
     @Override
-    public void render(PoseStack transform, MultiBufferSource provider, int light, T villager, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+    public void render(PoseStack transform, MultiBufferSource provider, int light, T villager, float limbAngle,
+            float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
         model.setAllVisible(true);
         this.model.leftLeg.visible = false;
         this.model.rightLeg.visible = false;
 
-        super.render(transform, provider, light, villager, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch);
+        super.render(transform, provider, light, villager, limbAngle, limbDistance, tickDelta, animationProgress,
+                headYaw, headPitch);
     }
 
     @Override
@@ -69,7 +71,6 @@ public class HairLayer<T extends LivingEntity, M extends HumanoidModel<T>> exten
         return ColorPalette.HAIR.getColor(
                 getVillager(villager).getGenetics().getGene(Genetics.EUMELANIN) * albinism,
                 getVillager(villager).getGenetics().getGene(Genetics.PHEOMELANIN) * albinism,
-                0
-        );
+                0);
     }
 }

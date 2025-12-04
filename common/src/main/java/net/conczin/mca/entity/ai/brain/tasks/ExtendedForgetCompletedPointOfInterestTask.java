@@ -24,13 +24,15 @@ public class ExtendedForgetCompletedPointOfInterestTask {
     public ExtendedForgetCompletedPointOfInterestTask() {
     }
 
-    public static OneShot<LivingEntity> create(Predicate<Holder<PoiType>> poiTypePredicate, MemoryModuleType<GlobalPos> poiPosModule, Consumer<LivingEntity> onFinish) {
+    public static OneShot<LivingEntity> create(Predicate<Holder<PoiType>> poiTypePredicate,
+            MemoryModuleType<GlobalPos> poiPosModule, Consumer<LivingEntity> onFinish) {
         return BehaviorBuilder.create((context) -> {
             return context.group(context.present(poiPosModule)).apply(context, (poiPos) -> {
                 return (world, entity, time) -> {
                     GlobalPos globalPos = context.get(poiPos);
                     BlockPos blockPos = globalPos.pos();
-                    if (world.dimension() == globalPos.dimension() && blockPos.closerToCenterThan(entity.position(), MAX_RANGE)) {
+                    if (world.dimension() == globalPos.dimension()
+                            && blockPos.closerToCenterThan(entity.position(), MAX_RANGE)) {
                         ServerLevel serverWorld = world.getServer().getLevel(globalPos.dimension());
                         if (serverWorld != null && serverWorld.getPoiManager().exists(blockPos, poiTypePredicate)) {
                             if (isBedOccupiedByOthers(serverWorld, blockPos, entity)) {

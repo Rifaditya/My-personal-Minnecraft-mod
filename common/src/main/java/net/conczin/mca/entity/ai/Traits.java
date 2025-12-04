@@ -27,11 +27,11 @@ public class Traits {
     public static Trait COLOR_BLIND = registerTrait("color_blind", 1.0F, 0.5F);
     public static Trait HETEROCHROMIA = registerTrait("heterochromia", 1.0F, 0.5F);
     public static Trait LACTOSE_INTOLERANCE = registerTrait("lactose_intolerance", 1.0F, 1.0F);
-    public static Trait COELIAC_DISEASE = registerTrait("coeliac_disease", 1.0F, 1.0F, false); // TODO
-    public static Trait DIABETES = registerTrait("diabetes", 1.0F, 1.0F, false); // TODO
+    public static Trait COELIAC_DISEASE = registerTrait("coeliac_disease", 1.0F, 1.0F, true);
+    public static Trait DIABETES = registerTrait("diabetes", 1.0F, 1.0F, true);
     public static Trait DWARFISM = registerTrait("dwarfism", 1.0F, 1.0F);
     public static Trait ALBINISM = registerTrait("albinism", 1.0F, 1.0F);
-    public static Trait VEGETARIAN = registerTrait("vegetarian", 1.0F, 1.0F, false); // TODO
+    public static Trait VEGETARIAN = registerTrait("vegetarian", 1.0F, 1.0F, true);
     public static Trait BISEXUAL = registerTrait("bisexual", 1.0F, 0.0F);
     public static Trait HOMOSEXUAL = registerTrait("homosexual", 1.0F, 0.0F);
     public static Trait ASEXUAL = registerTrait("asexual", 1.0F, 0.0F);
@@ -66,7 +66,9 @@ public class Traits {
     }
 
     public Set<Trait> getInheritedTraits() {
-        return getTraits().stream().filter(t -> random.nextFloat() < t.inherit * Config.getInstance().traitInheritChance).collect(Collectors.toSet());
+        return getTraits().stream()
+                .filter(t -> random.nextFloat() < t.inherit * Config.getInstance().traitInheritChance)
+                .collect(Collectors.toSet());
     }
 
     public boolean hasTrait(VillagerLike<?> target, Trait trait) {
@@ -104,7 +106,7 @@ public class Traits {
         entity.setTrackedValue(TRAITS, traits);
     }
 
-    //initializes the genes with random numbers
+    // initializes the genes with random numbers
     public void randomize() {
         float total = (float) Trait.values().stream().mapToDouble(tr -> tr.chance).sum();
         for (Trait t : Trait.values()) {
@@ -133,7 +135,8 @@ public class Traits {
     }
 
     public float getHorizontalScaleFactor() {
-        return (hasTrait(Traits.DWARFISM) ? 0.85f : 1.0f) * (hasTrait(Traits.TOUGH) ? 1.2f : 1.0f) * (hasTrait(Traits.WEAK) ? 0.85f : 1.0f);
+        return (hasTrait(Traits.DWARFISM) ? 0.85f : 1.0f) * (hasTrait(Traits.TOUGH) ? 1.2f : 1.0f)
+                * (hasTrait(Traits.WEAK) ? 0.85f : 1.0f);
     }
 
     public static class Trait {

@@ -10,7 +10,8 @@ import java.util.Map;
 
 /**
  * The long term memory stored String keys for a given amount of time
- * While not powerful in terms of features it allows adding more intelligence to villager interactions
+ * While not powerful in terms of features it allows adding more intelligence to
+ * villager interactions
  */
 public class LongTermMemory {
     final HashMap<String, Long> memories = new HashMap<>();
@@ -50,7 +51,7 @@ public class LongTermMemory {
         }
     }
 
-    //remember forever
+    // remember forever
     public void remember(String id) {
         remember(id, Integer.MAX_VALUE);
     }

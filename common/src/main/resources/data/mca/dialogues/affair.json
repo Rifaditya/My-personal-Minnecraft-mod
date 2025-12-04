@@ -1,0 +1,24 @@
+{
+    "answers": [
+        {
+            "name": "confirm",
+            "results": [
+                {
+                    "actions": {
+                        "command": "affair"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "cancel",
+            "results": [
+                {
+                    "actions": {
+                        "quit": true
+                    }
+                }
+            ]
+        }
+    ]
+}

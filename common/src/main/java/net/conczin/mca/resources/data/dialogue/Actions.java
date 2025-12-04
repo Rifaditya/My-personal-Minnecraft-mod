@@ -29,13 +29,16 @@ public class Actions {
                 if (newQuestion != null) {
                     if (newQuestion.isAuto()) {
                         // fire an random answer automatically
-                        Dialogues.getInstance().selectAnswer(villager, player, newQuestion.getName(), newQuestion.getRandomAnswer().getName());
+                        Dialogues.getInstance().selectAnswer(villager, player, newQuestion.getName(),
+                                newQuestion.getRandomAnswer().getName());
                         return;
                     } else {
-                        // a silent message might be a question the player asks one self and should not be spoken by the villager
+                        // a silent message might be a question the player asks one self and should not
+                        // be spoken by the villager
                         MutableComponent text = villager.getTranslatable(player, Question.getTranslationKey(id));
                         Network.sendToPlayer(new InteractionDialogueResponse(newQuestion, player, villager), player);
-                        Network.sendToPlayer(new InteractionDialogueQuestionResponse(text, newQuestion.isSilent()), player);
+                        Network.sendToPlayer(new InteractionDialogueQuestionResponse(text, newQuestion.isSilent()),
+                                player);
                     }
                 } else {
                     // we send nevertheless and assume it's a final question
@@ -77,8 +80,23 @@ public class Actions {
             villager.getVillagerBrain().rewardHearts(player, hearts);
         });
 
-        register("command", GsonHelper::convertToString, command -> (villager, player) ->
-                villager.getInteractions().handle(player, command));
+        register("command", GsonHelper::convertToString,
+                command -> (villager, player) -> villager.getInteractions().handle(player, command));
+
+        register("procreate", (a, b) -> a, id -> (villager, player) -> {
+            villager.getRelationships().getPregnancy().tryStartGestation(player);
+        });
+
+        register("chat", (a, b) -> a, id -> (villager, player) -> {
+            villager.getInteractions().stopInteracting();
+            player.displayClientMessage(net.minecraft.network.chat.Component.literal("Chat started! Say something...")
+                    .withStyle(net.minecraft.ChatFormatting.GREEN), false);
+
+            // Trigger initial greeting (simulate player saying "Hello")
+            java.util.concurrent.CompletableFuture.runAsync(() -> {
+                net.conczin.mca.entity.ai.chatAI.ChatAI.answer(player, villager, "Hello");
+            });
+        });
     }
 
     private final List<Action> actions;

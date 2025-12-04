@@ -61,7 +61,7 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
             return true;
         }
 
-        //an optional argument is stored separated using a dot
+        // an optional argument is stored separated using a dot
         String arg = "";
         String[] split = command.split("\\.");
         if (split.length > 1) {
@@ -87,7 +87,7 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
                     entity.stopRiding();
                 } else {
                     entity.level().getEntities(player, player.getBoundingBox()
-                                    .inflate(10), e -> e instanceof Saddleable && ((Saddleable) e).isSaddled())
+                            .inflate(10), e -> e instanceof Saddleable && ((Saddleable) e).isSaddled())
                             .stream()
                             .filter(horse -> !horse.isVehicle())
                             .min(Comparator.comparingDouble(a -> a.distanceToSqr(entity))).ifPresentOrElse(horse -> {
@@ -128,14 +128,25 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
                 entity.sendChatMessage(player, "interaction.adopt.success");
                 FamilyTreeNode parentNode = FamilyTree.get((ServerLevel) player.level()).getOrCreate(player);
                 entity.getRelationships().getFamilyEntry().assignParent(parentNode);
-                Optional<FamilyTreeNode> parentSpouse = FamilyTree.get((ServerLevel) player.level()).getOrEmpty(parentNode.partner());
+                Optional<FamilyTreeNode> parentSpouse = FamilyTree.get((ServerLevel) player.level())
+                        .getOrEmpty(parentNode.partner());
                 parentSpouse.ifPresent(p -> entity.getRelationships().getFamilyEntry().assignParent(p));
             }
             case "procreate" -> {
                 if (memory.getHearts() < 100) {
                     entity.sendChatMessage(player, "interaction.procreate.fail.lowhearts");
                 } else if (entity.getRelationships().mayProcreateAgain(player.level().getGameTime())) {
-                    entity.getRelationships().startProcreating(player.level().getGameTime());
+                    entity.getRelationships().startProcreating(player.level().getGameTime(), player, false);
+                    stopInteracting();
+                } else {
+                    entity.sendChatMessage(player, "interaction.procreate.fail.toosoon");
+                }
+                return true;
+            }
+            case "affair" -> {
+                if (entity.getRelationships().mayProcreateAgain(player.level().getGameTime())) {
+                    entity.getRelationships().startProcreating(player.level().getGameTime(), player, true);
+                    stopInteracting();
                 } else {
                     entity.sendChatMessage(player, "interaction.procreate.fail.toosoon");
                 }
@@ -224,28 +235,33 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
             }
             case "apologize" -> {
                 Vec3 pos = entity.position();
-                entity.level().getEntitiesOfClass(VillagerEntityMCA.class, new AABB(pos, pos).inflate(32)).forEach(v -> {
-                    if (entity.distanceToSqr(v) <= (v.getTarget() == null ? 1024 : 64)) {
-                        v.pardonPlayers(99);
-                    }
-                });
+                entity.level().getEntitiesOfClass(VillagerEntityMCA.class, new AABB(pos, pos).inflate(32))
+                        .forEach(v -> {
+                            if (entity.distanceToSqr(v) <= (v.getTarget() == null ? 1024 : 64)) {
+                                v.pardonPlayers(99);
+                            }
+                        });
             }
             case "location" -> {
                 if (!Config.getInstance().structuresInRumors.isEmpty()) {
-                    //choose a random arg from the default pool
+                    // choose a random arg from the default pool
                     if (arg.isEmpty()) {
-                        arg = Config.getInstance().structuresInRumors.get(entity.getRandom().nextInt(Config.getInstance().structuresInRumors.size()));
+                        arg = Config.getInstance().structuresInRumors
+                                .get(entity.getRandom().nextInt(Config.getInstance().structuresInRumors.size()));
                     }
 
-                    //slightly randomly the search center
+                    // slightly randomly the search center
                     ServerLevel world = (ServerLevel) entity.level();
                     String finalArg = arg;
                     MCA.executorService.execute(() -> {
                         ResourceLocation identifier = ResourceLocation.parse(finalArg);
-                        BlockPos pos = RandomPos.generateRandomDirection(entity.getRandom(), 1024, 0).offset(entity.blockPosition());
-                        Optional<BlockPos> position = WorldUtils.getClosestStructurePosition(world, pos, identifier, 64);
+                        BlockPos pos = RandomPos.generateRandomDirection(entity.getRandom(), 1024, 0)
+                                .offset(entity.blockPosition());
+                        Optional<BlockPos> position = WorldUtils.getClosestStructurePosition(world, pos, identifier,
+                                64);
                         if (position.isPresent()) {
-                            String posString = position.get().getX() + "," + position.get().getY() + "," + position.get().getZ();
+                            String posString = position.get().getX() + "," + position.get().getY() + ","
+                                    + position.get().getZ();
                             entity.sendChatMessage(player, "dialogue.location." + identifier.getPath(), posString);
                         } else {
                             entity.sendChatMessage(player, "dialogue.location.forgot");

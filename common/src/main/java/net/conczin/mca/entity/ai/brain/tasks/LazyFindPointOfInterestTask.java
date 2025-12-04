@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 public class LazyFindPointOfInterestTask extends AcquirePoi {
     private static final int MIN_DELAY = 200;
 
-    public static BehaviorControl<PathfinderMob> create(Predicate<Holder<PoiType>> poiPredicate, MemoryModuleType<GlobalPos> poiPosModule, MemoryModuleType<GlobalPos> potentialPoiPosModule, boolean onlyRunIfChild, Optional<Byte> entityStatus) {
+    public static BehaviorControl<PathfinderMob> create(Predicate<Holder<PoiType>> poiPredicate,
+            MemoryModuleType<GlobalPos> poiPosModule, MemoryModuleType<GlobalPos> potentialPoiPosModule,
+            boolean onlyRunIfChild, Optional<Byte> entityStatus) {
         MutableLong cooldown = new MutableLong(0L);
         Long2ObjectMap<RetryMarker> long2ObjectMap = new Long2ObjectOpenHashMap<>();
         OneShot<PathfinderMob> singleTickTask = BehaviorBuilder.create(taskContext -> {
@@ -63,7 +65,10 @@ public class LazyFindPointOfInterestTask extends AcquirePoi {
                             }
                         };
 
-                        Set<Pair<Holder<PoiType>, BlockPos>> set = pointOfInterestStorage.findAllClosestFirstWithType(poiPredicate, predicate2, entity.blockPosition(), 48, PoiManager.Occupancy.HAS_SPACE).limit(5L).collect(Collectors.toSet());
+                        Set<Pair<Holder<PoiType>, BlockPos>> set = pointOfInterestStorage
+                                .findAllClosestFirstWithType(poiPredicate, predicate2, entity.blockPosition(), 48,
+                                        PoiManager.Occupancy.HAS_SPACE)
+                                .limit(5L).collect(Collectors.toSet());
                         Path path = findPathToPois(entity, set);
                         if (path != null && path.canReach()) {
                             BlockPos blockPos = path.getTarget();
@@ -128,7 +133,8 @@ public class LazyFindPointOfInterestTask extends AcquirePoi {
         }
 
         public String toString() {
-            return "RetryMarker{, previousAttemptAt=" + this.previousAttemptAt + ", nextScheduledAttemptAt=" + this.nextScheduledAttemptAt + ", currentDelay=" + this.currentDelay + "}";
+            return "RetryMarker{, previousAttemptAt=" + this.previousAttemptAt + ", nextScheduledAttemptAt="
+                    + this.nextScheduledAttemptAt + ", currentDelay=" + this.currentDelay + "}";
         }
     }
 }

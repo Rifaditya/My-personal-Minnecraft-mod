@@ -26,13 +26,18 @@ public class CustomClothingManager {
     public static Storage<Clothing> getClothing() {
         Optional<MinecraftServer> server = MCA.getServer();
         return server.<Storage<Clothing>>map(minecraftServer -> minecraftServer.overworld().getDataStorage()
-                .computeIfAbsent(new SavedData.Factory<>(Storage::new, (nbt, provider) -> new Storage<>(nbt, Clothing::new), null), "immersive_library_clothing")).orElse(CLOTHING_DUMMY);
+                .computeIfAbsent(new SavedData.Factory<>(Storage::new,
+                        (nbt, provider) -> new Storage<>(nbt, Clothing::new), null), "immersive_library_clothing"))
+                .orElse(CLOTHING_DUMMY);
     }
 
     public static Storage<Hair> getHair() {
         Optional<MinecraftServer> server = MCA.getServer();
         return server.<Storage<Hair>>map(minecraftServer -> minecraftServer.overworld().getDataStorage()
-                .computeIfAbsent(new SavedData.Factory<>(Storage::new, (nbt, provider) -> new Storage<>(nbt, Hair::new), null), "immersive_library_hair")).orElse(HAIR_DUMMY);
+                .computeIfAbsent(
+                        new SavedData.Factory<>(Storage::new, (nbt, provider) -> new Storage<>(nbt, Hair::new), null),
+                        "immersive_library_hair"))
+                .orElse(HAIR_DUMMY);
     }
 
     public static class Storage<T extends SkinListEntry> extends SavedData {
@@ -44,7 +49,8 @@ public class CustomClothingManager {
         public Storage(CompoundTag nbt, BiFunction<String, JsonObject, T> entryFromNbt) {
             Gson gson = new Gson();
             for (String identifier : nbt.getAllKeys()) {
-                entries.put(identifier, entryFromNbt.apply(identifier, gson.fromJson(nbt.getString(identifier), JsonObject.class)));
+                entries.put(identifier,
+                        entryFromNbt.apply(identifier, gson.fromJson(nbt.getString(identifier), JsonObject.class)));
             }
         }
 

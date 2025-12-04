@@ -16,15 +16,13 @@ public interface CParameter<T, TrackedType> {
     static CDataParameter<Integer> create(String id, int def) {
         return new CDataParameter<>(id, EntityDataSerializers.INT, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getInt(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.putInt(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.putInt(key, value));
     }
 
     static CDataParameter<Float> create(String id, float def) {
         return new CDataParameter<>(id, EntityDataSerializers.FLOAT, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getFloat(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.putFloat(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.putFloat(key, value));
     }
 
     static CDataParameter<Boolean> create(String id, boolean def) {
@@ -36,22 +34,19 @@ public interface CParameter<T, TrackedType> {
                         return def;
                     }
                 },
-                (nbt, key, value, provider) -> nbt.putInt(key, value ? 1 : 0)
-        );
+                (nbt, key, value, provider) -> nbt.putInt(key, value ? 1 : 0));
     }
 
     static CDataParameter<String> create(String id, String def) {
         return new CDataParameter<>(id, EntityDataSerializers.STRING, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getString(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.putString(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.putString(key, value));
     }
 
     static CDataParameter<CompoundTag> create(String id, CompoundTag def) {
         return new CDataParameter<>(id, EntityDataSerializers.COMPOUND_TAG, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getCompound(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.put(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.put(key, value));
     }
 
     static CDataParameter<ItemStack> create(String id, ItemStack def) {
@@ -69,8 +64,7 @@ public interface CParameter<T, TrackedType> {
                 (tag, key, provider) -> new BlockPos(
                         tag.getInt(key + "X"),
                         tag.getInt(key + "Y"),
-                        tag.getInt(key + "Z")
-                ),
+                        tag.getInt(key + "Z")),
                 (tag, key, pos, provider) -> {
                     tag.putInt(key + "X", pos.getX());
                     tag.putInt(key + "Y", pos.getY());
@@ -81,8 +75,7 @@ public interface CParameter<T, TrackedType> {
     static CDataParameter<Optional<UUID>> create(String id, Optional<UUID> def) {
         return new CDataParameter<>(id, EntityDataSerializers.OPTIONAL_UUID, def,
                 (tag, key, provider) -> tag.hasUUID(key) ? Optional.of(tag.getUUID(key)) : Optional.empty(),
-                (tag, key, v, provider) -> v.ifPresent(uuid -> tag.putUUID(key, uuid))
-        );
+                (tag, key, v, provider) -> v.ifPresent(uuid -> tag.putUUID(key, uuid)));
     }
 
     @SuppressWarnings("unchecked")
