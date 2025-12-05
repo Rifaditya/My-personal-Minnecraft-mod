@@ -50,7 +50,16 @@ public class MCAClient {
     }
 
     public static boolean useGeneticsRenderer(UUID uuid) {
-        return getPlayerData(uuid).filter(f -> f.getPlayerModel() != VillagerLike.PlayerModel.VANILLA).isPresent();
+        Optional<VillagerLike<?>> data = getPlayerData(uuid);
+        if (!data.isPresent()) {
+            System.err.println("MCA DEBUG: useGeneticsRenderer - NO PLAYER DATA for UUID: " + uuid);
+            return false;
+        }
+        VillagerLike.PlayerModel model = data.get().getPlayerModel();
+        boolean result = model != VillagerLike.PlayerModel.VANILLA;
+        System.err.println(
+                "MCA DEBUG: useGeneticsRenderer - UUID: " + uuid + ", Model: " + model + ", Result: " + result);
+        return result;
     }
 
     public static boolean useVillagerRenderer(UUID uuid) {
