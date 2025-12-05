@@ -171,7 +171,10 @@ public class BreastPhysics {
         }
 
         if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
-            bounceIntensity *= 1.75f; // Increased from 1.25f to 1.75f for villagers
+            // Base multiplier + small variation based on entity ID for variety
+            float baseMultiplier = 1.75f;
+            float variation = (entity.getId() % 20) * 0.025f; // Range: 0.0 - 0.475
+            bounceIntensity *= (baseMultiplier + variation); // Range: 1.75 - 2.225
         }
 
         tickMovement(entity, motion, bounceIntensity, breastWeight);
@@ -204,7 +207,7 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         // Boost vertical bounce (jumping) significantly
-        float verticalMultiplier = 2.5f; // Increased from 2.0f for villagers
+        float verticalMultiplier = 4.0f; // Increased from 2.5f for more noticeable jumping bounce
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             verticalMultiplier = 0.09f; // User requested 0.09
         }
@@ -228,7 +231,10 @@ public class BreastPhysics {
 
         if (horizontalSpeed > 0.01) {
             float multiplier = isPlayer ? 0.35f : 2.0f;
-            float stepBounce = (float) (Math.sin(entity.tickCount * 0.8f) * horizontalSpeed * bounceIntensity
+            // Add slight variation to step frequency based on entity ID to prevent
+            // synchronized appearance
+            float stepFrequency = 0.8f + (entity.getId() % 10) * 0.02f; // Range: 0.8 - 0.98
+            float stepBounce = (float) (Math.sin(entity.tickCount * stepFrequency) * horizontalSpeed * bounceIntensity
                     * multiplier);
             this.targetBounceY += stepBounce;
         }
@@ -400,7 +406,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.velocity *= 0.85f; // Relaxed damping (was 0.75f, originally 0.9f)
         } else {
-            this.velocity *= 0.9f;
+            this.velocity *= 0.92f; // Reduced damping from 0.9f to allow more oscillation
         }
 
         this.bounceVel += this.velocity * percent * 1.1625f;
@@ -417,7 +423,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.velocityX *= 0.85f; // Relaxed damping
         } else {
-            this.velocityX *= 0.9f;
+            this.velocityX *= 0.92f; // Reduced damping from 0.9f to allow more oscillation
         }
 
         this.bounceVelX += this.velocityX * percent;
@@ -431,7 +437,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.rotVelocity *= 0.85f; // Relaxed damping
         } else {
-            this.rotVelocity *= 0.9f;
+            this.rotVelocity *= 0.92f; // Reduced damping from 0.9f to allow more oscillation
         }
 
         this.bounceRotVel += this.rotVelocity * percent;
