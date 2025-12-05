@@ -100,6 +100,8 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
 
             this.rightArm.xRot = -armRaise;
             this.rightArm.zRot = waveSideways;
+            this.leftArm.xRot = -armRaise;
+            this.leftArm.zRot = -waveSideways;
         }
 
         setPhysicsEntity(villager, animationProgress - villager.tickCount);
