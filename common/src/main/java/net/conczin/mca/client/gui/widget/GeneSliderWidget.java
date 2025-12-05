@@ -20,13 +20,13 @@ public class GeneSliderWidget extends ExtendedSliderWidget<Double> {
 
                 if (ageMultiplier != 1.0f) {
                     int currentPercent = (int) (value * ageMultiplier * 100);
-                    return Component.translatable("gene.tooltip",
-                            Component.translatable(geneType.getTranslationKey()),
-                            geneticPercent + "% (current " + currentPercent + "%)");
+                    return Component.literal(
+                            Component.translatable(geneType.getTranslationKey()).getString() + ": " +
+                                    geneticPercent + "% (current " + currentPercent + "%)");
                 } else {
                     return Component.translatable("gene.tooltip",
                             Component.translatable(geneType.getTranslationKey()),
-                            geneticPercent + "%");
+                            geneticPercent);
                 }
             }
             return text;

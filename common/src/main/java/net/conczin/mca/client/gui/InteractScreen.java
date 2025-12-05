@@ -265,9 +265,9 @@ public class InteractScreen extends AbstractDynamicScreen {
 
                 if (ageMultiplier != 1.0f) {
                     int currentValue = (int) (gene.get() * ageMultiplier * 100);
-                    lines.add(Component.translatable("gene.tooltip",
-                            Component.translatable(key),
-                            value + "% (current " + currentValue + "%)"));
+                    lines.add(Component.literal(
+                            Component.translatable(key).getString() + ": " +
+                                    value + "% (current " + currentValue + "%)"));
                 } else {
                     lines.add(Component.translatable("gene.tooltip",
                             Component.translatable(key), value));
