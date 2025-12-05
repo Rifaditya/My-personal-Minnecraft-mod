@@ -466,8 +466,13 @@ public class BreastPhysics {
 
         this.bounceRotVel += this.rotVelocity * percent;
 
-        // Clamp Rotation Velocity (Position)
-        this.bounceRotVel = Mth.clamp(this.bounceRotVel, -35f, 35f);
+        // Clamp Rotation Velocity (Position) - much stricter for players
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            this.bounceRotVel = Mth.clamp(this.bounceRotVel, -8f, 8f); // Very strict for players to prevent erratic
+                                                                       // movement
+        } else {
+            this.bounceRotVel = Mth.clamp(this.bounceRotVel, -35f, 35f);
+        }
 
         if (this.positionY < -0.5f)
             this.positionY = -0.5f;
