@@ -68,6 +68,13 @@ public interface CommonVillagerModel<T extends LivingEntity> {
             part.visible = false;
         }
 
+        // Disable physics in editor screens to prevent vibrating (it's a static
+        // preview)
+        if (net.minecraft.client.Minecraft
+                .getInstance().screen instanceof net.conczin.mca.client.gui.VillagerEditorScreen) {
+            return;
+        }
+
         // Physics Tick
         if (villager.level().isClientSide) {
             net.conczin.mca.client.physics.PhysicsState state = net.conczin.mca.client.physics.PhysicsState
@@ -86,9 +93,15 @@ public interface CommonVillagerModel<T extends LivingEntity> {
     default void renderBreasts(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
             int color) {
         T entity = getCurrentEntity();
-        if (entity != null && getVillager(entity).getGenetics().getGender() == Gender.FEMALE) {
-            getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity, getBodyPart(),
-                    getCurrentPartialTicks(), makePhysicsConfig(entity), 64);
+        if (entity != null) {
+            VillagerLike<?> villager = getVillager(entity);
+            // Allow rendering attempt if we have valid genetics data
+            if (villager != null && villager.getGenetics() != null
+                    && villager.getGenetics().getGender() == Gender.FEMALE) {
+                getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity,
+                        getBodyPart(),
+                        getCurrentPartialTicks(), makePhysicsConfig(entity), 64);
+            }
         }
     }
 

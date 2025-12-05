@@ -171,10 +171,10 @@ public class BreastPhysics {
         }
 
         if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
-            // Base multiplier + small variation based on entity ID for variety
+            // Base multiplier + variation based on entity ID for variety
             float baseMultiplier = 1.75f;
-            float variation = (entity.getId() % 20) * 0.025f; // Range: 0.0 - 0.475
-            bounceIntensity *= (baseMultiplier + variation); // Range: 1.75 - 2.225
+            float variation = (entity.getId() % 20) * 0.05f; // Range: 0.0 - 0.95 (doubled for more variety)
+            bounceIntensity *= (baseMultiplier + variation); // Range: 1.75 - 2.7
         }
 
         tickMovement(entity, motion, bounceIntensity, breastWeight);
@@ -207,11 +207,17 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         // Boost vertical bounce (jumping) significantly
-        float verticalMultiplier = 4.0f; // Increased from 2.5f for more noticeable jumping bounce
+        float verticalMultiplier = 8.0f; // Doubled from 4.0f for much more reactive physics
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             verticalMultiplier = 0.09f; // User requested 0.09
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
+
+        // Add acceleration-based bounce (change in velocity creates reactive forces)
+        double vertAcceleration = vertVelocity - lastVerticalMoveVelocity;
+        if (!isPlayer) {
+            this.targetBounceY += (float) vertAcceleration * bounceIntensity * 15.0f;
+        }
 
         // Add horizontal movement influence (Step Bounce)
         // Simulate walking rhythm: fast sine wave based on tickCount scaled by
@@ -231,12 +237,18 @@ public class BreastPhysics {
 
         if (horizontalSpeed > 0.01) {
             float multiplier = isPlayer ? 0.35f : 2.0f;
-            // Add slight variation to step frequency based on entity ID to prevent
-            // synchronized appearance
-            float stepFrequency = 0.8f + (entity.getId() % 10) * 0.02f; // Range: 0.8 - 0.98
+            // Add variation to step frequency based on entity ID to prevent synchronized
+            // appearance
+            float stepFrequency = 0.6f + (entity.getId() % 20) * 0.04f; // Range: 0.6 - 1.36 (much wider)
             float stepBounce = (float) (Math.sin(entity.tickCount * stepFrequency) * horizontalSpeed * bounceIntensity
                     * multiplier);
             this.targetBounceY += stepBounce;
+
+            // Add random micro-movements to feel less scripted (villagers only)
+            if (!isPlayer && entity.tickCount % 3 == 0) {
+                float randomPerturbation = (float) (Math.random() - 0.5) * bounceIntensity * 0.3f;
+                this.targetBounceY += randomPerturbation;
+            }
         }
 
         this.targetBounceY += breastWeight;
@@ -406,7 +418,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.velocity *= 0.85f; // Relaxed damping (was 0.75f, originally 0.9f)
         } else {
-            this.velocity *= 0.92f; // Reduced damping from 0.9f to allow more oscillation
+            this.velocity *= 0.96f; // Much reduced damping from 0.92f for longer, more realistic oscillation
         }
 
         this.bounceVel += this.velocity * percent * 1.1625f;
@@ -423,7 +435,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.velocityX *= 0.85f; // Relaxed damping
         } else {
-            this.velocityX *= 0.92f; // Reduced damping from 0.9f to allow more oscillation
+            this.velocityX *= 0.96f; // Much reduced damping from 0.92f for longer oscillation
         }
 
         this.bounceVelX += this.velocityX * percent;
@@ -437,7 +449,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.rotVelocity *= 0.85f; // Relaxed damping
         } else {
-            this.rotVelocity *= 0.92f; // Reduced damping from 0.9f to allow more oscillation
+            this.rotVelocity *= 0.96f; // Much reduced damping from 0.92f for longer oscillation
         }
 
         this.bounceRotVel += this.rotVelocity * percent;
