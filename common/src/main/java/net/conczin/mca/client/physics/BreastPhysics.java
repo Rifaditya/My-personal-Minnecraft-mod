@@ -207,16 +207,17 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         // Boost vertical bounce (jumping) significantly
-        float verticalMultiplier = 8.0f; // Doubled from 4.0f for much more reactive physics
+        float verticalMultiplier = 18.0f; // MASSIVE increase from 8.0f - jumping needs to be DRAMATIC!
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            verticalMultiplier = 0.09f; // User requested 0.09
+            verticalMultiplier = 0.4f; // Increased from 0.09f (was too weak)
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
         // Add acceleration-based bounce (change in velocity creates reactive forces)
         double vertAcceleration = vertVelocity - lastVerticalMoveVelocity;
         if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
-            this.targetBounceY += (float) vertAcceleration * bounceIntensity * 15.0f;
+            // TRIPLED from 15.0f to make jumping MUCH more reactive
+            this.targetBounceY += (float) vertAcceleration * bounceIntensity * 45.0f;
         }
 
         // Add horizontal movement influence (Step Bounce)
@@ -245,8 +246,9 @@ public class BreastPhysics {
             this.targetBounceY += stepBounce;
 
             // Add random micro-movements to feel less scripted (villagers only)
-            if (!isPlayer && entity.tickCount % 3 == 0) {
-                float randomPerturbation = (float) (Math.random() - 0.5) * bounceIntensity * 0.3f;
+            // INCREASED: Now every 2 ticks (was 3) with stronger effect (0.5f was 0.3f)
+            if (!isPlayer && entity.tickCount % 2 == 0) {
+                float randomPerturbation = (float) (Math.random() - 0.5) * bounceIntensity * 0.5f;
                 this.targetBounceY += randomPerturbation;
             }
         }
