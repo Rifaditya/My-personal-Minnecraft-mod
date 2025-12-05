@@ -119,6 +119,25 @@ public class BreastPhysics {
             return;
         }
 
+        // Performance optimization: Use simplified physics for distant entities
+        // This significantly reduces CPU usage when many villagers are loaded
+        try {
+            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            if (minecraft.cameraEntity != null) {
+                double distanceSquared = entity.distanceToSqr(minecraft.cameraEntity);
+                int chunkDistance = net.conczin.mca.Config.getInstance().physicsRenderDistance;
+                double blockDistance = chunkDistance * 16.0; // Convert chunks to blocks
+
+                // If distance check is enabled (> 0) and entity is beyond render distance
+                if (chunkDistance > 0 && distanceSquared > blockDistance * blockDistance) {
+                    simplifiedTick(armor, config);
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            // If we can't get camera entity (shouldn't happen), continue with full physics
+        }
+
         this.prePositionY = this.positionY;
         this.prePositionX = this.positionX;
         this.wfg_preBounceRotation = this.wfg_bounceRotation;
@@ -171,7 +190,7 @@ public class BreastPhysics {
         }
 
         if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
-            bounceIntensity *= 1.75f; // Increased from 1.25f to 1.75f for villagers
+            bounceIntensity *= 2.5f; // Increased from 1.75f for more dynamic villager physics
         }
 
         tickMovement(entity, motion, bounceIntensity, breastWeight);
@@ -204,39 +223,30 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         // Boost vertical bounce (jumping) significantly
-        float verticalMultiplier = 2.5f; // Increased from 2.0f for villagers
+        float verticalMultiplier = 3.5f; // Increased from 2.5f for more responsive villager jumping
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             verticalMultiplier = 0.09f; // User requested 0.09
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
-        // Add horizontal movement influence (Step Bounce)
-        // Simulate walking rhythm: fast sine wave based on tickCount scaled by
-        // horizontal speed
-        double horizontalSpeed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        // Use proper limb animation for walking/running bounce (replaces artificial
+        // sine wave)
+        // This makes physics synchronized with actual entity animation
+        float f2 = (float) entity.getDeltaMovement().lengthSqr() / 0.2F;
+        f2 = f2 * f2 * f2;
+        if (f2 < 1.0F)
+            f2 = 1.0F;
 
-        boolean isPlayer = entity instanceof net.minecraft.world.entity.player.Player;
-
-        if (isPlayer) {
-            // Clamp horizontal speed to prevent massive bounce when running (players move
-            // fast)
-            horizontalSpeed = Math.min(horizontalSpeed, 0.1);
-        } else {
-            // Villagers move slower, allow more speed influence
-            horizontalSpeed = Math.min(horizontalSpeed, 0.5);
-        }
-
-        if (horizontalSpeed > 0.01) {
-            float multiplier = isPlayer ? 0.35f : 2.0f;
-            float stepBounce = (float) (Math.sin(entity.tickCount * 0.8f) * horizontalSpeed * bounceIntensity
-                    * multiplier);
-            this.targetBounceY += stepBounce;
-        }
+        // For villagers, increase the walking bounce effect
+        float walkingBounceMultiplier = entity instanceof net.minecraft.world.entity.player.Player ? 0.5F : 1.5F;
+        this.targetBounceY += Mth.cos(entity.walkAnimation.position() * 0.6662F + (float) Math.PI)
+                * 0.5F * entity.walkAnimation.speed() * walkingBounceMultiplier / f2;
 
         this.targetBounceY += breastWeight;
 
         this.targetRotVel = calcRotation(entity, bounceIntensity);
 
+        boolean isPlayer = entity instanceof net.minecraft.world.entity.player.Player;
         float verticalRotInfluence = (float) motion.y * bounceIntensity * randomB;
         if (isPlayer) {
             verticalRotInfluence *= 0.05f; // Dampen vertical rotation for players
@@ -244,11 +254,6 @@ public class BreastPhysics {
         this.targetRotVel += verticalRotInfluence;
 
         this.targetBounceX = -calcRotation(entity, bounceIntensity) / 10f;
-
-        float f2 = (float) entity.getDeltaMovement().lengthSqr() / 0.2F;
-        f2 = f2 * f2 * f2;
-        if (f2 < 1.0F)
-            f2 = 1.0F;
     }
 
     private void tickPose(final LivingEntity entity, final float bounceIntensity) {
