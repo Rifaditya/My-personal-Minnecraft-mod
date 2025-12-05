@@ -207,17 +207,17 @@ public class BreastPhysics {
         lastVerticalMoveVelocity = vertVelocity;
 
         // Boost vertical bounce (jumping) significantly
-        float verticalMultiplier = 18.0f; // MASSIVE increase from 8.0f - jumping needs to be DRAMATIC!
+        float verticalMultiplier = 27.0f; // Increased 50% from 18.0f for even MORE dramatic villager physics!
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            verticalMultiplier = 0.12f; // Reduced by 70% from 0.4f (user request)
+            verticalMultiplier = 0.06f; // Reduced by another 50% from 0.12f (user request)
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
         // Add acceleration-based bounce (change in velocity creates reactive forces)
         double vertAcceleration = vertVelocity - lastVerticalMoveVelocity;
         if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
-            // TRIPLED from 15.0f to make jumping MUCH more reactive
-            this.targetBounceY += (float) vertAcceleration * bounceIntensity * 45.0f;
+            // Increased 50% from 45.0f to 67.5f for more reactive villager jumps
+            this.targetBounceY += (float) vertAcceleration * bounceIntensity * 67.5f;
         }
 
         // Add horizontal movement influence (Step Bounce)
@@ -239,8 +239,7 @@ public class BreastPhysics {
         // CRITICAL: Check if entity is jumping (significant vertical motion)
         // When jumping, AMPLIFY all forces for dramatic effect (ADDITIVE approach)
         boolean isJumping = Math.abs(motion.y) > 0.05; // Threshold for "jumping" vs minor bounce
-        float jumpAmplifier = (isJumping && !isPlayer) ? 4.5f : 1.0f; // 4.5x ALL forces when jumping (increased from
-                                                                      // 3.0f)!
+        float jumpAmplifier = (isJumping && !isPlayer) ? 6.75f : 1.0f; // Increased 50% from 4.5f to 6.75f!
 
         if (horizontalSpeed > 0.01) {
             float multiplier = isPlayer ? 0.35f : 2.0f;
@@ -430,7 +429,7 @@ public class BreastPhysics {
         if (entity instanceof net.minecraft.world.entity.player.Player) {
             this.velocity *= 0.85f; // Relaxed damping (was 0.75f, originally 0.9f)
         } else {
-            this.velocity *= 0.96f; // Much reduced damping from 0.92f for longer, more realistic oscillation
+            this.velocity *= 0.98f; // Increased from 0.96f for even MORE floppiness and longer oscillation!
         }
 
         this.bounceVel += this.velocity * percent * 1.1625f;
