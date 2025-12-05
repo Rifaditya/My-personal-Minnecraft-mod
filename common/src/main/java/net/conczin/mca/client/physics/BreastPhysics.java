@@ -119,23 +119,27 @@ public class BreastPhysics {
             return;
         }
 
-        // Performance optimization: Use simplified physics for distant entities
-        // This significantly reduces CPU usage when many villagers are loaded
-        try {
-            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-            if (minecraft.cameraEntity != null) {
-                double distanceSquared = entity.distanceToSqr(minecraft.cameraEntity);
-                int chunkDistance = net.conczin.mca.Config.getInstance().physicsRenderDistance;
-                double blockDistance = chunkDistance * 16.0; // Convert chunks to blocks
+        // Performance optimization: Use simplified physics for distant NON-PLAYER
+        // entities
+        // NEVER apply distance optimization to players - they should always have full
+        // physics
+        if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
+            try {
+                net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+                if (minecraft.cameraEntity != null) {
+                    double distanceSquared = entity.distanceToSqr(minecraft.cameraEntity);
+                    int chunkDistance = net.conczin.mca.Config.getInstance().physicsRenderDistance;
+                    double blockDistance = chunkDistance * 16.0; // Convert chunks to blocks
 
-                // If distance check is enabled (> 0) and entity is beyond render distance
-                if (chunkDistance > 0 && distanceSquared > blockDistance * blockDistance) {
-                    simplifiedTick(armor, config);
-                    return;
+                    // If distance check is enabled (> 0) and entity is beyond render distance
+                    if (chunkDistance > 0 && distanceSquared > blockDistance * blockDistance) {
+                        simplifiedTick(armor, config);
+                        return;
+                    }
                 }
+            } catch (Exception e) {
+                // If we can't get camera entity (shouldn't happen), continue with full physics
             }
-        } catch (Exception e) {
-            // If we can't get camera entity (shouldn't happen), continue with full physics
         }
 
         this.prePositionY = this.positionY;
