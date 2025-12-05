@@ -97,14 +97,31 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         if (entity != null) {
             try {
                 BreastPhysics.PhysicsConfig config = makePhysicsConfig(entity);
-                // Trust the physics config's canHaveBreasts check - it handles all the
-                // complexity
-                if (config != null && config.canHaveBreasts()) {
-                    getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity,
-                            getBodyPart(), getCurrentPartialTicks(), config, 64);
+                if (config == null) {
+                    if (entity.tickCount % 100 == 0) {
+                        System.err.println(
+                                "MCA DEBUG: renderBreasts - config is NULL for " + entity.getClass().getSimpleName());
+                    }
+                    return;
                 }
+
+                boolean canHave = config.canHaveBreasts();
+                if (!canHave) {
+                    if (entity.tickCount % 100 == 0) {
+                        System.err.println("MCA DEBUG: renderBreasts - canHaveBreasts returned FALSE for "
+                                + entity.getClass().getSimpleName());
+                    }
+                    return;
+                }
+
+                getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity,
+                        getBodyPart(), getCurrentPartialTicks(), config, 64);
             } catch (Exception e) {
-                // Silently fail if data not loaded yet - will retry next frame
+                if (entity.tickCount % 100 == 0) {
+                    System.err.println("MCA ERROR: renderBreasts exception for " + entity.getClass().getSimpleName()
+                            + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }

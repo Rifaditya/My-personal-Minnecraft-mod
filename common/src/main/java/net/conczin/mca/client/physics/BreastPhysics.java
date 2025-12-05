@@ -237,29 +237,27 @@ public class BreastPhysics {
         }
 
         // CRITICAL: Check if entity is jumping (significant vertical motion)
-        // If jumping, dramatically reduce step bounce so jumping physics dominate
+        // When jumping, AMPLIFY all forces for dramatic effect (ADDITIVE approach)
         boolean isJumping = Math.abs(motion.y) > 0.05; // Threshold for "jumping" vs minor bounce
+        float jumpAmplifier = (isJumping && !isPlayer) ? 3.0f : 1.0f; // 3x ALL forces when jumping!
 
         if (horizontalSpeed > 0.01) {
             float multiplier = isPlayer ? 0.35f : 2.0f;
-
-            // CRITICAL FIX: Reduce step bounce massively when jumping
-            if (isJumping && !isPlayer) {
-                multiplier *= 0.1f; // Reduce to 10% when jumping - let vertical forces dominate!
-            }
 
             // Add variation to step frequency based on entity ID to prevent synchronized
             // appearance
             float stepFrequency = 0.6f + (entity.getId() % 20) * 0.04f; // Range: 0.6 - 1.36 (much wider)
             float stepBounce = (float) (Math.sin(entity.tickCount * stepFrequency) * horizontalSpeed * bounceIntensity
-                    * multiplier);
+                    * multiplier * jumpAmplifier); // AMPLIFIED when jumping!
             this.targetBounceY += stepBounce;
 
             // Add random micro-movements to feel less scripted (villagers only)
-            // INCREASED: Now every 2 ticks (was 3) with stronger effect (0.5f was 0.3f)
-            // BUT: Disable when jumping to let vertical forces shine
-            if (!isPlayer && entity.tickCount % 2 == 0 && !isJumping) {
-                float randomPerturbation = (float) (Math.random() - 0.5) * bounceIntensity * 0.5f;
+            // INCREASED: Now every 2 ticks (was 3) with stronger effect
+            // AMPLIFIED when jumping for chaotic effect!
+            if (!isPlayer && entity.tickCount % 2 == 0) {
+                float perturbationStrength = isJumping ? 1.0f : 0.5f; // 2x stronger when jumping!
+                float randomPerturbation = (float) (Math.random() - 0.5) * bounceIntensity * perturbationStrength
+                        * jumpAmplifier;
                 this.targetBounceY += randomPerturbation;
             }
         }
