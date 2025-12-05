@@ -215,7 +215,7 @@ public class BreastPhysics {
 
         // Add acceleration-based bounce (change in velocity creates reactive forces)
         double vertAcceleration = vertVelocity - lastVerticalMoveVelocity;
-        if (!isPlayer) {
+        if (!(entity instanceof net.minecraft.world.entity.player.Player)) {
             this.targetBounceY += (float) vertAcceleration * bounceIntensity * 15.0f;
         }
 
