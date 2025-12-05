@@ -96,7 +96,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     private static final CDataParameter<Integer> GROWTH_AMOUNT = CParameter.create("GrowthAmount",
             -AgeState.getMaxAge());
     private static final CDataManager<VillagerEntityMCA> DATA = createTrackedData(VillagerEntityMCA.class).build();
-    private static final int RECALCULATE_DIMENSIONS_EVERY_N_TICKS = 100;
+    private static final int RECALCULATE_DIMENSIONS_EVERY_N_TICKS = 40;
     public final ConversationManager conversationManager = new ConversationManager(this);
     final ResourceLocation EXTRA_HEALTH_EFFECT_ID = MCA.locate("trait_health");
     private final VillagerBrain<VillagerEntityMCA> mcaBrain = new VillagerBrain<>(this);
@@ -315,15 +315,6 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             setAgeState(AgeState.byCurrentAge(age));
 
             AgeState current = getAgeState();
-
-            AgeState next = current.getNext();
-            if (current != next) {
-                dimensions.interpolate(current, next, AgeState.getDelta(age));
-            } else {
-                dimensions.set(current);
-            }
-        }
-    }
 
     @Override
     public boolean doHurtTarget(Entity target) {

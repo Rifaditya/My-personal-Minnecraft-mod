@@ -54,5 +54,17 @@ public interface VillagerDimensions {
             breasts = a.getBreasts();
             head = a.getHead();
         }
+
+        public void setWidth(float width) {
+            this.width = width;
+        }
+
+        public void setHeight(float height) {
+            this.height = height;
+        }
+
+        public void setBreasts(float breasts) {
+            this.breasts = breasts;
+        }
     }
 }
