@@ -236,6 +236,14 @@ public class BreastPhysics {
             horizontalSpeed = Math.min(horizontalSpeed, 0.5);
         }
 
+        // Calculate total movement speed for dynamic jiggle scaling
+        double totalSpeed = Math.sqrt(motion.x * motion.x + motion.y * motion.y + motion.z * motion.z);
+
+        // Apply speed-based multiplier to bounce intensity
+        // Faster movement = more jiggle
+        float speedMultiplier = 1.0f + (float) (totalSpeed * (isPlayer ? 3.0f : 8.0f));
+        speedMultiplier = Mth.clamp(speedMultiplier, 1.0f, isPlayer ? 2.5f : 4.0f);
+
         // CRITICAL: Check if entity is jumping (significant vertical motion)
         // When jumping, AMPLIFY all forces for dramatic effect (ADDITIVE approach)
         boolean isJumping = Math.abs(motion.y) > 0.05; // Threshold for "jumping" vs minor bounce
@@ -265,6 +273,9 @@ public class BreastPhysics {
 
         this.targetBounceY += breastWeight;
 
+        // Apply speed multiplier to vertical bounce
+        this.targetBounceY *= speedMultiplier;
+
         this.targetRotVel = calcRotation(entity, bounceIntensity);
 
         float verticalRotInfluence = (float) motion.y * bounceIntensity * randomB;
@@ -274,6 +285,9 @@ public class BreastPhysics {
         this.targetRotVel += verticalRotInfluence;
 
         this.targetBounceX = -calcRotation(entity, bounceIntensity) / 10f;
+
+        // Apply speed multiplier to horizontal bounce
+        this.targetBounceX *= speedMultiplier;
 
         float f2 = (float) entity.getDeltaMovement().lengthSqr() / 0.2F;
         f2 = f2 * f2 * f2;
