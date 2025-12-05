@@ -30,3 +30,9 @@ artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
+
+// Suppress javadoc warnings
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
