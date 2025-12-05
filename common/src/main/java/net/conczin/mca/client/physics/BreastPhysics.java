@@ -239,7 +239,8 @@ public class BreastPhysics {
         // CRITICAL: Check if entity is jumping (significant vertical motion)
         // When jumping, AMPLIFY all forces for dramatic effect (ADDITIVE approach)
         boolean isJumping = Math.abs(motion.y) > 0.05; // Threshold for "jumping" vs minor bounce
-        float jumpAmplifier = (isJumping && !isPlayer) ? 3.0f : 1.0f; // 3x ALL forces when jumping!
+        float jumpAmplifier = (isJumping && !isPlayer) ? 4.5f : 1.0f; // 4.5x ALL forces when jumping (increased from
+                                                                      // 3.0f)!
 
         if (horizontalSpeed > 0.01) {
             float multiplier = isPlayer ? 0.35f : 2.0f;
