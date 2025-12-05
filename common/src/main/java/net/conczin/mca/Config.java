@@ -359,13 +359,6 @@ public final class Config {
     public float breastGeneticsVariance = 0.5f;
 
     /**
-     * Maximum distance (in chunks) at which full breast physics are calculated.
-     * Beyond this distance, simplified physics are used for better performance.
-     * Set to 0 to always use full physics (not recommended with many villagers).
-     */
-    public int physicsRenderDistance = 4;
-
-    /**
      * Duration (in ticks) that burned clothing effects remain visible.
      */
     public int burnedClothingTickLength = 3600;
