@@ -143,7 +143,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
         for (Genetics.GeneType g : genes) {
             addRenderableWidget(new GeneSliderWidget(width / 2 + (right ? DATA_WIDTH / 2 : 0), y, DATA_WIDTH / 2, 20,
                     Component.translatable(g.getTranslationKey()), genetics.getGene(g),
-                    b -> genetics.setGene(g, b.floatValue())));
+                    b -> genetics.setGene(g, b.floatValue()), villager, g));
             if (right) {
                 y += 20;
             }
@@ -234,7 +234,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                                 villagerBreedingAge = -(int) ((1.0 - b) * AgeState.getMaxAge()) + 1;
                                 villager.setAge(villagerBreedingAge);
                                 villager.refreshDimensions();
-                            }));
+                            }, villager, null));
                     y += 28;
                 }
 
@@ -528,7 +528,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                         Component.translatable("gui.villager_editor.infection"), villager.getInfectionProgress(), b -> {
                             villager.setInfected(b > 0);
                             villager.setInfectionProgress(b.floatValue());
-                        }));
+                        }, villager, null));
                 y += 22;
 
                 // hearts

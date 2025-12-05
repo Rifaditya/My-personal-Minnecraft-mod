@@ -258,6 +258,14 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
         return getTrackedValue(AGE_STATE);
     }
 
+    default int getAge() {
+        Entity entity = asEntity();
+        if (entity instanceof net.minecraft.world.entity.AgeableMob ageableMob) {
+            return ageableMob.getAge();
+        }
+        return 0; // Default for non-ageable entities
+    }
+
     default VillagerDimensions getVillagerDimensions() {
         return getAgeState();
     }
