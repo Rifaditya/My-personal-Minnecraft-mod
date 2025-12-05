@@ -209,7 +209,7 @@ public class BreastPhysics {
         // Boost vertical bounce (jumping) significantly
         float verticalMultiplier = 18.0f; // MASSIVE increase from 8.0f - jumping needs to be DRAMATIC!
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            verticalMultiplier = 0.4f; // Increased from 0.09f (was too weak)
+            verticalMultiplier = 0.12f; // Reduced by 70% from 0.4f (user request)
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
