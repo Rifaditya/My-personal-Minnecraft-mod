@@ -236,8 +236,18 @@ public class BreastPhysics {
             horizontalSpeed = Math.min(horizontalSpeed, 0.5);
         }
 
+        // CRITICAL: Check if entity is jumping (significant vertical motion)
+        // If jumping, dramatically reduce step bounce so jumping physics dominate
+        boolean isJumping = Math.abs(motion.y) > 0.05; // Threshold for "jumping" vs minor bounce
+
         if (horizontalSpeed > 0.01) {
             float multiplier = isPlayer ? 0.35f : 2.0f;
+
+            // CRITICAL FIX: Reduce step bounce massively when jumping
+            if (isJumping && !isPlayer) {
+                multiplier *= 0.1f; // Reduce to 10% when jumping - let vertical forces dominate!
+            }
+
             // Add variation to step frequency based on entity ID to prevent synchronized
             // appearance
             float stepFrequency = 0.6f + (entity.getId() % 20) * 0.04f; // Range: 0.6 - 1.36 (much wider)
@@ -247,7 +257,8 @@ public class BreastPhysics {
 
             // Add random micro-movements to feel less scripted (villagers only)
             // INCREASED: Now every 2 ticks (was 3) with stronger effect (0.5f was 0.3f)
-            if (!isPlayer && entity.tickCount % 2 == 0) {
+            // BUT: Disable when jumping to let vertical forces shine
+            if (!isPlayer && entity.tickCount % 2 == 0 && !isJumping) {
                 float randomPerturbation = (float) (Math.random() - 0.5) * bounceIntensity * 0.5f;
                 this.targetBounceY += randomPerturbation;
             }

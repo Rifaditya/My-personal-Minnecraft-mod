@@ -94,13 +94,16 @@ public interface CommonVillagerModel<T extends LivingEntity> {
             int color) {
         T entity = getCurrentEntity();
         if (entity != null) {
-            VillagerLike<?> villager = getVillager(entity);
-            // Allow rendering attempt if we have valid genetics data
-            if (villager != null && villager.getGenetics() != null
-                    && villager.getGenetics().getGender() == Gender.FEMALE) {
-                getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity,
-                        getBodyPart(),
-                        getCurrentPartialTicks(), makePhysicsConfig(entity), 64);
+            try {
+                BreastPhysics.PhysicsConfig config = makePhysicsConfig(entity);
+                // Trust the physics config's canHaveBreasts check - it handles all the
+                // complexity
+                if (config != null && config.canHaveBreasts()) {
+                    getWildfireRenderer().render(poseStack, buffer, packedLight, packedOverlay, color, entity,
+                            getBodyPart(), getCurrentPartialTicks(), config, 64);
+                }
+            } catch (Exception e) {
+                // Silently fail if data not loaded yet - will retry next frame
             }
         }
     }
