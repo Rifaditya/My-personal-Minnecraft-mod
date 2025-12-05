@@ -313,8 +313,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         if (age != -2) {
             setTrackedValue(GROWTH_AMOUNT, age);
             setAgeState(AgeState.byCurrentAge(age));
-
-            AgeState current = getAgeState();
+        }
+    }
 
     @Override
     public boolean doHurtTarget(Entity target) {
