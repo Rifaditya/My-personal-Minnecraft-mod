@@ -68,6 +68,10 @@ public class MCAClient {
     }
 
     public static boolean renderArms(UUID uuid, String key) {
+        // If forcing villager model, bypass blacklist and always render
+        if (Config.getInstance().forceVillagerPlayerModel) {
+            return useVillagerRenderer(uuid);
+        }
         return useVillagerRenderer(uuid) &&
                 Config.getInstance().playerRendererBlacklist.entrySet().stream()
                         .filter(entry -> entry.getValue().equals("arms") || entry.getValue().equals(key))
@@ -102,10 +106,13 @@ public class MCAClient {
     }
 
     public static boolean isVillagerRendererAllowed() {
-        return !Config.getInstance().forceVillagerPlayerModel &&
-                Config.getInstance().playerRendererBlacklist.entrySet().stream()
-                        .filter(entry -> entry.getValue().equals("all") || entry.getValue().equals("block_villager"))
-                        .noneMatch(entry -> MCA.platformHelper.isModLoaded(entry.getKey()));
+        // If forcing villager model, always allow
+        if (Config.getInstance().forceVillagerPlayerModel) {
+            return true;
+        }
+        return Config.getInstance().playerRendererBlacklist.entrySet().stream()
+                .filter(entry -> entry.getValue().equals("all") || entry.getValue().equals("block_villager"))
+                .noneMatch(entry -> MCA.platformHelper.isModLoaded(entry.getKey()));
     }
 
     public static boolean areShadersAllowed(String key) {
