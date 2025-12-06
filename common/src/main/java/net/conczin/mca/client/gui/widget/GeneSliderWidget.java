@@ -15,18 +15,17 @@ public class GeneSliderWidget extends ExtendedSliderWidget<Double> {
             Consumer<Double> callback, VillagerEntityMCA villager, Genetics.GeneType geneType) {
         super(x, y, width, height, text, value, callback, () -> {
             if (villager != null && geneType != null) {
-                float ageMultiplier = getAgeMultiplierForGene(villager, geneType);
-                int geneticPercent = (int) (value * 100);
+                GeneInfo info = getGeneInfo(villager, geneType, value);
 
-                if (ageMultiplier != 1.0f) {
-                    int currentPercent = (int) (value * ageMultiplier * 100);
+                if (info.ageMultiplier != 1.0f) {
+                    String status = info.growthPhase != null ? ", " + info.growthPhase : "";
                     return Component.literal(
                             Component.translatable(geneType.getTranslationKey()).getString() + ": " +
-                                    geneticPercent + "% (current " + currentPercent + "%)");
+                                    info.geneticPercent + "% (current " + info.currentPercent + "%" + status + ")");
                 } else {
                     return Component.translatable("gene.tooltip",
                             Component.translatable(geneType.getTranslationKey()),
-                            geneticPercent);
+                            info.geneticPercent);
                 }
             }
             return text;
@@ -35,16 +34,40 @@ public class GeneSliderWidget extends ExtendedSliderWidget<Double> {
         this.geneType = geneType;
     }
 
-    private static float getAgeMultiplierForGene(VillagerEntityMCA villager, Genetics.GeneType gene) {
+    private static class GeneInfo {
+        final float ageMultiplier;
+        final int geneticPercent;
+        final int currentPercent;
+        final String growthPhase; // "growing", "peak", or "shrinking"
+
+        GeneInfo(float multiplier, int genetic, int current, String phase) {
+            this.ageMultiplier = multiplier;
+            this.geneticPercent = genetic;
+            this.currentPercent = current;
+            this.growthPhase = phase;
+        }
+    }
+
+    private static GeneInfo getGeneInfo(VillagerEntityMCA villager, Genetics.GeneType gene, double value) {
+        int geneticPercent = (int) (value * 100);
+        float ageMultiplier = 1.0f;
+        String growthPhase = null;
+
         if (gene == Genetics.BREAST) {
             // Breast development based on age state
-            return villager.getAgeState().getBreasts();
+            ageMultiplier = villager.getAgeState().getBreasts();
+            if (ageMultiplier < 1.0f) {
+                growthPhase = "growing";
+            } else {
+                growthPhase = "peak";
+            }
         } else if (gene == Genetics.SIZE || gene == Genetics.WIDTH) {
             // Adult aging curve for size and width
             int age = villager.getAge();
             if (age < 0) {
                 // Child stages - use height multiplier
-                return villager.getAgeState().getHeight();
+                ageMultiplier = villager.getAgeState().getHeight();
+                growthPhase = "growing";
             } else {
                 // Adult aging curve: 70% at age 18, 100% at ages 60-70, back to 70% at age 100
                 float maxAge = AgeState.getMaxAge();
@@ -57,18 +80,22 @@ public class GeneSliderWidget extends ExtendedSliderWidget<Double> {
                 if (ageProgress <= GROWTH_END) {
                     // Growing phase
                     float growthProgress = ageProgress / GROWTH_END;
-                    return YOUNG_SIZE + (growthProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    ageMultiplier = YOUNG_SIZE + (growthProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    growthPhase = "growing";
                 } else if (ageProgress <= PLATEAU_END) {
-                    return PEAK_SIZE; // Peak phase
+                    ageMultiplier = PEAK_SIZE; // Peak phase
+                    growthPhase = "peak";
                 } else {
                     // Elder shrinking phase
                     float elderProgress = (ageProgress - PLATEAU_END) / (1.0f - PLATEAU_END);
-                    return PEAK_SIZE - (elderProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    ageMultiplier = PEAK_SIZE - (elderProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    growthPhase = "shrinking";
                 }
             }
         }
-        // Other genes are not affected by age
-        return 1.0f;
+
+        int currentPercent = (int) (value * ageMultiplier * 100);
+        return new GeneInfo(ageMultiplier, geneticPercent, currentPercent, growthPhase);
     }
 
     @Override

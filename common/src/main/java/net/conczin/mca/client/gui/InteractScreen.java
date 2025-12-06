@@ -261,13 +261,13 @@ public class InteractScreen extends AbstractDynamicScreen {
             for (Genetics.Gene gene : villager.getGenetics()) {
                 String key = gene.getType().getTranslationKey();
                 int value = (int) (gene.get() * 100);
-                float ageMultiplier = getAgeMultiplierForGene(gene.getType());
+                GenePhaseInfo info = getGenePhaseInfo(gene.getType(), gene.get());
 
-                if (ageMultiplier != 1.0f) {
-                    int currentValue = (int) (gene.get() * ageMultiplier * 100);
+                if (info.ageMultiplier != 1.0f) {
+                    String status = info.growthPhase != null ? ", " + info.growthPhase : "";
                     lines.add(Component.literal(
                             Component.translatable(key).getString() + ": " +
-                                    value + "% (current " + currentValue + "%)"));
+                                    value + "% (current " + info.currentValue + "%" + status + ")"));
                 } else {
                     lines.add(Component.translatable("gene.tooltip",
                             Component.translatable(key), value));
@@ -328,16 +328,37 @@ public class InteractScreen extends AbstractDynamicScreen {
         }
     }
 
-    private float getAgeMultiplierForGene(Genetics.GeneType gene) {
+    private static class GenePhaseInfo {
+        final float ageMultiplier;
+        final int currentValue;
+        final String growthPhase; // "growing", "peak", or "shrinking"
+
+        GenePhaseInfo(float multiplier, int current, String phase) {
+            this.ageMultiplier = multiplier;
+            this.currentValue = current;
+            this.growthPhase = phase;
+        }
+    }
+
+    private GenePhaseInfo getGenePhaseInfo(Genetics.GeneType gene, double value) {
+        float ageMultiplier = 1.0f;
+        String growthPhase = null;
+
         if (gene == Genetics.BREAST) {
             // Breast development based on age state
-            return villager.getAgeState().getBreasts();
+            ageMultiplier = villager.getAgeState().getBreasts();
+            if (ageMultiplier < 1.0f) {
+                growthPhase = "growing";
+            } else {
+                growthPhase = "peak";
+            }
         } else if (gene == Genetics.SIZE || gene == Genetics.WIDTH) {
             // Adult aging curve for size and width
             int age = villager.getAge();
             if (age < 0) {
                 // Child stages - use height multiplier
-                return villager.getAgeState().getHeight();
+                ageMultiplier = villager.getAgeState().getHeight();
+                growthPhase = "growing";
             } else {
                 // Adult aging curve: 70% at age 18, 100% at ages 60-70, back to 70% at age 100
                 float maxAge = net.conczin.mca.entity.ai.relationship.AgeState.getMaxAge();
@@ -350,18 +371,22 @@ public class InteractScreen extends AbstractDynamicScreen {
                 if (ageProgress <= GROWTH_END) {
                     // Growing phase
                     float growthProgress = ageProgress / GROWTH_END;
-                    return YOUNG_SIZE + (growthProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    ageMultiplier = YOUNG_SIZE + (growthProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    growthPhase = "growing";
                 } else if (ageProgress <= PLATEAU_END) {
-                    return PEAK_SIZE; // Peak phase
+                    ageMultiplier = PEAK_SIZE; // Peak phase
+                    growthPhase = "peak";
                 } else {
                     // Elder shrinking phase
                     float elderProgress = (ageProgress - PLATEAU_END) / (1.0f - PLATEAU_END);
-                    return PEAK_SIZE - (elderProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    ageMultiplier = PEAK_SIZE - (elderProgress * (PEAK_SIZE - YOUNG_SIZE));
+                    growthPhase = "shrinking";
                 }
             }
         }
-        // Other genes are not affected by age
-        return 1.0f;
+
+        int currentValue = (int) (value * ageMultiplier * 100);
+        return new GenePhaseInfo(ageMultiplier, currentValue, growthPhase);
     }
 
     // checks if the mouse hovers over a tooltip
