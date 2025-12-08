@@ -953,8 +953,6 @@ public final class Config {
      */
     public Map<String, String> playerRendererBlacklist = Map.of(
             "morph", "arms",
-            "firstpersonmod", "arms",
-            "firstperson", "arms",
             "epicfight", "all");
 
     /**
