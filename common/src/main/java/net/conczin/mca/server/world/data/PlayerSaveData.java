@@ -101,7 +101,13 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
     private void resetEntityData() {
         entityData = new CompoundTag();
 
-        VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(world);
+        // Randomly select gender (50/50 chance)
+        // This fixes the bug where players always default to male
+        boolean isFemale = world.random.nextBoolean();
+        VillagerEntityMCA villager = isFemale
+                ? EntitiesMCA.FEMALE_VILLAGER.create(world)
+                : EntitiesMCA.MALE_VILLAGER.create(world);
+
         assert villager != null;
         villager.initializeSkin(true);
         villager.getGenetics().randomize();
