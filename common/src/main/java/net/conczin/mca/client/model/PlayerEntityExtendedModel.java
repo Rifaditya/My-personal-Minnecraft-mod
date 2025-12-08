@@ -307,14 +307,14 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
      * @param entity The entity being rendered
      */
     private void applyFirstPersonVisibility(T entity) {
-        // CRITICAL: If FPM is installed, let it handle everything
-        if (FPMCompat.isFPMInstalled()) {
-            // FPM is present - defer all first-person logic to FPM
-            // This ensures compatibility with FPM's GUI and other FPM-dependent mods
+        // CRITICAL: If FPM is actively rendering, let it control visibility
+        if (FPMCompat.isFPMRenderingPlayer()) {
+            // FPM is rendering - defer visibility logic to FPM
+            // MCA's model (with breasts) still renders
             return;
         }
 
-        // FPM not installed - use MCA's built-in first-person logic
+        // FPM not rendering - use MCA's built-in first-person logic
 
         // Only apply to the camera entity in first person
         if (!FirstPersonLogic.isCameraEntityFirstPerson(entity)) {
