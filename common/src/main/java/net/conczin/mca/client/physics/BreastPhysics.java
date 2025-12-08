@@ -173,7 +173,13 @@ public class BreastPhysics {
         }
         this.prePos = entity.position();
 
-        float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((config.getBounceMultiplier() * 3.5f) * 100)
+        // PLAYER FLOPPINESS CAP: Limit to 3% max for players
+        float effectiveBounceMultiplier = config.getBounceMultiplier();
+        if (entity instanceof net.minecraft.world.entity.player.Player) {
+            effectiveBounceMultiplier = Math.min(effectiveBounceMultiplier, 0.03f); // Cap at 3%
+        }
+
+        float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((effectiveBounceMultiplier * 3.5f) * 100)
                 / 100f;
 
         // Cap resistance so physics isn't fully disabled
