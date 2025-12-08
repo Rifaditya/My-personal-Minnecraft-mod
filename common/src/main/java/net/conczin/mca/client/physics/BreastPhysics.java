@@ -173,11 +173,11 @@ public class BreastPhysics {
         }
         this.prePos = entity.position();
 
-        // PLAYER FLOPPINESS RESCALE: Map full slider (0-100%) to 0-5% of power
-        // Slider at 100% = 5% of original maximum power for players
+        // PLAYER FLOPPINESS RESCALE: Map full slider (0-100%) to 0-2.5% of power
+        // Slider at 100% = 2.5% of original maximum power for players (halved from 5%)
         float effectiveBounceMultiplier = config.getBounceMultiplier();
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            effectiveBounceMultiplier = effectiveBounceMultiplier * 0.05f; // Scale to 5% of current
+            effectiveBounceMultiplier = effectiveBounceMultiplier * 0.025f; // Scale to 2.5% of current
         }
 
         float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((effectiveBounceMultiplier * 3.5f) * 100)
