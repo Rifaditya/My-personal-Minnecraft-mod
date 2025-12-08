@@ -96,6 +96,11 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         T entity = getCurrentEntity();
         if (entity != null) {
             try {
+                // Don't render breasts if first-person mode would hide the body
+                if (net.conczin.mca.client.firstperson.FirstPersonLogic.shouldHideBody(entity)) {
+                    return;
+                }
+
                 BreastPhysics.PhysicsConfig config = makePhysicsConfig(entity);
                 if (config == null) {
                     if (entity.tickCount % 100 == 0) {

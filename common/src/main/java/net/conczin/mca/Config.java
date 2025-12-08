@@ -974,6 +974,55 @@ public final class Config {
      */
     public boolean scaleEyeHeightWithPlayerHeight = true;
 
+    //////////////////////
+    // First Person Mode //
+    //////////////////////
+
+    /**
+     * First-person model visibility settings.
+     * Integrated from FirstPersonModel mod to prevent conflicts.
+     */
+    public FirstPersonMode firstPersonMode = new FirstPersonMode();
+
+    /**
+     * Configuration for first-person camera mode features.
+     * Hides player head and optionally arms/body when in first person.
+     */
+    public static class FirstPersonMode {
+        /**
+         * Master toggle for first-person mode features.
+         */
+        public boolean enabled = true;
+
+        /**
+         * Enables dynamic hands feature.
+         * Arms become visible when looking down.
+         */
+        public boolean dynamicHands = true;
+
+        /**
+         * Hides player head in first-person view.
+         */
+        public boolean hideHeadInFirstPerson = true;
+
+        /**
+         * Hides body (including breasts) when swimming/crawling in first person.
+         */
+        public boolean hideBodyWhenSwimming = true;
+
+        /**
+         * Pitch angle (degrees) at which arms start to appear when looking down.
+         * Default: 40 degrees
+         */
+        public float dynamicHandsPitchThreshold = 40.0f;
+
+        /**
+         * Maximum arm rotation offset for dynamic hands effect.
+         * Default: 0.7 radians
+         */
+        public float dynamicHandsMaxOffset = 0.7f;
+    }
+
     public static Config getInstance() {
         return INSTANCE;
     }

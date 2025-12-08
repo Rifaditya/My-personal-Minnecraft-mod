@@ -14,6 +14,7 @@ import net.conczin.mca.client.physics.BreastPhysics;
 import net.conczin.mca.entity.ai.Genetics;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.entity.VillagerLike;
+import net.conczin.mca.client.firstperson.FirstPersonLogic;
 
 import static net.conczin.mca.client.model.VillagerEntityBaseModelMCA.BREASTS;
 import static net.conczin.mca.client.model.VillagerEntityModelMCA.BREASTPLATE;
@@ -252,6 +253,9 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
             super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
             applyVillagerDimensions(CommonVillagerModel.getVillager(villager), villager.isCrouching());
 
+            // Apply first-person visibility logic
+            applyFirstPersonVisibility(villager);
+
             setPhysicsEntity(villager, animationProgress - villager.tickCount);
         } catch (Exception e) {
             System.err.println("MCA ERROR: Error in PlayerEntityExtendedModel.setupAnim");
@@ -278,5 +282,47 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
         leftPants.visible = model.leftLeg.visible;
         rightLeg.visible = model.rightLeg.visible;
         rightPants.visible = model.rightLeg.visible;
+    }
+
+    /**
+     * Applies first-person visibility logic to model parts.
+     * Hides head, arms, and body based on camera state and config settings.
+     * 
+     * @param entity The entity being rendered
+     */
+    private void applyFirstPersonVisibility(T entity) {
+        // Only apply to the camera entity in first person
+        if (!FirstPersonLogic.isCameraEntityFirstPerson(entity)) {
+            return;
+        }
+
+        // Hide head in first person
+        if (FirstPersonLogic.shouldHideHead()) {
+            head.visible = false;
+            hat.visible = false;
+        }
+
+        // Hide body when swimming/crawling
+        if (FirstPersonLogic.shouldHideBody(entity)) {
+            body.visible = false;
+            jacket.visible = false;
+            breasts.visible = false;
+            breastsWear.visible = false;
+        }
+
+        // Handle arms based on dynamic hands setting
+        if (FirstPersonLogic.shouldHideArms(entity)) {
+            leftArm.visible = false;
+            leftSleeve.visible = false;
+            rightArm.visible = false;
+            rightSleeve.visible = false;
+        } else {
+            // Apply dynamic arm offset when looking down
+            float armOffset = FirstPersonLogic.getDynamicArmOffset(entity);
+            if (armOffset > 0) {
+                leftArm.xRot += armOffset;
+                rightArm.xRot += armOffset;
+            }
+        }
     }
 }
