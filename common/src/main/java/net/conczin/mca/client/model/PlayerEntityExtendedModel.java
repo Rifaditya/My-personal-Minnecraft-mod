@@ -80,9 +80,12 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
         this.breasts.visible = false;
         this.breastsWear.visible = false;
 
-        super.renderToBuffer(matrices, vertices, light, overlay, color);
-
+        // IMPORTANT: Render breasts FIRST, before super.renderToBuffer
+        // This ensures hair and other layers render ON TOP of breasts
         renderBreasts(matrices, vertices, light, overlay, color);
+
+        // Now render the base model (including hair) which will draw over breasts
+        super.renderToBuffer(matrices, vertices, light, overlay, color);
     }
 
     @Override
