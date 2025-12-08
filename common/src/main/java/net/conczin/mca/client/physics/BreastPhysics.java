@@ -226,7 +226,10 @@ public class BreastPhysics {
         // Boost vertical bounce (jumping) significantly
         float verticalMultiplier = 40.5f; // Increased another 50% from 27.0f - EXTREME villager physics!
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            verticalMultiplier = 0.06f; // Reduced by another 50% from 0.12f (user request)
+            // CRITICAL: Apply EXTREME dampening for low bounce settings
+            // At 1% bounce (0.01), this should be almost nothing
+            float dampening = bounceIntensity * bounceIntensity; // Square it for stronger effect
+            verticalMultiplier = 0.06f * dampening; // Reduced by dampening factor
         }
         this.targetBounceY = (float) motion.y * bounceIntensity * verticalMultiplier;
 
