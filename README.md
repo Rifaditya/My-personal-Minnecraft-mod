@@ -1,4 +1,5 @@
 Minecraft Comes Alive Reborn
+Reminder this is a fork an abomonation of mod with MCA as base foundation
 =====================
 
 [![Crowdin](https://badges.crowdin.net/minecraft-comes-alive-2/localized.svg)](https://crowdin.com/project/minecraft-comes-alive-2)
