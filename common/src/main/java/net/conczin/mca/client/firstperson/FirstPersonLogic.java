@@ -7,9 +7,21 @@ import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Logic handler for first-person model visibility features.
- * Integrated from FirstPersonModel mod to prevent conflicts with MCA rendering.
  * 
- * @author MCA Team (integrated from tr7zw's FirstPersonModel)
+ * ====================================================================
+ * FIRSTPERSON MODEL INTEGRATION
+ * ====================================================================
+ * This code is adapted from FirstPersonModel by tr7zw
+ * Original mod: https://github.com/tr7zw/FirstPersonModel
+ * Author: tr7zw
+ * License: LGPL-3.0
+ * 
+ * Integrated into MCA to prevent mod conflicts while preserving
+ * first-person immersion features.
+ * ====================================================================
+ * 
+ * @author tr7zw (original FirstPersonModel)
+ * @author MCA Team (integration and adaptation)
  */
 public class FirstPersonLogic {
 

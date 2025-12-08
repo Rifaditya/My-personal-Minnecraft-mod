@@ -20,6 +20,23 @@ import net.minecraft.world.effect.MobEffects;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * ====================================================================
+ * WILDFIRE GENDER MODS INTEGRATION
+ * ====================================================================
+ * This physics simulation code is adapted from Wildfire's Female Gender Mod
+ * Original mod: https://github.com/WildfireRomeo/WildfireFemaleGenderMod
+ * Author: WildfireRomeo
+ * License: LGPL-3.0
+ * 
+ * Integrated into MCA to provide realistic breast physics for female
+ * villager models. This system simulates movement, bounce, and rotation
+ * based on entity motion, pose, and interactions.
+ * ====================================================================
+ * 
+ * @author WildfireRomeo (original Wildfire Gender Mod)
+ * @author MCA Team (integration, tuning, and adaptation)
+ */
 public class BreastPhysics {
 
     public static final float TIGHTNESS_REDUCTION_FACTOR = 0.15F;

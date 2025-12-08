@@ -23,6 +23,22 @@ import java.util.function.Consumer;
 
 import net.conczin.mca.client.render.wildfire.uv.UVQuad;
 
+/**
+ * ====================================================================
+ * WILDFIRE GENDER MODS INTEGRATION
+ * ====================================================================
+ * This code is adapted from Wildfire's Female Gender Mod
+ * Original mod: https://github.com/WildfireRomeo/WildfireFemaleGenderMod
+ * Author: WildfireRomeo
+ * License: LGPL-3.0
+ * 
+ * Integrated into MCA to provide breast physics and rendering for
+ * female villager models.
+ * ====================================================================
+ * 
+ * @author WildfireRomeo (original Wildfire Gender Mod)
+ * @author MCA Team (integration and adaptation)
+ */
 public class WildfireBreastRenderer {
 
     // Default UV Layouts from Wildfire Configuration

@@ -344,6 +344,15 @@ public final class Config {
 
     /**
      * Enables female body features (visual only).
+     * 
+     * ====================================================================
+     * WILDFIRE GENDER MODS INTEGRATION
+     * ====================================================================
+     * Breast physics and rendering from Wildfire's Female Gender Mod
+     * Original: https://github.com/WildfireRomeo/WildfireFemaleGenderMod
+     * Author: WildfireRomeo
+     * License: LGPL-3.0
+     * ====================================================================
      */
     public boolean enableBoobs = true;
 
@@ -980,13 +989,22 @@ public final class Config {
 
     /**
      * First-person model visibility settings.
-     * Integrated from FirstPersonModel mod to prevent conflicts.
+     * 
+     * ====================================================================
+     * FIRSTPERSON MODEL INTEGRATION
+     * ====================================================================
+     * Integrated from FirstPersonModel by tr7zw
+     * Original: https://github.com/tr7zw/FirstPersonModel
+     * License: LGPL-3.0
+     * ====================================================================
      */
     public FirstPersonMode firstPersonMode = new FirstPersonMode();
 
     /**
      * Configuration for first-person camera mode features.
      * Hides player head and optionally arms/body when in first person.
+     * 
+     * Based on FirstPersonModel by tr7zw (LGPL-3.0)
      */
     public static class FirstPersonMode {
         /**
