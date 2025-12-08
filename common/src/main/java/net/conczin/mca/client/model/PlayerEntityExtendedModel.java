@@ -15,6 +15,7 @@ import net.conczin.mca.entity.ai.Genetics;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.entity.VillagerLike;
 import net.conczin.mca.client.firstperson.FirstPersonLogic;
+import net.conczin.mca.client.firstperson.FPMCompat;
 
 import static net.conczin.mca.client.model.VillagerEntityBaseModelMCA.BREASTS;
 import static net.conczin.mca.client.model.VillagerEntityModelMCA.BREASTPLATE;
@@ -288,9 +289,30 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
      * Applies first-person visibility logic to model parts.
      * Hides head, arms, and body based on camera state and config settings.
      * 
+     * ====================================================================
+     * FPM COMPATIBILITY
+     * ====================================================================
+     * If FirstPersonModel by tr7zw is installed, this method does NOTHING
+     * and lets FPM handle all first-person rendering logic.
+     * 
+     * This allows users to:
+     * - Use MCA alone (built-in FPM features)
+     * - Install FPM for full GUI and advanced features
+     * - Run mods that depend on FPM
+     * ====================================================================
+     * 
      * @param entity The entity being rendered
      */
     private void applyFirstPersonVisibility(T entity) {
+        // CRITICAL: If FPM is installed, let it handle everything
+        if (FPMCompat.isFPMInstalled()) {
+            // FPM is present - defer all first-person logic to FPM
+            // This ensures compatibility with FPM's GUI and other FPM-dependent mods
+            return;
+        }
+
+        // FPM not installed - use MCA's built-in first-person logic
+
         // Only apply to the camera entity in first person
         if (!FirstPersonLogic.isCameraEntityFirstPerson(entity)) {
             return;
