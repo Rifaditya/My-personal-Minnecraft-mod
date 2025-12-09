@@ -960,9 +960,7 @@ public final class Config {
      * Supported values: arms, left_arm, right_arm, all, block_player,
      * block_villager
      */
-    public Map<String, String> playerRendererBlacklist = Map.of(
-            "morph", "arms",
-            "epicfight", "all");
+    public Map<String, String> playerRendererBlacklist = Map.of();
 
     /**
      * Map of enabled traits. Keys are trait IDs, values are true/false.
