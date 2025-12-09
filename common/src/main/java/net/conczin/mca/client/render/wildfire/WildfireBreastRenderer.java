@@ -307,11 +307,19 @@ public class WildfireBreastRenderer {
         var model = side.isLeft ? lBreast : rBreast;
         renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
 
-        // Render wear layer (clothing/jacket overlay) if not wearing chest armor
-        // This ensures the breasts don't appear "bare" in first-person view
-        if (!isArmor && !isChestplateOccupied) {
-            var wearModel = side.isLeft ? lBreastWear : rBreastWear;
-            renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+        // Render wear layer (clothing/jacket overlay) when appropriate
+        // The wear layer should ALWAYS render when:
+        // 1. We're not rendering the armor layer itself (!isArmor)
+        // 2. No chest armor is equipped (armorStack.isEmpty()) OR physics override is
+        // enabled
+        if (!isArmor) {
+            // Simplified logic: Always render wear layer unless actual armor is covering
+            // breasts
+            boolean shouldRenderWear = armorStack.isEmpty() || !isChestplateOccupied;
+            if (shouldRenderWear) {
+                var wearModel = side.isLeft ? lBreastWear : rBreastWear;
+                renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+            }
         }
     }
 
