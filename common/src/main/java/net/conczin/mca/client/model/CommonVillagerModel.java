@@ -97,7 +97,9 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         if (entity != null) {
             try {
                 // Don't render breasts if first-person mode would hide the body
-                if (net.conczin.mca.client.firstperson.FirstPersonLogic.shouldHideBody(entity)) {
+                // EXCEPT when rendering in GUI (inventory screen, etc.)
+                if (!net.conczin.mca.client.firstperson.FirstPersonLogic.isRenderingInGui()
+                        && net.conczin.mca.client.firstperson.FirstPersonLogic.shouldHideBody(entity)) {
                     return;
                 }
 
