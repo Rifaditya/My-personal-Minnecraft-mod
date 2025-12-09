@@ -307,8 +307,9 @@ public class WildfireBreastRenderer {
         var model = side.isLeft ? lBreast : rBreast;
         renderBox(model, matrixStack, vertexConsumer, light, overlay, color);
 
-        // Only render wear layer if NOT armor
-        if (!isArmor) {
+        // Render wear layer (clothing/jacket overlay) if not wearing chest armor
+        // This ensures the breasts don't appear "bare" in first-person view
+        if (!isArmor && !isChestplateOccupied) {
             var wearModel = side.isLeft ? lBreastWear : rBreastWear;
             renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
         }

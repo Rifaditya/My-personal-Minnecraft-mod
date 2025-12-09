@@ -454,7 +454,7 @@ public class BreastPhysics {
 
         // Strict clamping for players
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            targetBounceY = Mth.clamp(targetBounceY, -2.5f, 2.5f);
+            targetBounceY = Mth.clamp(targetBounceY, -1.25f, 1.25f); // Reduced from ±2.5f (50% reduction)
             targetRotVel = Mth.clamp(targetRotVel, -15f, 15f);
             targetBounceX = Mth.clamp(targetBounceX, -1.0f, 1.0f);
         } else {
