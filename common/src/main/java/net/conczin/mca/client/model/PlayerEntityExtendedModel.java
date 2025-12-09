@@ -315,6 +315,12 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
             return;
         }
 
+        // Don't hide body parts when rendering in GUI (inventory screen, etc.)
+        // Players should see their full character model in the inventory
+        if (FirstPersonLogic.isRenderingInGui()) {
+            return;
+        }
+
         // FPM not rendering - use MCA's built-in first-person logic
 
         // Only apply to the camera entity in first person

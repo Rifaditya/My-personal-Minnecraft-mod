@@ -127,6 +127,18 @@ public class FirstPersonLogic {
     }
 
     /**
+     * Checks if the player model is being rendered in a GUI context (inventory
+     * screen, etc.)
+     * Body parts should remain visible during GUI rendering even in first person.
+     * 
+     * @return true if currently rendering in a GUI, false otherwise
+     */
+    public static boolean isRenderingInGui() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.screen != null;
+    }
+
+    /**
      * Quick check: is the entity in first person view?
      * 
      * @param entity The entity to check
