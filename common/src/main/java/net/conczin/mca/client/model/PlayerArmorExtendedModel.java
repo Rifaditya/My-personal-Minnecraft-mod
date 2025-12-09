@@ -174,7 +174,8 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
 
             @Override
             public float getFloppiness() {
-                return villager.getGenetics().getFloppiness();
+                // Reduce maximum floppiness for players by 50%
+                return villager.getGenetics().getFloppiness() * 0.5f;
             }
 
             @Override

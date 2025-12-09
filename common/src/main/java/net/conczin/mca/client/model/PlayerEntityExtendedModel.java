@@ -144,7 +144,8 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
 
         @Override
         public float getFloppiness() {
-            return genetics.getGene(Genetics.FLOPPINESS);
+            // Reduce maximum floppiness for players by 50%
+            return genetics.getGene(Genetics.FLOPPINESS) * 0.5f;
         }
 
         @Override
