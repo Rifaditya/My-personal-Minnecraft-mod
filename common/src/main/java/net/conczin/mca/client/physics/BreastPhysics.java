@@ -173,11 +173,12 @@ public class BreastPhysics {
         }
         this.prePos = entity.position();
 
-        // PLAYER FLOPPINESS RESCALE: Map full slider (0-100%) to 0-2.5% of power
-        // Slider at 100% = 2.5% of original maximum power for players (halved from 5%)
+        // PLAYER FLOPPINESS RESCALE: Map full slider (0-100%) to 0-1.25% of power
+        // Slider at 100% = 1.25% of original maximum power for players (halved from
+        // 2.5%)
         float effectiveBounceMultiplier = config.getBounceMultiplier();
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            effectiveBounceMultiplier = effectiveBounceMultiplier * 0.025f; // Scale to 2.5% of current
+            effectiveBounceMultiplier = effectiveBounceMultiplier * 0.0125f; // Scale to 1.25% of current
         }
 
         float bounceIntensity = (targetBreastSize * 2.5f) * Math.round((effectiveBounceMultiplier * 3.5f) * 100)
@@ -469,7 +470,7 @@ public class BreastPhysics {
 
         // Add damping to prevent infinite oscillation
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            this.velocity *= 0.85f; // Relaxed damping (was 0.75f, originally 0.9f)
+            this.velocity *= 0.925f; // Reduced damping further (was 0.85f, 0.75f, originally 0.9f)
         } else {
             this.velocity *= 0.99f; // EXTREME floppiness - increased from 0.98f, almost no damping!
         }
@@ -486,7 +487,7 @@ public class BreastPhysics {
 
         // Add damping
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            this.velocityX *= 0.85f; // Relaxed damping
+            this.velocityX *= 0.925f; // Reduced damping further (was 0.85f)
         } else {
             this.velocityX *= 0.96f; // Much reduced damping from 0.92f for longer oscillation
         }
@@ -500,7 +501,7 @@ public class BreastPhysics {
 
         // Add damping
         if (entity instanceof net.minecraft.world.entity.player.Player) {
-            this.rotVelocity *= 0.85f; // Relaxed damping
+            this.rotVelocity *= 0.925f; // Reduced damping further (was 0.85f)
         } else {
             this.rotVelocity *= 0.96f; // Much reduced damping from 0.92f for longer oscillation
         }
