@@ -7,6 +7,7 @@ import net.conczin.mca.client.physics.PhysicsState;
 import net.conczin.mca.client.render.wildfire.uv.UVLayout;
 import net.conczin.mca.client.render.wildfire.WildfireModelRenderer.BreastModelBox;
 import net.conczin.mca.client.render.wildfire.WildfireModelRenderer.OverlayModelBox;
+import net.conczin.mca.client.firstperson.FPMCompat;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -294,9 +295,11 @@ public class WildfireBreastRenderer {
         if (lBreast == null || rBreast == null || lBreastWear == null || rBreastWear == null) {
             this.lBreast = new BreastModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.0F, LEFT_BREAST_UV_LAYOUT);
             this.rBreast = new BreastModelBox(64, this.texHeight, 0F, 0.0F, 0F, 4, 5, 3, 0.0F, RIGHT_BREAST_UV_LAYOUT);
-            this.lBreastWear = new OverlayModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.25F,
+            // Increased delta from 0.25F to 0.4F to prevent culling interference in
+            // first-person view
+            this.lBreastWear = new OverlayModelBox(64, this.texHeight, -4F, 0.0F, 0F, 4, 5, 3, 0.4F,
                     LEFT_BREAST_OVERLAY_UV_LAYOUT);
-            this.rBreastWear = new OverlayModelBox(64, this.texHeight, 0, 0.0F, 0F, 4, 5, 3, 0.25F,
+            this.rBreastWear = new OverlayModelBox(64, this.texHeight, 0, 0.0F, 0F, 4, 5, 3, 0.4F,
                     RIGHT_BREAST_OVERLAY_UV_LAYOUT);
         }
     }
@@ -318,7 +321,20 @@ public class WildfireBreastRenderer {
             boolean shouldRenderWear = armorStack.isEmpty() || !isChestplateOccupied;
             if (shouldRenderWear) {
                 var wearModel = side.isLeft ? lBreastWear : rBreastWear;
-                renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+
+                // FIRST-PERSON CULLING PROTECTION:
+                // When FPM is rendering the player, add extra z-offset to prevent culling
+                // interference from other mods (like Sodium culling optimizations)
+                boolean isFirstPersonRendering = FPMCompat.isFPMRenderingPlayer();
+                if (isFirstPersonRendering) {
+                    // Push wear layer slightly forward to ensure it renders on top of base breast
+                    matrixStack.pushPose();
+                    matrixStack.translate(0, 0, -0.015f); // Small z-offset to prevent z-fighting
+                    renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+                    matrixStack.popPose();
+                } else {
+                    renderBox(wearModel, matrixStack, vertexConsumer, light, overlay, color);
+                }
             }
         }
     }
