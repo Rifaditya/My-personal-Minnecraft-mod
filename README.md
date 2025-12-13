@@ -39,15 +39,6 @@ Following mods have the required resource packs included and are therefore fully
 - Upgrade Aquatic
 - [Player2](https://player2.game/)
 
-## Contributing
-
-Any contributions to are welcome. Simply clone into your workspace, set it up, make your changes, and submit a pull
-request for review.
-
-Alternatively you can help translating MCA into your language
-on [Crowdin](https://crowdin.com/project/minecraft-comes-alive-2)!
-
-Or you can Join the [Discord Community](https://discord.com/invite/EjYwZUJbpf) for questions, suggestions or social
 interactions.
 
 ## Credits
