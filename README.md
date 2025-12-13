@@ -1,6 +1,7 @@
-Minecraft Comes Alive Reborn
+Minecraft Comes Alive Dasik edits
+Reminder this is a fork an abomonation of mod with MCA as base foundation
 =====================
-
+Forcked from
 [![Crowdin](https://badges.crowdin.net/minecraft-comes-alive-2/localized.svg)](https://crowdin.com/project/minecraft-comes-alive-2)
 
 Hosted on
@@ -38,15 +39,6 @@ Following mods have the required resource packs included and are therefore fully
 - Upgrade Aquatic
 - [Player2](https://player2.game/)
 
-## Contributing
-
-Any contributions to are welcome. Simply clone into your workspace, set it up, make your changes, and submit a pull
-request for review.
-
-Alternatively you can help translating MCA into your language
-on [Crowdin](https://crowdin.com/project/minecraft-comes-alive-2)!
-
-Or you can Join the [Discord Community](https://discord.com/invite/EjYwZUJbpf) for questions, suggestions or social
 interactions.
 
 ## Credits
