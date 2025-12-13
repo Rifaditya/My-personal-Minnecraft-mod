@@ -131,6 +131,20 @@ First-person body rendering support and integration.
 
 ---
 
+## ☕ Support the Creator
+
+> **Note:** While this mod is strictly non-commercial and I accept no payment for it, if you enjoy my other content (like YouTube videos, tutorials, or future projects), you can support me through the links below!
+
+| Platform | Link |
+|----------|------|
+| 🎥 **YouTube** | [Subscribe to my channel](https://www.youtube.com/@Dasik_Igaijinn) |
+
+*More donation options coming soon maybe if ever*
+
+Your support helps me continue creating content and working on projects like this! 💙
+
+---
+
 ## Original MCA Features (Retained)
 
 - Replace villagers with human-like NPCs
