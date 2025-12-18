@@ -1,36 +1,34 @@
 package net.conczin.mca.client.render.layer;
 
 import net.conczin.mca.MCA;
+import net.conczin.mca.client.render.VillagerLikeRenderState;
 import net.conczin.mca.client.resources.ColorPalette;
-import net.conczin.mca.entity.ai.Genetics;
-import net.conczin.mca.entity.ai.Traits;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.LivingEntity;
 
-import static net.conczin.mca.client.model.CommonVillagerModel.getVillager;
-
-public class SkinLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends VillagerLayer<T, M> {
-    public SkinLayer(RenderLayerParent<T, M> renderer, M model) {
+/**
+ * SkinLayer - updated for 1.21.11 API
+ * Now uses VillagerLikeRenderState instead of entity access
+ */
+public class SkinLayer<S extends VillagerLikeRenderState, M extends HumanoidModel<S>> extends VillagerLayer<S, M> {
+    public SkinLayer(RenderLayerParent<S, M> renderer, M model) {
         super(renderer, model);
     }
 
     @Override
-    public Identifier getSkin(T villager) {
-        Genetics genetics = getVillager(villager).getGenetics();
-        int skin = (int) Math.min(4, Math.max(0, genetics.getGene(Genetics.SKIN) * 5));
-        return cached("skins/skin/" + genetics.getGender().getDataName() + "/" + skin + ".png", MCA::locate);
+    public Identifier getSkin(S state) {
+        int skin = (int) Math.min(4, Math.max(0, state.skinGene * 5));
+        return cached("skins/skin/" + state.gender.getDataName() + "/" + skin + ".png", MCA::locate);
     }
 
     @Override
-    public int getColor(T villager, float tickDelta) {
-        float albinism = getVillager(villager).getTraits().hasTrait(Traits.ALBINISM) ? 0.1f : 1.0f;
+    public int getColor(S state) {
+        float albinism = state.hasAlbinism ? 0.1f : 1.0f;
 
         return ColorPalette.SKIN.getColor(
-                getVillager(villager).getGenetics().getGene(Genetics.MELANIN) * albinism,
-                getVillager(villager).getGenetics().getGene(Genetics.HEMOGLOBIN) * albinism,
-                getVillager(villager).getInfectionProgress()
-        );
+                state.melaninGene * albinism,
+                state.hemoglobinGene * albinism,
+                state.infectionProgress);
     }
 }
