@@ -3,15 +3,20 @@ package net.conczin.mca.client.model;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.conczin.mca.client.render.VillagerLikeRenderState;
 import net.conczin.mca.entity.ai.relationship.AgeState;
 import net.conczin.mca.entity.ai.relationship.VillagerDimensions;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.entity.LivingEntity;
 
 import static net.conczin.mca.client.model.VillagerEntityBaseModelMCA.BREASTS;
 
-public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidModel<T> implements CommonVillagerModel<T> {
+/**
+ * PlayerArmorExtendedModel - updated for 1.21.11 API
+ * Now uses VillagerLikeRenderState instead of entity type parameters
+ */
+public class PlayerArmorExtendedModel<S extends VillagerLikeRenderState> extends HumanoidModel<S>
+        implements CommonVillagerModel<S> {
     public final ModelPart breasts;
 
     final VillagerDimensions.Mutable dimensions = new VillagerDimensions.Mutable(AgeState.ADULT);
@@ -23,15 +28,15 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
     }
 
     @Override
-    public void copyPropertiesTo(HumanoidModel<T> target) {
+    public void copyPropertiesTo(HumanoidModel<S> target) {
         super.copyPropertiesTo(target);
 
-        if (target instanceof PlayerEntityExtendedModel<T> playerTarget) {
+        if (target instanceof PlayerEntityExtendedModel<S> playerTarget) {
             copyAttributes(playerTarget);
         }
     }
 
-    private void copyAttributes(PlayerEntityExtendedModel<T> target) {
+    private void copyAttributes(PlayerEntityExtendedModel<S> target) {
         copyCommonAttributes(target);
 
         target.breasts.visible = breasts.visible;
@@ -84,14 +89,10 @@ public class PlayerArmorExtendedModel<T extends LivingEntity> extends HumanoidMo
     }
 
     @Override
-    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-        if (CommonVillagerModel.getVillager(villager).getAgeState() == AgeState.BABY && !villager.isPassenger()) {
-            limbDistance = (float) Math.sin(villager.tickCount / 12F);
-            limbAngle = (float) Math.cos(villager.tickCount / 9F) * 3;
-            headYaw += (float) Math.sin(villager.tickCount / 2F);
-        }
+    public void setupAnim(S state) {
+        super.setupAnim(state);
 
-        super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
-        applyVillagerDimensions(CommonVillagerModel.getVillager(villager), villager.isCrouching());
+        // Use state data instead of entity access
+        applyVillagerDimensions(state, state.isCrouching);
     }
 }

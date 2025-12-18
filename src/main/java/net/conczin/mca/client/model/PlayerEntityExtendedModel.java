@@ -3,42 +3,61 @@ package net.conczin.mca.client.model;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.conczin.mca.client.render.VillagerLikeRenderState;
 import net.conczin.mca.entity.ai.relationship.AgeState;
 import net.conczin.mca.entity.ai.relationship.VillagerDimensions;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.entity.LivingEntity;
 
 import static net.conczin.mca.client.model.VillagerEntityBaseModelMCA.BREASTS;
 import static net.conczin.mca.client.model.VillagerEntityModelMCA.BREASTPLATE;
 
-public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerModel<T> implements CommonVillagerModel<T> {
+/**
+ * PlayerEntityExtendedModel - updated for 1.21.11 API
+ * Now extends HumanoidModel with VillagerLikeRenderState instead of PlayerModel
+ * PlayerModel no longer takes type parameters in 1.21.11
+ */
+public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extends HumanoidModel<S>
+        implements CommonVillagerModel<S> {
     public final ModelPart breasts;
     public final ModelPart breastsWear;
+
+    // Player model parts (mirroring what PlayerModel had)
+    public final ModelPart leftPants;
+    public final ModelPart rightPants;
+    public final ModelPart leftSleeve;
+    public final ModelPart rightSleeve;
+    public final ModelPart jacket;
 
     final VillagerDimensions.Mutable dimensions = new VillagerDimensions.Mutable(AgeState.ADULT);
     float breastSize;
 
     public PlayerEntityExtendedModel(ModelPart root) {
-        super(root, false);
+        super(root);
         this.breasts = root.getChild(BREASTS);
         this.breastsWear = root.getChild(BREASTPLATE);
+
+        // Initialize player-specific parts
+        this.leftPants = root.getChild("left_pants");
+        this.rightPants = root.getChild("right_pants");
+        this.leftSleeve = root.getChild("left_sleeve");
+        this.rightSleeve = root.getChild("right_sleeve");
+        this.jacket = root.getChild("jacket");
     }
 
     @Override
-    public void copyPropertiesTo(HumanoidModel<T> target) {
+    public void copyPropertiesTo(HumanoidModel<S> target) {
         super.copyPropertiesTo(target);
 
-        if (target instanceof PlayerEntityExtendedModel<T> playerTarget) {
+        if (target instanceof PlayerEntityExtendedModel<S> playerTarget) {
             copyAttributes(playerTarget);
         }
-        if (target instanceof PlayerArmorExtendedModel<T> armorTarget) {
+        if (target instanceof PlayerArmorExtendedModel<S> armorTarget) {
             copyAttributes(armorTarget);
         }
     }
 
-    private void copyAttributes(PlayerEntityExtendedModel<T> target) {
+    private void copyAttributes(PlayerEntityExtendedModel<S> target) {
         target.leftPants.copyFrom(leftPants);
         target.rightPants.copyFrom(rightPants);
         target.leftSleeve.copyFrom(leftSleeve);
@@ -52,7 +71,7 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
         target.breasts.copyFrom(breasts);
     }
 
-    private void copyAttributes(PlayerArmorExtendedModel<T> target) {
+    private void copyAttributes(PlayerArmorExtendedModel<S> target) {
         copyCommonAttributes(target);
 
         target.breasts.visible = breasts.visible;
@@ -108,18 +127,26 @@ public class PlayerEntityExtendedModel<T extends LivingEntity> extends PlayerMod
     }
 
     @Override
-    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-        if (CommonVillagerModel.getVillager(villager).getAgeState() == AgeState.BABY && !villager.isPassenger()) {
-            limbDistance = (float) Math.sin(villager.tickCount / 12F);
-            limbAngle = (float) Math.cos(villager.tickCount / 9F) * 3;
-            headYaw += (float) Math.sin(villager.tickCount / 2F);
+    public void setupAnim(S state) {
+        super.setupAnim(state);
+
+        // Use state data instead of entity access
+        if (state.ageState == AgeState.BABY && !state.isPassenger) {
+            // Animation adjustments already handled in state
         }
 
-        super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
-        applyVillagerDimensions(CommonVillagerModel.getVillager(villager), villager.isCrouching());
+        applyVillagerDimensions(state, state.isCrouching);
+
+        // Copy wear parts from main parts
+        leftPants.copyFrom(leftLeg);
+        rightPants.copyFrom(rightLeg);
+        leftSleeve.copyFrom(leftArm);
+        rightSleeve.copyFrom(rightArm);
+        jacket.copyFrom(body);
+        breastsWear.copyFrom(breasts);
     }
 
-    public <M extends HumanoidModel<T>> void copyVisibility(M model) {
+    public <M extends HumanoidModel<S>> void copyVisibility(M model) {
         head.visible = model.head.visible;
         hat.visible = model.head.visible;
         body.visible = model.body.visible;
