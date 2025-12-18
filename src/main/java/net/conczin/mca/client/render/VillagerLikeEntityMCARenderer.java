@@ -20,58 +20,84 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>> extends HumanoidMobRenderer<T, VillagerEntityModelMCA<T>> {
+/**
+ * VillagerLikeEntityMCARenderer - updated for 1.21.11 API
+ * Now uses 3 type parameters: Entity, RenderState, Model
+ */
+public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
+        extends HumanoidMobRenderer<T, VillagerLikeRenderState, VillagerEntityModelMCA<VillagerLikeRenderState>> {
     private static final Identifier TEXTURE = Identifier.parse("textures/entity/steve.png");
 
-    public VillagerLikeEntityMCARenderer(EntityRendererProvider.Context ctx, VillagerEntityModelMCA<T> model) {
-        super(ctx, model, 0.5F);
-        addLayer(new HumanoidArmorLayer<>(this, createArmorModel(0.3f), createArmorModel(0.55f), ctx.getModelManager()));
+    @SuppressWarnings("unchecked")
+    public VillagerLikeEntityMCARenderer(EntityRendererProvider.Context ctx, VillagerEntityModelMCA<?> model) {
+        super(ctx, (VillagerEntityModelMCA<VillagerLikeRenderState>) model, 0.5F);
+        addLayer(
+                new HumanoidArmorLayer<>(this, createArmorModel(0.3f), createArmorModel(0.55f), ctx.getModelManager()));
     }
 
-    private VillagerEntityBaseModelMCA<T> createArmorModel(float modelSize) {
+    private VillagerEntityBaseModelMCA<VillagerLikeRenderState> createArmorModel(float modelSize) {
         return new VillagerEntityBaseModelMCA<>(
                 LayerDefinition.create(
-                                VillagerEntityBaseModelMCA.getModelData(new CubeDeformation(modelSize)), 64, 32)
-                        .bakeRoot()
-        );
+                        VillagerEntityBaseModelMCA.getModelData(new CubeDeformation(modelSize)), 64, 32)
+                        .bakeRoot());
     }
 
     @Override
-    protected void scale(T villager, PoseStack matrices, float tickDelta) {
-        float height = villager.getRawVerticalScaleFactor();
-        float width = villager.getRawHorizontalScaleFactor();
+    public VillagerLikeRenderState createRenderState() {
+        return new VillagerLikeRenderState();
+    }
+
+    @Override
+    public void extractRenderState(T villager, VillagerLikeRenderState state, float partialTick) {
+        super.extractRenderState(villager, state, partialTick);
+
+        state.verticalScaleFactor = villager.getRawVerticalScaleFactor();
+        state.horizontalScaleFactor = villager.getRawHorizontalScaleFactor();
+        state.ageState = villager.getAgeState();
+        state.isPassenger = villager.isPassenger();
+        state.infectionProgress = villager.getInfectionProgress();
+
+        Player player = Minecraft.getInstance().player;
+        state.hasCustomName = villager.getCustomName() != null;
+        state.isInvisibleToPlayer = player != null && villager.isInvisibleTo(player);
+        state.distanceToPlayer = player != null ? player.distanceToSqr(villager) : 0.0;
+    }
+
+    @Override
+    protected void scale(VillagerLikeRenderState state, PoseStack matrices) {
+        float height = state.verticalScaleFactor;
+        float width = state.horizontalScaleFactor;
         matrices.scale(width, height, width);
-        if (villager.getAgeState() == AgeState.BABY && !villager.isPassenger()) {
+        if (state.ageState == AgeState.BABY && !state.isPassenger) {
             matrices.translate(0, 0.6F, 0);
         }
     }
 
     @Nullable
     @Override
-    protected RenderType getRenderType(T entity, boolean showBody, boolean translucent, boolean showOutlines) {
-        //setting the type to null prevents it from rendering
-        //we need a skin layer anyway because of the color
+    protected RenderType getRenderType(VillagerLikeRenderState state, boolean showBody, boolean translucent,
+            boolean showOutlines) {
+        // setting the type to null prevents it from rendering
+        // we need a skin layer anyway because of the color
         return null;
     }
 
     @Override
-    protected boolean shouldShowName(T villager) {
-        Player player = Minecraft.getInstance().player;
-        return villager.getCustomName() != null
-               && !(Minecraft.getInstance().screen instanceof VillagerEditorScreen)
-               && player != null
-               && Config.getInstance().showNameTags
-               && player.distanceToSqr(villager) < Math.pow(Config.getInstance().nameTagDistance, 2.0f)
-               && !villager.isInvisibleTo(player);
+    protected boolean shouldShowName(VillagerLikeRenderState state) {
+        return state.hasCustomName
+                && !(Minecraft.getInstance().screen instanceof VillagerEditorScreen)
+                && Config.getInstance().showNameTags
+                && state.distanceToPlayer < Math.pow(Config.getInstance().nameTagDistance, 2.0f)
+                && !state.isInvisibleToPlayer;
     }
 
     @Override
-    public Identifier getTextureLocation(T mobEntity) {
+    public Identifier getTextureLocation(VillagerLikeRenderState state) {
         return TEXTURE;
     }
 
     @Override
-    protected boolean isShaking(T entity) {
-        return entity.getInfectionProgress() > Infectable.FEVER_THRESHOLD;
+    protected boolean isShaking(VillagerLikeRenderState state) {
+        return state.infectionProgress > Infectable.FEVER_THRESHOLD;
     }
 }
