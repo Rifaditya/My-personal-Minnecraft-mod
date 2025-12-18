@@ -61,6 +61,28 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         state.hasCustomName = villager.getCustomName() != null;
         state.isInvisibleToPlayer = player != null && villager.isInvisibleTo(player);
         state.distanceToPlayer = player != null ? player.distanceToSqr(villager) : 0.0;
+
+        // Villager visual data for layers
+        state.clothes = villager.getClothes();
+        state.isBurned = villager.isBurned();
+        state.gender = villager.getGenetics().getGender();
+
+        // Genetics for skin/hair rendering
+        state.skinGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.SKIN);
+        state.melaninGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.MELANIN);
+        state.hemoglobinGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.HEMOGLOBIN);
+        state.hairGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.HAIR);
+        state.eumelaninGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.EUMELANIN);
+        state.pheomelaninGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.PHEOMELANIN);
+
+        // Hair data
+        state.hair = villager.getHair();
+
+        // Traits
+        state.hasAlbinism = villager.getTraits().hasTrait(net.conczin.mca.entity.ai.Traits.ALBINISM);
+
+        // Player detection
+        state.isPlayer = villager instanceof net.minecraft.world.entity.player.Player;
     }
 
     @Override
