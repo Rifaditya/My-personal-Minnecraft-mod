@@ -15,7 +15,7 @@ import net.conczin.mca.registry.EntitiesMCA;
 import net.conczin.mca.server.SpawnQueue;
 import net.conczin.mca.server.world.data.*;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.UuidArgument;
@@ -125,7 +125,7 @@ public class AdminCommand {
         //remove from player spouse
         ctx.getSource().getLevel().players().forEach(player -> {
             PlayerSaveData playerData = PlayerSaveData.get(player);
-            if (playerData.getPartnerUUID().orElse(Util.NIL_UUID).equals(uuid)) {
+            if (playerData.getPartnerUUID().orElse(new UUID(0, 0)).equals(uuid)) {
                 playerData.endRelationShip(RelationshipState.SINGLE);
             }
         });

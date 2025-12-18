@@ -4,7 +4,7 @@ import net.conczin.mca.registry.CriterionMCA;
 import net.conczin.mca.server.world.data.FamilyTree;
 import net.conczin.mca.server.world.data.FamilyTreeNode;
 import net.conczin.mca.server.world.data.PlayerSaveData;
-import net.minecraft.Util;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -133,7 +133,7 @@ public interface EntityRelationship {
 
     default Optional<UUID> getPartnerUUID() {
         UUID spouse = getFamilyEntry().partner();
-        if (spouse.equals(Util.NIL_UUID)) {
+        if (spouse.equals(new UUID(0, 0))) {
             return Optional.empty();
         } else {
             return Optional.of(spouse);
@@ -157,14 +157,14 @@ public interface EntityRelationship {
     }
 
     default boolean isPromisedTo(UUID uuid) {
-        return getPartnerUUID().orElse(Util.NIL_UUID).equals(uuid) && isPromised();
+        return getPartnerUUID().orElse(new UUID(0, 0)).equals(uuid) && isPromised();
     }
 
     default boolean isMarriedTo(UUID uuid) {
-        return getPartnerUUID().orElse(Util.NIL_UUID).equals(uuid) && isMarried();
+        return getPartnerUUID().orElse(new UUID(0, 0)).equals(uuid) && isMarried();
     }
 
     default boolean isEngagedWith(UUID uuid) {
-        return getPartnerUUID().orElse(Util.NIL_UUID).equals(uuid) && isEngaged();
+        return getPartnerUUID().orElse(new UUID(0, 0)).equals(uuid) && isEngaged();
     }
 }

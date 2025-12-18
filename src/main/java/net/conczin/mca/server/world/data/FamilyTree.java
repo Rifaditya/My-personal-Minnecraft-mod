@@ -4,7 +4,7 @@ import net.conczin.mca.entity.ai.relationship.EntityRelationship;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.util.NbtHelper;
 import net.conczin.mca.util.WorldUtils;
-import net.minecraft.Util;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -78,8 +78,8 @@ public class FamilyTree extends SavedData {
                 name,
                 isPlayer,
                 gender,
-                Util.NIL_UUID,
-                Util.NIL_UUID
+                new UUID(0, 0),
+                new UUID(0, 0)
         );
     }
 }

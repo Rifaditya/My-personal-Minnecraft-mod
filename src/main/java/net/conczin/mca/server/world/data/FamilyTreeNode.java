@@ -6,7 +6,7 @@ import net.conczin.mca.entity.ai.relationship.EntityRelationship;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.entity.ai.relationship.RelationshipState;
 import net.conczin.mca.util.NbtHelper;
-import net.minecraft.Util;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -44,7 +44,7 @@ public final class FamilyTreeNode {
     private String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE).toString();
     private UUID father;
     private UUID mother;
-    private UUID partner = Util.NIL_UUID;
+    private UUID partner = new UUID(0, 0);
     private RelationshipState relationshipState = RelationshipState.SINGLE;
     private boolean deceased;
 
@@ -78,7 +78,7 @@ public final class FamilyTreeNode {
     }
 
     public static boolean isValid(@Nullable UUID uuid) {
-        return uuid != null && !Util.NIL_UUID.equals(uuid);
+        return uuid != null && !new UUID(0, 0).equals(uuid);
     }
 
     private static void gatherParents(FamilyTreeNode current, Set<UUID> family, int depth) {
@@ -94,7 +94,7 @@ public final class FamilyTreeNode {
             return;
         }
         walker.apply(entry).forEach(id -> {
-            if (!Util.NIL_UUID.equals(id)) {
+            if (!new UUID(0, 0).equals(id)) {
                 output.add(id); //zero UUIDs are no real members
             }
             if (depth > 1) {
@@ -192,14 +192,14 @@ public final class FamilyTreeNode {
 
     public void updatePartner(@Nullable Entity newPartner, @Nullable RelationshipState state) {
         //cancel relationship with previous partner
-        if (!this.partner.equals(Util.NIL_UUID) && (newPartner == null || !this.partner.equals(newPartner.getUUID()))) {
+        if (!this.partner.equals(new UUID(0, 0)) && (newPartner == null || !this.partner.equals(newPartner.getUUID()))) {
             getRoot().getOrEmpty(this.partner).ifPresent(n -> {
-                n.partner = Util.NIL_UUID;
+                n.partner = new UUID(0, 0);
                 n.relationshipState = RelationshipState.SINGLE;
             });
         }
 
-        this.partner = newPartner == null ? Util.NIL_UUID : newPartner.getUUID();
+        this.partner = newPartner == null ? new UUID(0, 0) : newPartner.getUUID();
         this.relationshipState = state == null && newPartner == null ? RelationshipState.SINGLE : state;
 
         // ensure the family tree has an entry
@@ -368,7 +368,7 @@ public final class FamilyTreeNode {
     public boolean removeFather() {
         if (isValid(father)) {
             rootNode.getOrEmpty(father).ifPresent(e -> e.children.remove(this.id));
-            father = Util.NIL_UUID;
+            father = new UUID(0, 0);
             markDirty();
             return true;
         } else {
@@ -379,7 +379,7 @@ public final class FamilyTreeNode {
     public boolean removeMother() {
         if (isValid(mother)) {
             rootNode.getOrEmpty(mother).ifPresent(e -> e.children.remove(this.id));
-            mother = Util.NIL_UUID;
+            mother = new UUID(0, 0);
             markDirty();
             return true;
         } else {
@@ -394,7 +394,7 @@ public final class FamilyTreeNode {
 
     // entries with these conditions are usually generated
     public boolean probablyGenerated() {
-        return mother.equals(Util.NIL_UUID) && father.equals(Util.NIL_UUID) && children.size() == 1 && deceased && !isPlayer();
+        return mother.equals(new UUID(0, 0)) && father.equals(new UUID(0, 0)) && children.size() == 1 && deceased && !isPlayer();
     }
 
     // true if there is at least one non-generated relative
@@ -402,7 +402,7 @@ public final class FamilyTreeNode {
         if (!children.isEmpty()) {
             return true;
         }
-        if (!partner.equals(Util.NIL_UUID)) {
+        if (!partner.equals(new UUID(0, 0))) {
             return true;
         }
         return !getParents().allMatch(FamilyTreeNode::probablyGenerated);
