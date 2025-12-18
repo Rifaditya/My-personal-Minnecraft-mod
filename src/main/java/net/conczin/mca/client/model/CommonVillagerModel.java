@@ -3,18 +3,23 @@ package net.conczin.mca.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.mca.MCAClient;
+import net.conczin.mca.client.render.VillagerLikeRenderState;
 import net.conczin.mca.entity.VillagerLike;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.entity.ai.relationship.VillagerDimensions;
 import net.conczin.mca.registry.EntitiesMCA;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
-public interface CommonVillagerModel<T extends LivingEntity> {
+/**
+ * CommonVillagerModel - updated for 1.21.11 API
+ * Now uses RenderState-extending types instead of entity types
+ */
+public interface CommonVillagerModel<S extends VillagerLikeRenderState> {
     static VillagerLike<?> getVillager(Level world, UUID uuid) {
         if (MCAClient.fallbackVillager == null) {
             MCAClient.fallbackVillager = EntitiesMCA.MALE_VILLAGER.create(world);
@@ -47,7 +52,7 @@ public interface CommonVillagerModel<T extends LivingEntity> {
     void setBreastSize(float getBreastSize);
 
     default void renderCommon(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-        //head
+        // head
         float headSize = getDimensions().getHead();
 
         matrices.pushPose();
@@ -55,7 +60,7 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         getCommonHeadParts().forEach(a -> a.render(matrices, vertices, light, overlay, color));
         matrices.popPose();
 
-        //body
+        // body
         getCommonBodyParts().forEach(a -> a.render(matrices, vertices, light, overlay, color));
 
         if (getBreastPart().visible && getBodyPart().visible) {
@@ -72,10 +77,14 @@ public interface CommonVillagerModel<T extends LivingEntity> {
         }
     }
 
-    default void applyVillagerDimensions(VillagerLike<?> villager, boolean isSneaking) {
-        getDimensions().set(villager.getVillagerDimensions());
-        setBreastSize(villager.getGenetics().getBreastSize());
-        getBreastPart().visible = villager.getGenetics().getGender() == Gender.FEMALE;
+    /**
+     * Apply villager dimensions from RenderState
+     * Updated for 1.21.11 API - uses RenderState instead of entity
+     */
+    default void applyVillagerDimensions(S state, boolean isSneaking) {
+        // Get dimensions and breast size from state
+        setBreastSize(state.breastSize);
+        getBreastPart().visible = state.gender == Gender.FEMALE;
 
         for (ModelPart part : getBreastParts()) {
             part.xRot = (float) Math.PI * 0.3f + getBodyPart().xRot;
@@ -87,11 +96,12 @@ public interface CommonVillagerModel<T extends LivingEntity> {
                 cz = 1.5f;
             }
 
-            part.setPos(0.25f, (float) (5.0f - Math.pow(getBreastSize(), 0.5) * 2.5f + cy), -1.5f + getBreastSize() * 0.25f + cz);
+            part.setPos(0.25f, (float) (5.0f - Math.pow(getBreastSize(), 0.5) * 2.5f + cy),
+                    -1.5f + getBreastSize() * 0.25f + cz);
         }
     }
 
-    default void copyCommonAttributes(CommonVillagerModel<T> target) {
+    default void copyCommonAttributes(CommonVillagerModel<S> target) {
         target.getDimensions().set(getDimensions());
         target.setBreastSize(getBreastSize());
     }
