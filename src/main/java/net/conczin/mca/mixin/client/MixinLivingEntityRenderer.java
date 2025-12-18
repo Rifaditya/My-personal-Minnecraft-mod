@@ -1,7 +1,7 @@
 package net.conczin.mca.mixin.client;
 
 import net.conczin.mca.MCAClient;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
