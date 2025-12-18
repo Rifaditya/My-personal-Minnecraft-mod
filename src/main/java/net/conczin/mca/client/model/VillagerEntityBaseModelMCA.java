@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.conczin.mca.Config;
-import net.conczin.mca.entity.VillagerLike;
+import net.conczin.mca.client.render.VillagerLikeRenderState;
 import net.conczin.mca.entity.ai.relationship.AgeState;
 import net.conczin.mca.entity.ai.relationship.VillagerDimensions;
 import net.minecraft.client.model.HumanoidModel;
@@ -14,9 +14,13 @@ import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.world.entity.LivingEntity;
 
-public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>> extends HumanoidModel<T> implements CommonVillagerModel<T> {
+/**
+ * VillagerEntityBaseModelMCA - updated for 1.21.11 API
+ * Now uses VillagerLikeRenderState instead of entity type parameters
+ */
+public class VillagerEntityBaseModelMCA<S extends VillagerLikeRenderState> extends HumanoidModel<S>
+        implements CommonVillagerModel<S> {
     protected static final String BREASTS = "breasts";
 
     public final ModelPart breasts;
@@ -57,35 +61,36 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
     }
 
     @Override
-    public void prepareMobModel(T entity, float limbAngle, float limbDistance, float tickDelta) {
-        super.prepareMobModel(entity, limbDistance, limbAngle, tickDelta);
-        riding |= entity.getAgeState() == AgeState.BABY;
-    }
+    public void setupAnim(S state) {
+        // In 1.21.11, setupAnim only takes the RenderState
+        // Animation calculations now use the state data
+        super.setupAnim(state);
 
-    @Override
-    public void setupAnim(T villager, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-        if (villager.getAgeState() == AgeState.BABY && !villager.isPassenger()) {
-            limbDistance = (float) Math.sin(villager.tickCount / 12F);
-            limbAngle = (float) Math.cos(villager.tickCount / 9F) * 3;
-            headYaw += (float) Math.sin(villager.tickCount / 2F);
+        // Get animation values from state
+        float limbAngle = state.walkAnimationPos;
+        float limbDistance = state.walkAnimationSpeed;
+        float animationProgress = state.ageInTicks;
+
+        if (state.ageState == AgeState.BABY && !state.isPassenger) {
+            limbDistance = (float) Math.sin(state.tickCount / 12F);
+            limbAngle = (float) Math.cos(state.tickCount / 9F) * 3;
         }
 
-        //remove the boost for babies
-        if (villager.isBaby()) {
+        // Baby boost adjustment
+        if (state.isBabyVillager) {
             limbAngle /= 3.0f;
         }
 
-        //and add our own
-        limbAngle /= (0.2f + villager.getRawVerticalScaleFactor());
+        // Scale adjustment
+        limbAngle /= (0.2f + state.verticalScaleFactor);
 
-        super.setupAnim(villager, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
-
-        if (villager.getVillagerBrain().isPanicking()) {
+        // Panicking animation
+        if (state.isPanicking) {
             float toRadians = (float) Math.PI / 180;
 
             float armRaise = (((float) Math.sin(animationProgress / 5) * 30 - 180)
-                              + ((float) Math.sin(animationProgress / 3) * 3))
-                             * toRadians;
+                    + ((float) Math.sin(animationProgress / 3) * 3))
+                    * toRadians;
             float waveSideways = ((float) Math.sin(animationProgress / 2) * 12 - 17) * toRadians;
 
             this.leftArm.xRot = armRaise;
@@ -94,14 +99,14 @@ public class VillagerEntityBaseModelMCA<T extends LivingEntity & VillagerLike<T>
             this.rightArm.zRot = waveSideways;
         }
 
-        applyVillagerDimensions(villager, villager.isCrouching());
+        applyVillagerDimensions(state, state.isCrouching);
     }
 
     @Override
-    public void copyPropertiesTo(HumanoidModel<T> target) {
+    public void copyPropertiesTo(HumanoidModel<S> target) {
         super.copyPropertiesTo(target);
 
-        if (target instanceof VillagerEntityBaseModelMCA<T> m) {
+        if (target instanceof VillagerEntityBaseModelMCA<S> m) {
             copyCommonAttributes(m);
 
             m.breasts.visible = breasts.visible;

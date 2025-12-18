@@ -50,4 +50,11 @@ public class VillagerLikeRenderState extends HumanoidRenderState {
     // Player rendering
     public boolean isPlayer = false;
     public java.util.UUID playerUUID = null;
+
+    // Animation data for models
+    public int tickCount = 0;
+    public boolean isPanicking = false;
+    public boolean isCrouching = false;
+    public boolean isBabyVillager = false;
+    public float breastSize = 0f;
 }
