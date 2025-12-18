@@ -31,7 +31,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.client.renderer.entity.ZombieVillagerRenderer;
-import net.minecraft.client.renderer.item.ItemProperties;
+// TODO: ItemProperties API changed in 1.21.11 - find replacement
+// import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.player.Player;
 
@@ -71,7 +72,8 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
         managerHelper.registerReloadListener(new FabricSupportersLoader());
         managerHelper.registerReloadListener(new ApiIdentifiableReloadListener());
 
-        ModelPredicatesMCA.setup(ItemProperties::register);
+        // TODO: ItemProperties API changed in 1.21.11 - ModelPredicatesMCA disabled
+        // ModelPredicatesMCA.setup(ItemProperties::register);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, server) -> MCAClient.onLogin());
 
