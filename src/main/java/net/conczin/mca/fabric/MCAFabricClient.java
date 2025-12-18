@@ -17,7 +17,8 @@ import net.conczin.mca.registry.EntitiesMCA;
 import net.conczin.mca.registry.ModelPredicatesMCA;
 import net.conczin.mca.registry.ParticleTypesMCA;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+// TODO: BlockRenderLayerMap removed in Fabric API for 1.21.11 - find alternative
+// import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -56,8 +57,10 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
         EntityRendererRegistry.register(EntitiesMCA.GRIM_REAPER, GrimReaperRenderer::new);
         EntityRendererRegistry.register(EntitiesMCA.CRIB, CribEntityRenderer::new);
 
-        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.NEG_INTERACTION, InteractionParticle.Factory::new);
-        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.POS_INTERACTION, InteractionParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.NEG_INTERACTION,
+                InteractionParticle.Factory::new);
+        ParticleFactoryRegistry.getInstance().register(ParticleTypesMCA.POS_INTERACTION,
+                InteractionParticle.Factory::new);
 
         BlockEntityRendererRegistry.register(BlockEntityTypesMCA.TOMBSTONE, TombstoneBlockEntityRenderer::new);
 
@@ -70,11 +73,11 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
 
         ModelPredicatesMCA.setup(ItemProperties::register);
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-                MCAClient.onLogin()
-        );
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, server) -> MCAClient.onLogin());
 
-        BlockRenderLayerMap.INSTANCE.putBlock(BlocksMCA.INFERNAL_FLAME, RenderType.cutout());
+        // TODO: BlockRenderLayerMap removed - use vanilla method or Fabric alternative
+        // BlockRenderLayerMap.INSTANCE.putBlock(BlocksMCA.INFERNAL_FLAME,
+        // RenderType.cutout());
 
         ClientTickEvents.START_CLIENT_TICK.register(MCAClient::tickClient);
 
