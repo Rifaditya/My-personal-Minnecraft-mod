@@ -16,9 +16,11 @@ public class ZombieVillagerEntityModelMCA<S extends VillagerLikeRenderState> ext
     @Override
     public void setupAnim(S state) {
         super.setupAnim(state);
-        // Zombie arm animation using attack time from state
-        AnimationUtils.animateZombieArms(leftArm, rightArm, false, state.attackTime, state.ageInTicks);
-        leftArmwear.copyFrom(leftArm);
-        rightArmwear.copyFrom(rightArm);
+        // Zombie arm animation - in 1.21.11, animateZombieArms takes only 4 args:
+        // leftArm, rightArm, isAggressive, ageInTicks
+        AnimationUtils.animateZombieArms(leftArm, rightArm, false, state.ageInTicks);
+        // ModelPart.copyFrom removed in 1.21.11, using direct property copy
+        leftArmwear.setRotation(leftArm.xRot, leftArm.yRot, leftArm.zRot);
+        rightArmwear.setRotation(rightArm.xRot, rightArm.yRot, rightArm.zRot);
     }
 }
