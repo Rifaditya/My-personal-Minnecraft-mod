@@ -8,7 +8,7 @@ import net.conczin.mca.MCAClient;
 import net.conczin.mca.client.model.PlayerEntityExtendedModel;
 import net.conczin.mca.client.model.VillagerEntityModelMCA;
 import net.conczin.mca.client.render.VillagerLikeRenderState;
-import net.minecraft.ResourceLocationException;
+// ResourceLocationException removed in 1.21.11
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -137,7 +137,7 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
         return TEXTURE_CACHE.computeIfAbsent(name, s -> {
             try {
                 return supplier.apply(s);
-            } catch (ResourceLocationException ignored) {
+            } catch (Exception ignored) { // Was ResourceLocationException
                 return null;
             }
         });
