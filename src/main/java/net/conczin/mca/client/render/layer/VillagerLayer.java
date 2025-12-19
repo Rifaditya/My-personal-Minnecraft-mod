@@ -85,7 +85,8 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
         }
 
         // copy the animation to this layers model
-        getParentModel().copyPropertiesTo(model);
+        // Note: copyPropertiesTo removed in 1.21.11, animation is already inherited
+        // from parent
 
         submitFinal(poseStack, collector, light, state);
     }
@@ -93,7 +94,8 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
     public void submitFinal(PoseStack poseStack, SubmitNodeCollector collector, int light, S state) {
         // Note: In 1.21.11, we use the RenderState's flags for visibility
         boolean visible = !state.isInvisible;
-        boolean glowing = state.appearsGlowing;
+        // appearsGlowing removed in 1.21.11 - always false for now
+        boolean glowing = false;
 
         Identifier skin = getSkin(state);
         if (canUse(skin)) {
@@ -114,13 +116,13 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
     @Nullable
     protected RenderType getRenderLayer(Identifier texture, boolean showBody, boolean translucent,
             boolean showOutline) {
-        if (translucent) {
-            return RenderType.itemEntityTranslucentCull(texture);
-        } else if (showBody) {
+        // Note: RenderType API changed significantly in 1.21.11
+        // These methods need to be updated when proper 1.21.11 rendering is implemented
+        if (showBody) {
             return this.model.renderType(texture);
-        } else {
-            return showOutline ? RenderType.outline(texture) : null;
         }
+        // TODO: Implement translucent and outline rendering for 1.21.11
+        return null;
     }
 
     public final boolean canUse(Identifier texture) {
