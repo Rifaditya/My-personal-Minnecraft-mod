@@ -3,7 +3,7 @@ package net.conczin.mca.client.render;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.entity.ai.relationship.AgeState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Render state for VillagerLikeEntityMCARenderer (1.21.11 API)
@@ -38,11 +38,11 @@ public class VillagerLikeRenderState extends HumanoidRenderState {
 
     // Face data
     public String face = "";
-    public ResourceLocation faceOverlay = null;
+    public Identifier faceOverlay = null;
 
     // Hair data
     public String hair = "";
-    public ResourceLocation hairOverlay = null;
+    public Identifier hairOverlay = null;
 
     // Traits
     public boolean hasAlbinism = false;
