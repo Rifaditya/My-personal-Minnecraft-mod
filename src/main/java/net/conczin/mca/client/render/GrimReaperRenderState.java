@@ -1,5 +1,6 @@
 package net.conczin.mca.client.render;
 
+import net.conczin.mca.entity.ReaperAttackState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
 /**
@@ -7,5 +8,6 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
  * Extends HumanoidRenderState for humanoid mob rendering
  */
 public class GrimReaperRenderState extends HumanoidRenderState {
-    // Additional grim reaper specific state can be added here
+    // Attack state for animation
+    public ReaperAttackState attackState = ReaperAttackState.IDLE;
 }

@@ -2,7 +2,7 @@ package net.conczin.mca.client.model;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.conczin.mca.entity.GrimReaperEntity;
+import net.conczin.mca.client.render.GrimReaperRenderState;
 import net.conczin.mca.entity.ReaperAttackState;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -16,7 +16,11 @@ import java.util.Map;
 
 import static net.minecraft.client.model.geom.PartNames.*;
 
-public class GrimReaperEntityModel<T extends GrimReaperEntity> extends HumanoidModel<T> {
+/**
+ * GrimReaperEntityModel - updated for 1.21.11 API
+ * Now uses GrimReaperRenderState instead of entity type parameter
+ */
+public class GrimReaperEntityModel<S extends GrimReaperRenderState> extends HumanoidModel<S> {
     private static final Map<ReaperAttackState, ModelTransformSet> POSES = ImmutableMap.of(
             ReaperAttackState.PRE, new ModelTransformSet.Builder()
                     .rotate(HEAD, -15.6F, 40.4F, 0)
@@ -73,15 +77,14 @@ public class GrimReaperEntityModel<T extends GrimReaperEntity> extends HumanoidM
                 .addOrReplaceChild("scythe_handle",
                         CubeListBuilder.create().texOffs(36, 32).addBox(0, -26, 0, 1, 31, 1, dilation)
                                 .texOffs(0, 32).addBox(0.5F, -26, 0.5F, 16, 16, 0, dilation),
-                        ModelTransformSet.Builder.createTransform(0, 10, 0, 90, -20, 90)
-                );
+                        ModelTransformSet.Builder.createTransform(0, 10, 0, 90, -20, 90));
 
         return modelData;
     }
 
     @Override
-    public void setupAnim(T entity, float f, float g, float h, float i, float j) {
-        super.setupAnim(entity, f, g, h, i, j);
+    public void setupAnim(S state) {
+        super.setupAnim(state);
 
         body.setPos(0, 0, 0);
         body.setRotation(0, 0, 0);
@@ -93,7 +96,8 @@ public class GrimReaperEntityModel<T extends GrimReaperEntity> extends HumanoidM
 
         scythe.loadPose(scytheTransform);
 
-        reaperState = entity.getAttackState();
+        // Attack state is now stored in the render state
+        reaperState = state.attackState;
         ModelTransformSet set = POSES.get(reaperState);
 
         if (set != null) {

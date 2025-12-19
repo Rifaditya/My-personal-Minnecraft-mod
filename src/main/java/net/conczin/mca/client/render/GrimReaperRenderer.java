@@ -32,7 +32,8 @@ public class GrimReaperRenderer extends
     @Override
     public void extractRenderState(GrimReaperEntity reaper, GrimReaperRenderState state, float partialTick) {
         super.extractRenderState(reaper, state, partialTick);
-        // Add any grim reaper specific state extraction here
+        // Extract attack state for model animation
+        state.attackState = reaper.getAttackState();
     }
 
     @Override
