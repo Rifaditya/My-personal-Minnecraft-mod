@@ -458,7 +458,9 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
             String s = nbt.getString("CustomName").orElse("");
             try {
                 if (!s.isEmpty()) {
-                    entity.setCustomName(Component.Serializer.fromJson(s, entity.registryAccess()));
+                    // Component.Serializer removed in 1.21.11 - use literal for now
+                    // TODO: Use ComponentSerialization.CODEC for proper JSON parsing
+                    entity.setCustomName(Component.literal(s));
                 }
             } catch (Exception exception) {
                 MCA.LOGGER.warn("Failed to parse entity custom name {}", s, exception);
@@ -499,4 +501,3 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
         static final PlayerModel[] VALUES = values();
     }
 }
-
