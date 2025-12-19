@@ -265,11 +265,13 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     }
 
     public final VillagerProfession getProfession() {
-        return getVillagerData().getProfession();
+        return getVillagerData().profession().value();
     }
 
     public final void setProfession(VillagerProfession profession) {
-        setVillagerData(getVillagerData().setProfession(profession));
+        // Create holder for the profession from registry
+        var holder = BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(profession);
+        setVillagerData(getVillagerData().withProfession(holder));
         refreshBrain((ServerLevel) level());
     }
 
@@ -295,12 +297,12 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Override
     public void setVillagerData(VillagerData data) {
-        boolean hasChanged = !level().isClientSide() && getProfession() != data.getProfession()
-                && data.getProfession() != ProfessionsMCA.OUTLAW;
+        boolean hasChanged = !level().isClientSide() && getProfession() != data.profession().value()
+                && data.profession().value() != ProfessionsMCA.OUTLAW;
         super.setVillagerData(data);
         if (hasChanged) {
             randomizeClothes();
-            getRelationships().getFamilyEntry().setProfession(data.getProfession());
+            getRelationships().getFamilyEntry().setProfession(data.profession().value());
         }
     }
 
@@ -330,11 +332,11 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
+    public boolean doHurtTarget(ServerLevel level, Entity target) {
         // player just get a beating
         attackedEntity(target);
 
-        return super.doHurtTarget(target);
+        return super.doHurtTarget(level, target);
     }
 
     private void attackedEntity(Entity target) {
@@ -433,7 +435,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                     copiedBeginTradeWith(player);
                 }
             }
-            return InteractionResult.sidedSuccess(level().isClientSide());
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
