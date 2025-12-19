@@ -748,7 +748,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 setInfectionProgress(infection);
 
                 if (infection > 1.0f) {
-                    convertTo(EntityType.ZOMBIE_VILLAGER, false);
+                    convertToMCA(EntityType.ZOMBIE_VILLAGER, false);
                     discard();
                 }
             }
@@ -766,7 +766,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             // strengthen experienced villagers
             AttributeInstance instance = this.getAttributes().getInstance(Attributes.MAX_HEALTH);
             if (instance != null) {
-                int level = this.getVillagerData().getLevel() - 1;
+                int level = this.getVillagerData().level() - 1;
                 instance.removeModifier(EXTRA_HEALTH_EFFECT_ID);
                 instance.addTransientModifier(new AttributeModifier(EXTRA_HEALTH_EFFECT_ID,
                         Config.getInstance().villagerHealthBonusPerLevel * level,
@@ -1229,25 +1229,36 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     @Nullable
-    public <T extends Mob> T convertTo(EntityType<T> type, boolean keepInventory) {
+    public <T extends Mob> T convertToMCA(EntityType<T> type, boolean keepInventory) {
         residency.leaveHome();
 
         T mob;
         if (!isRemoved() && type == EntityType.ZOMBIE_VILLAGER) {
-            mob = (T) super.convertTo(getGenetics().getGender().getZombieType(), keepInventory);
+            // Use new convertTo with ConversionParams for 1.21.11
+            var params = keepInventory ? ConversionParams.single(this, true, true)
+                    : ConversionParams.single(this, false, false);
+            mob = (T) super.convertTo(getGenetics().getGender().getZombieType(), params, converted -> {
+            });
         } else {
-            mob = super.convertTo(type, keepInventory);
+            var params = keepInventory ? ConversionParams.single(this, true, true)
+                    : ConversionParams.single(this, false, false);
+            mob = super.convertTo(type, params, converted -> {
+            });
         }
+
+        if (mob == null)
+            return null;
 
         if (mob instanceof VillagerLike<?> zombie) {
             zombie.copyVillagerAttributesFrom(this);
         }
 
         if (mob instanceof ZombieVillager zombie) {
-            zombie.finalizeSpawn((ServerLevel) level(), level().getCurrentDifficultyAt(zombie.blockPosition()),
-                    EntitySpawnReason.CONVERSION, new Zombie.ZombieGroupData(false, true));
+            if (level() instanceof ServerLevel serverLevel) {
+                zombie.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(zombie.blockPosition()),
+                        EntitySpawnReason.CONVERSION, new Zombie.ZombieGroupData(false, true));
+            }
             zombie.setVillagerData(getVillagerData());
             zombie.setGossips(getGossips().store(NbtOps.INSTANCE));
             zombie.setTradeOffers(getOffers().copy());
