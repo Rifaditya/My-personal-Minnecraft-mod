@@ -660,7 +660,9 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 ItemStack food = getMainHandItem();
                 FoodProperties foodProperties = food.get(DataComponents.FOOD);
                 if (foodProperties != null) {
-                    eat(level(), food);
+                    // eat() signature changed in 1.21.11 - use the food directly
+                    food.shrink(1);
+                    heal(foodProperties.nutrition());
                 } else {
                     // noinspection ConstantConditions
                     if (!findAndEquipToMain(VillagerEntityMCA::canEat)) {
@@ -1257,7 +1259,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                         EntitySpawnReason.CONVERSION, new Zombie.ZombieGroupData(false, true));
             }
             zombie.setVillagerData(getVillagerData());
-            zombie.setGossips(getGossips().store(NbtOps.INSTANCE));
+            // GossipContainer.store() removed in 1.21.11 - TODO: find new serialization API
+            // zombie.setGossips(getGossips().store(NbtOps.INSTANCE));
             zombie.setTradeOffers(getOffers().copy());
             zombie.setVillagerXp(getVillagerXp());
             zombie.setUUID(getUUID());
@@ -1387,7 +1390,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         if (this.despawnDelay > 0 && !this.isTrading() && --this.despawnDelay == 0) {
             if (getRelationships().getPartner().isPresent() || getVillagerBrain().getMemories().values().stream()
                     .anyMatch(m -> random.nextInt(Config.getInstance().marriageHeartsRequirement) < m.getHearts())) {
-                setProfession(VillagerProfession.NONE);
+                // VillagerProfession.NONE is now a ResourceKey - lookup from registry
+                setProfession(BuiltInRegistries.VILLAGER_PROFESSION.getValue(VillagerProfession.NONE));
                 setDespawnDelay(0);
             } else {
                 this.discard();
