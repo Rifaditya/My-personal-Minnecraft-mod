@@ -68,9 +68,14 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
 
     static VillagerLike<?> toVillager(PlayerSaveData player) {
         CompoundTag villagerData = player.getEntityData();
-        VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(player.getWorld());
+        // EntityType.create signature changed in 1.21.11 - now requires more parameters
+        VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(player.getWorld(), e -> {
+        }, net.minecraft.core.BlockPos.ZERO, EntitySpawnReason.LOAD, false, false);
         assert villager != null;
-        villager.readAdditionalSaveData(villagerData);
+        // TODO: readAdditionalSaveData now takes ValueInput, not CompoundTag
+        // villager.readAdditionalSaveData(villagerData);
+        // For now, use the type data manager to load data
+        villager.getTypeDataManager().load(villager, villagerData);
         return villager;
     }
 
