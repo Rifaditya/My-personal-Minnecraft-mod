@@ -1280,28 +1280,24 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public void readAdditionalSaveData(ValueInput nbt) {
         super.readAdditionalSaveData(nbt);
 
-        getTypeDataManager().load(this, nbt);
-        relations.readFromNbt(nbt);
-        longTermMemory.readFromNbt(nbt);
+        // TODO: These need CompoundTag but ValueInput is passed - may need adapter
+        // getTypeDataManager().load(this, nbt);
+        // relations.readFromNbt(nbt);
+        // longTermMemory.readFromNbt(nbt);
 
-        playerModel = PlayerModel.VALUES[nbt.getInt("PlayerModel")];
+        playerModel = PlayerModel.VALUES[nbt.getIntOr("PlayerModel", 0)];
 
         updateAttributes();
 
         inventory.clearContent();
-        InventoryUtils.readFromNBT(this.registryAccess(), inventory, nbt);
+        // TODO: InventoryUtils.readFromNBT needs updating for ValueInput
+        // InventoryUtils.readFromNBT(this.registryAccess(), inventory, nbt);
 
-        if (nbt.contains("DespawnDelay")) {
-            this.despawnDelay = nbt.getInt("DespawnDelay");
-        }
+        this.despawnDelay = nbt.getIntOr("DespawnDelay", 0);
+        this.interactedWith = nbt.getBooleanOr("InteractedWith", false);
 
-        if (nbt.contains("InteractedWith")) {
-            this.interactedWith = nbt.getBoolean("InteractedWith");
-        }
-
-        if (nbt.contains("Clothes")) {
-            validateClothes();
-        }
+        // Clothes validation - check if clothes data exists via Optional
+        nbt.getString("Clothes").ifPresent(clothes -> validateClothes());
 
         if (getVillagerBrain().getPersonality() == Personality.UNASSIGNED) {
             getVillagerBrain().randomize();
@@ -1312,11 +1308,12 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public final void addAdditionalSaveData(ValueOutput nbt) {
         super.addAdditionalSaveData(nbt);
 
-        relations.writeToNbt(nbt);
-        longTermMemory.writeToNbt(nbt);
-
-        getTypeDataManager().save(this, nbt);
-        InventoryUtils.saveToNBT(this.registryAccess(), inventory, nbt);
+        // TODO: These methods need updating to accept ValueOutput instead of
+        // CompoundTag
+        // relations.writeToNbt(nbt);
+        // longTermMemory.writeToNbt(nbt);
+        // getTypeDataManager().save(this, nbt);
+        // InventoryUtils.saveToNBT(this.registryAccess(), inventory, nbt);
 
         nbt.putInt("DespawnDelay", this.despawnDelay);
         nbt.putBoolean("InteractedWith", this.interactedWith);
@@ -1421,7 +1418,11 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     }
 
     public void customLevelUp() {
-        this.setVillagerData(this.getVillagerData().setLevel(this.getVillagerData().getLevel() + 1));
-        this.updateTrades();
+        // Use withLevel for immutable VillagerData pattern in 1.21.11
+        this.setVillagerData(this.getVillagerData().withLevel(this.getVillagerData().level() + 1));
+        // updateTrades now requires ServerLevel
+        if (this.level() instanceof ServerLevel serverLevel) {
+            this.updateTrades(serverLevel);
+        }
     }
 }
