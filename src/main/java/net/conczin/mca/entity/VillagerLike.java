@@ -36,7 +36,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.sheep.Sheep;
-import net.minecraft.world.entity.npc.VillagerDataHolder;
+import net.conczin.mca.entity.VillagerDataHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 
@@ -45,7 +45,8 @@ import java.util.Set;
 
 import static net.minecraft.world.entity.LivingEntity.getSlotForHand;
 
-public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrackedEntity<E>, VillagerDataHolder, Infectable, Messenger {
+public interface VillagerLike<E extends Entity & VillagerLike<E>>
+        extends CTrackedEntity<E>, VillagerDataHolder, Infectable, Messenger {
     CDataParameter<String> CLOTHES = CParameter.create("Clothes", "");
     CDataParameter<String> HAIR = CParameter.create("Hair", "");
     CDataParameter<Float> HAIR_COLOR_RED = CParameter.create("HairColorRed", 0.0f);
@@ -147,7 +148,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
     }
 
     default boolean canBeAttractedTo(VillagerLike<?> other) {
-        return getAttractedGenderSet(this).contains(other.getGenetics().getGender()) && getAttractedGenderSet(other).contains(getGenetics().getGender());
+        return getAttractedGenderSet(this).contains(other.getGenetics().getGender())
+                && getAttractedGenderSet(other).contains(getGenetics().getGender());
     }
 
     default boolean canBeAttractedTo(PlayerSaveData other) {
@@ -175,11 +177,9 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
     }
 
     default String getProfessionName() {
-        String professionName = (
-                getProfessionId().getNamespace().equalsIgnoreCase("minecraft") ?
-                        (getProfessionId().getPath().equals("none") ? "mca.none" : getProfessionId().getPath()) :
-                        getProfessionId().toString()
-        ).replace(":", ".");
+        String professionName = (getProfessionId().getNamespace().equalsIgnoreCase("minecraft")
+                ? (getProfessionId().getPath().equals("none") ? "mca.none" : getProfessionId().getPath())
+                : getProfessionId().toString()).replace(":", ".");
 
         return MCA.isBlankString(professionName) ? "mca.none" : professionName;
     }
@@ -239,8 +239,7 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
                 1.0f,
                 getTrackedValue(HAIR_COLOR_RED),
                 getTrackedValue(HAIR_COLOR_GREEN),
-                getTrackedValue(HAIR_COLOR_BLUE)
-        ); // TODO
+                getTrackedValue(HAIR_COLOR_BLUE)); // TODO
     }
 
     default void setHairDye(DyeColor color) {
@@ -264,7 +263,7 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
     }
 
     default void updateAttributes() {
-        //set speed
+        // set speed
         float speed = 1.0f;
         if (getTraits().hasTrait(Traits.ATHLETIC)) {
             speed *= 1.1f;
@@ -278,7 +277,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
         AttributeInstance entityAttributeInstance = asEntity().getAttribute(Attributes.MOVEMENT_SPEED);
         if (entityAttributeInstance != null) {
             entityAttributeInstance.removeModifier(SPEED_ID);
-            AttributeModifier speedModifier = new AttributeModifier(SPEED_ID, speed - 1.0f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+            AttributeModifier speedModifier = new AttributeModifier(SPEED_ID, speed - 1.0f,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
             entityAttributeInstance.addTransientModifier(speedModifier);
         }
 
@@ -293,7 +293,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
         AttributeInstance attackAttributeInstance = asEntity().getAttribute(Attributes.ATTACK_DAMAGE);
         if (attackAttributeInstance != null) {
             attackAttributeInstance.removeModifier(DAMAGE_ID);
-            AttributeModifier damageModifier = new AttributeModifier(DAMAGE_ID, damageMultiplier - 1.0f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+            AttributeModifier damageModifier = new AttributeModifier(DAMAGE_ID, damageMultiplier - 1.0f,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
             attackAttributeInstance.addTransientModifier(damageModifier);
         }
     }
@@ -321,9 +322,9 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
 
     default float getRawHorizontalScaleFactor() {
         return getGenetics().getHorizontalScaleFactor()
-               * getTraits().getHorizontalScaleFactor()
-               * getVillagerDimensions().getWidth()
-               * getGenetics().getGender().getHorizontalScaleFactor();
+                * getTraits().getHorizontalScaleFactor()
+                * getVillagerDimensions().getWidth()
+                * getGenetics().getGender().getHorizontalScaleFactor();
     }
 
     default float getVerticalScaleFactor() {
@@ -335,9 +336,9 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
             return asEntity().isBaby() ? 0.5f : 1.0f;
         } else {
             return getGenetics().getVerticalScaleFactor()
-                   * getTraits().getVerticalScaleFactor()
-                   * getVillagerDimensions().getHeight()
-                   * getGenetics().getGender().getScaleFactor();
+                    * getTraits().getVerticalScaleFactor()
+                    * getVillagerDimensions().getHeight()
+                    * getGenetics().getGender().getScaleFactor();
         }
     }
 
@@ -373,7 +374,7 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
         randomizeClothes();
         randomizeHair();
 
-        //colored hair
+        // colored hair
         if (!isPlayer) {
             Mob entity = asEntity();
             if (entity.getRandom().nextFloat() < Config.getInstance().coloredHairChance) {
@@ -402,7 +403,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
 
     default void validateClothes() {
         if (!asEntity().level().isClientSide()) {
-            if (!getClothes().startsWith("immersive_library") && !ClothingList.getInstance().clothing.containsKey(getClothes())) {
+            if (!getClothes().startsWith("immersive_library")
+                    && !ClothingList.getInstance().clothing.containsKey(getClothes())) {
                 MCA.LOGGER.info("Villagers clothing {} does not exist!", getClothes());
                 randomizeClothes();
             }
@@ -414,14 +416,14 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
         }
     }
 
-    @SuppressWarnings({"unchecked", "RedundantSuppression"})
+    @SuppressWarnings({ "unchecked", "RedundantSuppression" })
     default CompoundTag toNbtForConversion() {
         CompoundTag output = new CompoundTag();
         this.getTypeDataManager().save((E) asEntity(), output);
         return output;
     }
 
-    @SuppressWarnings({"unchecked", "RedundantSuppression"})
+    @SuppressWarnings({ "unchecked", "RedundantSuppression" })
     default void readNbtForConversion(CompoundTag input) {
         this.getTypeDataManager().load((E) asEntity(), input);
     }
@@ -462,7 +464,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>> extends CTrack
             double d = random.nextGaussian() * 0.02;
             double e = random.nextGaussian() * 0.02;
             double f = random.nextGaussian() * 0.02;
-            asEntity().level().addParticle(ParticleTypes.SMOKE, asEntity().getRandomX(1.0), asEntity().getRandomY() + 1.0, asEntity().getRandomZ(1.0), d, e, f);
+            asEntity().level().addParticle(ParticleTypes.SMOKE, asEntity().getRandomX(1.0),
+                    asEntity().getRandomY() + 1.0, asEntity().getRandomZ(1.0), d, e, f);
         }
     }
 

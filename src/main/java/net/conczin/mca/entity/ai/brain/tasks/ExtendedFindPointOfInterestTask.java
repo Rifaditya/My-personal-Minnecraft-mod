@@ -8,7 +8,7 @@ import net.conczin.mca.entity.VillagerEntityMCA;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.DebugPackets;
+// DebugPackets removed in 1.21.11
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -45,11 +45,14 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
     private final Long2ObjectMap<RetryMarker> foundPositionsToExpiry = new Long2ObjectOpenHashMap<>();
     private long positionExpireTimeLimit;
 
-    public ExtendedFindPointOfInterestTask(Predicate<Holder<PoiType>> poiType, MemoryModuleType<GlobalPos> moduleType, boolean onlyRunIfAdult, Optional<Byte> entityStatus, Consumer<VillagerEntityMCA> onFinish) {
+    public ExtendedFindPointOfInterestTask(Predicate<Holder<PoiType>> poiType, MemoryModuleType<GlobalPos> moduleType,
+            boolean onlyRunIfAdult, Optional<Byte> entityStatus, Consumer<VillagerEntityMCA> onFinish) {
         this(poiType, moduleType, onlyRunIfAdult, entityStatus, onFinish, (e, p) -> true);
     }
 
-    public ExtendedFindPointOfInterestTask(Predicate<Holder<PoiType>> poiType, MemoryModuleType<GlobalPos> moduleType, boolean onlyRunIfAdult, Optional<Byte> entityStatus, Consumer<VillagerEntityMCA> onFinish, BiPredicate<VillagerEntityMCA, BlockPos> predicate) {
+    public ExtendedFindPointOfInterestTask(Predicate<Holder<PoiType>> poiType, MemoryModuleType<GlobalPos> moduleType,
+            boolean onlyRunIfAdult, Optional<Byte> entityStatus, Consumer<VillagerEntityMCA> onFinish,
+            BiPredicate<VillagerEntityMCA, BlockPos> predicate) {
         super(create(moduleType));
 
         this.onFinish = onFinish;
@@ -72,16 +75,17 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
             return false;
         }
         if (this.positionExpireTimeLimit == 0L) {
-            this.positionExpireTimeLimit = pathAwareEntity.level().getGameTime() + (long) serverWorld.random.nextInt(POSITION_EXPIRE_INTERVAL);
+            this.positionExpireTimeLimit = pathAwareEntity.level().getGameTime()
+                    + (long) serverWorld.random.nextInt(POSITION_EXPIRE_INTERVAL);
             return false;
         }
         return serverWorld.getGameTime() >= this.positionExpireTimeLimit;
     }
 
-
     @Override
     protected void start(ServerLevel serverWorld, VillagerEntityMCA villager, long l) {
-        this.positionExpireTimeLimit = l + POSITION_EXPIRE_INTERVAL + (long) serverWorld.getRandom().nextInt(POSITION_EXPIRE_INTERVAL);
+        this.positionExpireTimeLimit = l + POSITION_EXPIRE_INTERVAL
+                + (long) serverWorld.getRandom().nextInt(POSITION_EXPIRE_INTERVAL);
         PoiManager pointOfInterestStorage = serverWorld.getPoiManager();
         this.foundPositionsToExpiry.long2ObjectEntrySet().removeIf(entry -> !entry.getValue().isAttempting(l));
         Predicate<BlockPos> predicate = blockPos -> {
@@ -97,7 +101,9 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
             }
             return this.predicate.test(villager, blockPos);
         };
-        Set<Pair<Holder<PoiType>, BlockPos>> set = pointOfInterestStorage.findAllClosestFirstWithType(this.poiType, predicate, villager.blockPosition(), POI_SORTING_RADIUS, PoiManager.Occupancy.HAS_SPACE).limit(MAX_POSITIONS_PER_RUN).collect(Collectors.toSet());
+        Set<Pair<Holder<PoiType>, BlockPos>> set = pointOfInterestStorage.findAllClosestFirstWithType(this.poiType,
+                predicate, villager.blockPosition(), POI_SORTING_RADIUS, PoiManager.Occupancy.HAS_SPACE)
+                .limit(MAX_POSITIONS_PER_RUN).collect(Collectors.toSet());
         Path path = findPathToPois(villager, set);
         if (path != null && path.canReach()) {
             BlockPos blockPos2 = path.getTarget();
@@ -106,22 +112,26 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
                     return otherPos.equals(blockPos2);
                 }, blockPos2, 1);
 
-                villager.getBrain().setMemory(this.targetMemoryModuleType, GlobalPos.of(serverWorld.dimension(), blockPos2));
+                villager.getBrain().setMemory(this.targetMemoryModuleType,
+                        GlobalPos.of(serverWorld.dimension(), blockPos2));
                 this.entityStatus.ifPresent(statusByte -> serverWorld.broadcastEntityEvent(villager, statusByte));
                 this.foundPositionsToExpiry.clear();
-                DebugPackets.sendPoiTicketCountPacket(serverWorld, blockPos2);
+                // DebugPackets.sendPoiTicketCountPacket(serverWorld, blockPos2); // Removed in
+                // 1.21.11
 
                 // on finish callback
                 onFinish.accept(villager);
             });
         } else {
             for (Pair<Holder<PoiType>, BlockPos> blockPos2 : set) {
-                this.foundPositionsToExpiry.computeIfAbsent(blockPos2.getSecond().asLong(), m -> new RetryMarker(villager.level().random, l));
+                this.foundPositionsToExpiry.computeIfAbsent(blockPos2.getSecond().asLong(),
+                        m -> new RetryMarker(villager.level().random, l));
             }
         }
     }
 
-    //todo this check is not necessary in vanilla, but since the 1.19.2 port of 7.4.0 it is requires as occupied beds are used
+    // todo this check is not necessary in vanilla, but since the 1.19.2 port of
+    // 7.4.0 it is requires as occupied beds are used
     private boolean isBedOccupiedByOthers(ServerLevel world, BlockPos pos, LivingEntity entity) {
         BlockState blockState = world.getBlockState(pos);
         return blockState.is(BlockTags.BEDS) && blockState.getValue(BedBlock.OCCUPIED) && !entity.isSleeping();

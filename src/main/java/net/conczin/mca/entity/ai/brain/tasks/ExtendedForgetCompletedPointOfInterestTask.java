@@ -3,7 +3,7 @@ package net.conczin.mca.entity.ai.brain.tasks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.game.DebugPackets;
+// DebugPackets removed in 1.21.11
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,19 +24,21 @@ public class ExtendedForgetCompletedPointOfInterestTask {
     public ExtendedForgetCompletedPointOfInterestTask() {
     }
 
-    public static OneShot<LivingEntity> create(Predicate<Holder<PoiType>> poiTypePredicate, MemoryModuleType<GlobalPos> poiPosModule, Consumer<LivingEntity> onFinish) {
+    public static OneShot<LivingEntity> create(Predicate<Holder<PoiType>> poiTypePredicate,
+            MemoryModuleType<GlobalPos> poiPosModule, Consumer<LivingEntity> onFinish) {
         return BehaviorBuilder.create((context) -> {
             return context.group(context.present(poiPosModule)).apply(context, (poiPos) -> {
                 return (world, entity, time) -> {
                     GlobalPos globalPos = context.get(poiPos);
                     BlockPos blockPos = globalPos.pos();
-                    if (world.dimension() == globalPos.dimension() && blockPos.closerToCenterThan(entity.position(), MAX_RANGE)) {
+                    if (world.dimension() == globalPos.dimension()
+                            && blockPos.closerToCenterThan(entity.position(), MAX_RANGE)) {
                         ServerLevel serverWorld = world.getServer().getLevel(globalPos.dimension());
                         if (serverWorld != null && serverWorld.getPoiManager().exists(blockPos, poiTypePredicate)) {
                             if (isBedOccupiedByOthers(serverWorld, blockPos, entity)) {
                                 poiPos.erase();
                                 world.getPoiManager().release(blockPos);
-                                DebugPackets.sendPoiTicketCountPacket(world, blockPos);
+                                // DebugPackets.sendPoiTicketCountPacket(world, blockPos); // Removed in 1.21.11
                             }
                         } else {
                             poiPos.erase();
