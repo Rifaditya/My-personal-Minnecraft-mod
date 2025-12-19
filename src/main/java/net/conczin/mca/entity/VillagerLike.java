@@ -43,7 +43,7 @@ import net.minecraft.world.item.DyeColor;
 import java.util.Optional;
 import java.util.Set;
 
-import static net.minecraft.world.entity.LivingEntity.getSlotForHand;
+// getSlotForHand removed from LivingEntity in 1.21.11 - use inline helper
 
 public interface VillagerLike<E extends Entity & VillagerLike<E>>
         extends CTrackedEntity<E>, VillagerDataHolder, Infectable, Messenger {
@@ -165,11 +165,11 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
     }
 
     default EquipmentSlot getDominantSlot() {
-        return getSlotForHand(getDominantHand());
+        return getDominantHand() == InteractionHand.OFF_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND;
     }
 
     default EquipmentSlot getOpposingSlot() {
-        return getSlotForHand(getOpposingHand());
+        return getOpposingHand() == InteractionHand.OFF_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND;
     }
 
     default Identifier getProfessionId() {
