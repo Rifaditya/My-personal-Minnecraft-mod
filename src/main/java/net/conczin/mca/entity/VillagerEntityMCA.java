@@ -501,7 +501,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         double d = random.nextDouble();
 
         if (d < 0.5D) {
-            return VillagerType.byBiome(level().getBiome(blockPosition())).value();
+            // VillagerType.byBiome returns ResourceKey<VillagerType> in 1.21.11
+            // Need to look up the actual VillagerType from the registry
+            var typeKey = VillagerType.byBiome(level().getBiome(blockPosition()));
+            return BuiltInRegistries.VILLAGER_TYPE.getValue(typeKey);
         }
 
         if (d < 0.75D) {
@@ -512,11 +515,10 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     }
 
     @Override
-    public final void hurt(DamageSource source, float damageAmount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damageAmount) {
         // no baby squishes
         if (getVehicle() instanceof Player) {
-            super.hurt(source, 0.0f);
-            return;
+            return super.hurtServer(level, source, 0.0f);
         }
 
         // you can't hit babies!
@@ -526,8 +528,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             if (source.getEntity() instanceof Player && requestCooldown()) {
                 sendEventMessage(Component.translatable("villager.baby_hit"));
             }
-            super.hurt(source, 0.0f);
-            return;
+            return super.hurtServer(level, source, 0.0f);
         }
 
         // Guards take 50% less damage
@@ -539,39 +540,37 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             damageAmount *= 0.75f;
         }
 
-        if (!level().isClientSide()) {
-            // scream and loose hearts
-            if (source.getEntity() instanceof Player player) {
-                if (level().getGameTime() - lastHit > 40) {
-                    lastHit = level().getGameTime();
-                    if ((!isGuard() || getSmallBounty() == 0) && requestCooldown()) {
-                        if (getHealth() < getMaxHealth() / 2) {
-                            sendChatMessage(player, "villager.badly_hurt");
-                        } else {
-                            sendChatMessage(player, "villager.hurt");
-                        }
+        // scream and loose hearts (server-side only now guaranteed)
+        if (source.getEntity() instanceof Player player) {
+            if (level.getGameTime() - lastHit > 40) {
+                lastHit = level.getGameTime();
+                if ((!isGuard() || getSmallBounty() == 0) && requestCooldown()) {
+                    if (getHealth() < getMaxHealth() / 2) {
+                        sendChatMessage(player, "villager.badly_hurt");
+                    } else {
+                        sendChatMessage(player, "villager.hurt");
                     }
                 }
-
-                // loose hearts, the weaker the villager, the more it is scared. The first hit
-                // might be an accident.
-                int trustIssues = (int) ((1.0 - getHealth() / getMaxHealth() * 0.75) * (3.0 + 2.0 * damageAmount));
-                getVillagerBrain().getMemoriesForPlayer(player).modHearts(-trustIssues);
             }
 
-            // infect the villager
-            if (source.getDirectEntity() instanceof Zombie
-                    && getProfession() != ProfessionsMCA.GUARD
-                    && Config.getInstance().enableInfection
-                    && random.nextFloat() < Config.getInstance().zombieBiteInfectionChance
-                    && random.nextFloat() > (getVillagerData().getLevel() - 1)
-                            * Config.getInstance().infectionChanceDecreasePerLevel
-                    && (getResidency().getHomeVillage().filter(v -> v.hasBuilding("infirmary")).isEmpty()
-                            || random.nextBoolean())) {
-                setInfected(true);
-                sendChatToAllAround("villager.bitten");
-                MCA.LOGGER.info("{} has been infected", getName());
-            }
+            // loose hearts, the weaker the villager, the more it is scared. The first hit
+            // might be an accident.
+            int trustIssues = (int) ((1.0 - getHealth() / getMaxHealth() * 0.75) * (3.0 + 2.0 * damageAmount));
+            getVillagerBrain().getMemoriesForPlayer(player).modHearts(-trustIssues);
+        }
+
+        // infect the villager
+        if (source.getDirectEntity() instanceof Zombie
+                && getProfession() != ProfessionsMCA.GUARD
+                && Config.getInstance().enableInfection
+                && random.nextFloat() < Config.getInstance().zombieBiteInfectionChance
+                && random.nextFloat() > (getVillagerData().level() - 1)
+                        * Config.getInstance().infectionChanceDecreasePerLevel
+                && (getResidency().getHomeVillage().filter(v -> v.hasBuilding("infirmary")).isEmpty()
+                        || random.nextBoolean())) {
+            setInfected(true);
+            sendChatToAllAround("villager.bitten");
+            MCA.LOGGER.info("{} has been infected", getName());
         }
 
         Entity attacker = source.getEntity();
@@ -583,7 +582,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             getBrain().setMemory(MemoryModuleTypeMCA.SMALL_BOUNTY, getSmallBounty() + 1);
 
             Vec3 pos = position();
-            level().getEntitiesOfClass(VillagerEntityMCA.class, new AABB(pos, pos).inflate(32)).forEach(v -> {
+            level.getEntitiesOfClass(VillagerEntityMCA.class, new AABB(pos, pos).inflate(32)).forEach(v -> {
                 if (this.distanceToSqr(v) <= (v.getTarget() == null ? 1024 : 64)) {
                     if (attacker instanceof Player player) {
                         int bounty = v.getSmallBounty();
@@ -612,7 +611,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             damageAmount *= 0.0f;
         }
 
-        super.hurt(source, damageAmount);
+        return super.hurtServer(level, source, damageAmount);
     }
 
     private boolean requestCooldown() {
