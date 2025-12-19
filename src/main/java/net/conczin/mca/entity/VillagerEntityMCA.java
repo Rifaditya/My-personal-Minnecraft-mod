@@ -458,7 +458,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     private void copiedBeginTradeWith(Player customer) {
         this.copiedPrepareOffersFor(customer);
         this.setTradingPlayer(customer);
-        this.openTradingScreen(customer, this.getDisplayName(), this.getVillagerData().getLevel());
+        this.openTradingScreen(customer, this.getDisplayName(), this.getVillagerData().level());
     }
 
     private void copiedPrepareOffersFor(Player player) {
@@ -488,7 +488,9 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 ? relations.getPregnancy().createChild(Gender.getRandom(), partnerVillager)
                 : relations.getPregnancy().createChild(Gender.getRandom());
 
-        child.setVillagerData(child.getVillagerData().setType(getRandomType(partner)));
+        // Use withType with registry-wrapped holder for 1.21.11
+        var typeHolder = BuiltInRegistries.VILLAGER_TYPE.wrapAsHolder(getRandomType(partner));
+        child.setVillagerData(child.getVillagerData().withType(typeHolder));
 
         child.finalizeSpawn(level, level.getCurrentDifficultyAt(child.blockPosition()), EntitySpawnReason.BREEDING,
                 null);
@@ -499,14 +501,14 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         double d = random.nextDouble();
 
         if (d < 0.5D) {
-            return VillagerType.byBiome(level().getBiome(blockPosition()));
+            return VillagerType.byBiome(level().getBiome(blockPosition())).value();
         }
 
         if (d < 0.75D) {
-            return getVillagerData().getType();
+            return getVillagerData().type().value();
         }
 
-        return ((Villager) partner).getVillagerData().getType();
+        return ((Villager) partner).getVillagerData().type().value();
     }
 
     @Override
