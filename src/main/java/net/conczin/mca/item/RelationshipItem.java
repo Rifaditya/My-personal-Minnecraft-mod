@@ -43,3 +43,4 @@ public abstract class RelationshipItem extends TooltippedItem implements Special
         return true;
     }
 }
+

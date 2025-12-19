@@ -200,3 +200,4 @@ public class DestinyScreen extends VillagerEditorScreen {
         setPage("story");
     }
 }
+

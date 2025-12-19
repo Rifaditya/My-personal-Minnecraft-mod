@@ -52,3 +52,4 @@ public final class MCA {
         void register(EntityType<? extends LivingEntity> entity, AttributeSupplier.Builder attributes);
     }
 }
+

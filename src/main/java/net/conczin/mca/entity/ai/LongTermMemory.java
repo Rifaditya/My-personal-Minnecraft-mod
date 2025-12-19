@@ -78,3 +78,4 @@ public class LongTermMemory {
         return getMemory(id) > 0;
     }
 }
+

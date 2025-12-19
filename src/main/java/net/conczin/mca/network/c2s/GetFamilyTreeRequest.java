@@ -43,3 +43,4 @@ public record GetFamilyTreeRequest(UUID uuid) implements HandleablePayload {
         return TYPE;
     }
 }
+

@@ -71,3 +71,4 @@ public interface EntitiesMCA {
         ATTRIBUTES.forEach(helper::register);
     }
 }
+

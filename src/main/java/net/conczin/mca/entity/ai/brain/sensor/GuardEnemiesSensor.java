@@ -68,3 +68,4 @@ public class GuardEnemiesSensor extends Sensor<LivingEntity> {
         return getPriority(entity, null) >= 0;
     }
 }
+

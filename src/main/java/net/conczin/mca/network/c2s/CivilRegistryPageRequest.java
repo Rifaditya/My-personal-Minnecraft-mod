@@ -41,3 +41,4 @@ public record CivilRegistryPageRequest(int index, int from, int to) implements H
         return TYPE;
     }
 }
+

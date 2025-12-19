@@ -10,3 +10,4 @@ public class FabricMCAScreens extends MCAScreens implements IdentifiableResource
         return ID;
     }
 }
+

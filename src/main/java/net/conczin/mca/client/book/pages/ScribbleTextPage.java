@@ -29,3 +29,4 @@ public class ScribbleTextPage extends TextPage {
         super.render(screen, context, mouseX, mouseY, delta);
     }
 }
+

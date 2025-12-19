@@ -145,3 +145,4 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
         });
     }
 }
+

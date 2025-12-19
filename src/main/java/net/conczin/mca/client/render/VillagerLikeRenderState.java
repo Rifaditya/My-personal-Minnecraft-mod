@@ -58,3 +58,4 @@ public class VillagerLikeRenderState extends HumanoidRenderState {
     public boolean isBabyVillager = false;
     public float breastSize = 0f;
 }
+

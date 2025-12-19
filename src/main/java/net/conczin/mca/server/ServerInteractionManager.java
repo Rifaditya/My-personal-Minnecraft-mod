@@ -310,3 +310,4 @@ public class ServerInteractionManager {
         player.sendSystemMessage(message.withStyle(ChatFormatting.YELLOW));
     }
 }
+

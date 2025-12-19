@@ -38,3 +38,4 @@ public class EngagementRingItem extends RelationshipItem {
         return consume;
     }
 }
+

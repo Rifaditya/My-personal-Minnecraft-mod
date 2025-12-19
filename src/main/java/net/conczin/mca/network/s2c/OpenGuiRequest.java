@@ -55,3 +55,4 @@ public record OpenGuiRequest(int gui, int villager) implements HandleablePayload
         CLOSE,
     }
 }
+

@@ -14,3 +14,4 @@ public interface Status {
 
     byte MOB_SPAWN = 20;
 }
+

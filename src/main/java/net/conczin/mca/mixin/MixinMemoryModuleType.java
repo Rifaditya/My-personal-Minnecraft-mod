@@ -14,3 +14,4 @@ public interface MixinMemoryModuleType {
         return null;
     }
 }
+

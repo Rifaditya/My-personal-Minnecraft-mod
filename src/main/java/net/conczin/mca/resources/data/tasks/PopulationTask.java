@@ -44,3 +44,4 @@ public class PopulationTask extends Task {
         return Component.translatable("task.population", population);
     }
 }
+

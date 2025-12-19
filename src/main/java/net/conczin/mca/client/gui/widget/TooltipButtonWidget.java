@@ -19,3 +19,4 @@ public class TooltipButtonWidget extends ButtonWidget {
         super.setTooltip(Tooltip.create(Component.translatable(message + ".tooltip")));
     }
 }
+

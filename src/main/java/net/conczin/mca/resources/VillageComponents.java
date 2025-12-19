@@ -25,3 +25,4 @@ public class VillageComponents {
         return namePool.getOrDefault(from, NameSet.DEFAULT).toName(rng);
     }
 }
+

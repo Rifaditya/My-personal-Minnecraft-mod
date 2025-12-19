@@ -28,3 +28,4 @@ public class ElevenlabsSpeechManager extends RealtimeSpeechManager {
         RealtimeSpeechManager.download(output, this.url + voiceId + "?output_format=pcm_22050", payload, Config.getInstance().elevenlabsPrivateAPIkey);
     }
 }
+

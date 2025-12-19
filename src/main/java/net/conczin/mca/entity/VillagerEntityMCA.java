@@ -163,7 +163,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public void restock() {
         super.restock();
 
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             Optional<Village> village = residency.getHomeVillage();
             if (village.isPresent() && Config.getInstance().villagerRestockNotification) {
                 village.get().broadCastMessage((ServerLevel) level(), "events.restock", getName().getString());
@@ -289,7 +289,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     @Override
     public void setVillagerData(VillagerData data) {
-        boolean hasChanged = !level().isClientSide && getProfession() != data.getProfession() && data.getProfession() != ProfessionsMCA.OUTLAW;
+        boolean hasChanged = !level().isClientSide() && getProfession() != data.getProfession() && data.getProfession() != ProfessionsMCA.OUTLAW;
         super.setVillagerData(data);
         if (hasChanged) {
             randomizeClothes();
@@ -382,7 +382,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             getDialogueType(player);
 
             if (player.isShiftKeyDown()) {
-                if (!level().isClientSide && canTradeWithProfession()) {
+                if (!level().isClientSide() && canTradeWithProfession()) {
                     getInteractions().stopInteracting();
                     MixinVillagerInvoker invoker = (MixinVillagerInvoker) this;
                     invoker.invokeStartTrading(player);
@@ -405,21 +405,21 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         if (!stack.is(TagsMCA.Items.VILLAGER_EGGS) && isAlive() && !isTrading() && !isSleeping() && canInteractWithItemStackInHand(stack) && !getVillagerBrain().isPanicking()) {
             if (isBaby()) {
                 copiedSayNo();
-            } else if (!level().isClientSide) {
+            } else if (!level().isClientSide()) {
                 boolean hasOffers = hasTradeOffers();
                 if (hand == InteractionHand.MAIN_HAND) {
-                    if (!hasOffers && !level().isClientSide) {
+                    if (!hasOffers && !level().isClientSide()) {
                         copiedSayNo();
                     }
 
                     player.awardStat(Stats.TALKED_TO_VILLAGER);
                 }
 
-                if (hasOffers && !level().isClientSide) {
+                if (hasOffers && !level().isClientSide()) {
                     copiedBeginTradeWith(player);
                 }
             }
-            return InteractionResult.sidedSuccess(level().isClientSide);
+            return InteractionResult.sidedSuccess(level().isClientSide());
         }
         return InteractionResult.PASS;
     }
@@ -517,7 +517,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             damageAmount *= 0.75f;
         }
 
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             //scream and loose hearts
             if (source.getEntity() instanceof Player player) {
                 if (level().getGameTime() - lastHit > 40) {
@@ -629,7 +629,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             spawnBurntParticles();
         }
 
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             if (tickCount % 200 == 0 && getHealth() < getMaxHealth()) {
                 // if the villager has food they should try to eat.
                 ItemStack food = getMainHandItem();
@@ -698,7 +698,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             refreshDimensions();
         }
 
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             // procreate anim
             if (relations.isProcreating()) {
                 yHeadRot += 50;
@@ -840,13 +840,13 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         }
 
         //death message
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             getResidency().getHomeVillage().flatMap(Village::getCivilRegistry).ifPresent(r -> r.addText(getCombatTracker().getDeathMessage()));
         }
 
         super.die(cause);
 
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
 
@@ -1105,7 +1105,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     @Override
     public boolean setAgeState(AgeState state) {
         if (VillagerLike.super.setAgeState(state)) {
-            if (!level().isClientSide) {
+            if (!level().isClientSide()) {
                 // trigger grow up advancements
                 relations.getParents()
                         .filter(ServerPlayer.class::isInstance)
@@ -1369,3 +1369,4 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         this.updateTrades();
     }
 }
+

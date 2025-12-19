@@ -21,3 +21,4 @@ public class TombstoneBlockEntityRenderState extends BlockEntityRenderState {
     public float nameScale = 1.0f;
     public java.util.List<net.minecraft.util.FormattedCharSequence> nameLines = java.util.Collections.emptyList();
 }
+

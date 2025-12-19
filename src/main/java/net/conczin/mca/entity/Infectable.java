@@ -20,3 +20,4 @@ public interface Infectable {
 
     void setInfectionProgress(float progress);
 }
+

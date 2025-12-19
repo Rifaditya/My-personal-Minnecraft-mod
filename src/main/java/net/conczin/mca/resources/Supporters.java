@@ -50,3 +50,4 @@ public class Supporters extends SimpleJsonResourceReloadListener {
         return PoolUtil.pickOne(supporters, "nobody", rng);
     }
 }
+

@@ -251,3 +251,4 @@ public final class BuildingType {
         return blocks.values().stream().mapToInt(v -> v).sum();
     }
 }
+

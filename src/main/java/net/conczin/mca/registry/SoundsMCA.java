@@ -70,3 +70,4 @@ public interface SoundsMCA {
         SOUNDS.forEach(helper::register);
     }
 }
+

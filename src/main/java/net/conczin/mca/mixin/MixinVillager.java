@@ -31,3 +31,4 @@ abstract class MixinVillager implements IVillagerEntity {
         mca$reason = spawnType;
     }
 }
+

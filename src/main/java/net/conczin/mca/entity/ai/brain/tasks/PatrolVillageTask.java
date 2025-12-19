@@ -51,3 +51,4 @@ public class PatrolVillageTask extends Behavior<VillagerEntityMCA> {
         }).map(BlockPos::containing);
     }
 }
+

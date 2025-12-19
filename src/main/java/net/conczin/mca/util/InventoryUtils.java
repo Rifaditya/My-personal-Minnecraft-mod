@@ -112,3 +112,4 @@ public interface InventoryUtils {
         return comp == null ? base : comp.compute(base, EquipmentSlot.MAINHAND);
     }
 }
+

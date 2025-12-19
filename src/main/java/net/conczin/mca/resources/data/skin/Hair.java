@@ -33,3 +33,4 @@ public class Hair extends SkinListEntry {
         super(identifier, gender, chance);
     }
 }
+

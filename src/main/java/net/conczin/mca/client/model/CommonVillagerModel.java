@@ -106,3 +106,4 @@ public interface CommonVillagerModel<S extends VillagerLikeRenderState> {
         target.setBreastSize(getBreastSize());
     }
 }
+

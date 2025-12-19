@@ -29,3 +29,4 @@ public class SingleWeighedSoundEvents extends WeighedSoundEvents {
         return sound;
     }
 }
+

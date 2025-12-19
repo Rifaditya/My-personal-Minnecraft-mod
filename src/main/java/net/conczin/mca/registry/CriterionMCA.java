@@ -31,3 +31,4 @@ public interface CriterionMCA {
         TRIGGERS.forEach(helper::register);
     }
 }
+

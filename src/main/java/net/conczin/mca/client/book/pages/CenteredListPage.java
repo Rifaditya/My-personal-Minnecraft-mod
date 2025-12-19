@@ -44,3 +44,4 @@ public class CenteredListPage extends ListPage {
         }
     }
 }
+

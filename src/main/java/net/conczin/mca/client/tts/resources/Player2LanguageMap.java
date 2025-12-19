@@ -18,3 +18,4 @@ public class Player2LanguageMap {
         LANGUAGE_MAP.put("pt_br", "brazilian_portuguese");
     }
 }
+

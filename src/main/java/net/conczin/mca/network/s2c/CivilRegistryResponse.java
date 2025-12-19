@@ -47,3 +47,4 @@ public record CivilRegistryResponse(int index, List<String> lines) implements Ha
         return TYPE;
     }
 }
+

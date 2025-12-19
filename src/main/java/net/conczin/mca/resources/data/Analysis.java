@@ -77,3 +77,4 @@ public class Analysis implements Iterable<Analysis.AnalysisElement> {
     public record AnalysisElement(boolean positive, String value, String key) {
     }
 }
+

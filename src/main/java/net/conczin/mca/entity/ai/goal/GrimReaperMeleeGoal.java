@@ -148,3 +148,4 @@ public class GrimReaperMeleeGoal extends Goal {
         }
     }
 }
+

@@ -30,3 +30,4 @@ public record BabyNamingVillagerMessage(int slot, String name) implements Handle
         return TYPE;
     }
 }
+

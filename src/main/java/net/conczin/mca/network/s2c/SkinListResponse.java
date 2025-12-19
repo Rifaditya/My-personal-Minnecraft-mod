@@ -34,3 +34,4 @@ public record SkinListResponse(
         return TYPE;
     }
 }
+

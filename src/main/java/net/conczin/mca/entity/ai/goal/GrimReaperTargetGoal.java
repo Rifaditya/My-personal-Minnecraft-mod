@@ -44,3 +44,4 @@ public class GrimReaperTargetGoal extends Goal {
         return mob.getTarget() != null;
     }
 }
+

@@ -117,3 +117,4 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
         chosenActions.trigger(villager, player);
     }
 }
+

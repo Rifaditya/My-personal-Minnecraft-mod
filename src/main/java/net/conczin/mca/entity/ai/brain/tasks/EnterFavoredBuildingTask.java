@@ -41,3 +41,4 @@ public class EnterFavoredBuildingTask extends EnterBuildingTask {
         return Optional.empty();
     }
 }
+

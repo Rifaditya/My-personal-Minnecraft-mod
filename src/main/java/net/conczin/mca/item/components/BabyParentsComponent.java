@@ -33,3 +33,4 @@ public record BabyParentsComponent(
             BabyParentsComponent::new
     );
 }
+

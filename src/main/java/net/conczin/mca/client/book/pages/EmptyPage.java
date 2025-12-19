@@ -9,3 +9,4 @@ public class EmptyPage extends Page {
         // N/A
     }
 }
+

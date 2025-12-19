@@ -46,3 +46,4 @@ public class LegacyImageButton extends ImageButton {
         renderTexture(guiGraphics, Identifier, getX(), getY(), xTexStart, yTexStart, yDiffTex, width, height, textureWidth, textureHeight);
     }
 }
+

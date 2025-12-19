@@ -26,3 +26,4 @@ public class FamilyTreeItem extends TooltippedItem {
         return InteractionResultHolder.success(stack);
     }
 }
+

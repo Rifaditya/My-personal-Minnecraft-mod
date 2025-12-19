@@ -78,3 +78,4 @@ public class BowTask<E extends Mob & CrossbowAttackMob> extends Behavior<E> {
         entity.setAggressive(false);
     }
 }
+

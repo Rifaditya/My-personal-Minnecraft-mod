@@ -32,3 +32,4 @@ public class SkinLayer<S extends VillagerLikeRenderState, M extends HumanoidMode
                 state.infectionProgress);
     }
 }
+

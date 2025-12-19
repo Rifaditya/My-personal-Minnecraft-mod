@@ -75,3 +75,4 @@ public class PotionOfMetamorphosisItem extends TooltippedItem {
         entry.setGender(gender);
     }
 }
+

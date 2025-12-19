@@ -17,3 +17,4 @@ public class CribEntityRenderState extends EntityRenderState {
     public Identifier texture = null;
     public int entityId = 0;
 }
+

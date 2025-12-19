@@ -56,3 +56,4 @@ public class TitlePage extends Page {
         drawCenteredText(screen, context, screen.getTextRenderer(), subtitle, screen.width / 2 - 2, y, 0xFFFFFF);
     }
 }
+

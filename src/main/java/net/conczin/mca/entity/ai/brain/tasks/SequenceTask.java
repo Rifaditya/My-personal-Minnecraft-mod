@@ -58,3 +58,4 @@ public class SequenceTask<E extends LivingEntity> extends Behavior<E> {
         return false;
     }
 }
+

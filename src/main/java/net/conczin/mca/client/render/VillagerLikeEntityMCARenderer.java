@@ -123,3 +123,4 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         return state.infectionProgress > Infectable.FEVER_THRESHOLD;
     }
 }
+

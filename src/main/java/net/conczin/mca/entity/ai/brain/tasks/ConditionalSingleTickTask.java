@@ -22,3 +22,4 @@ public class ConditionalSingleTickTask<E extends LivingEntity> extends OneShot<E
         return predicate.test(entity) && task.trigger(world, entity, time);
     }
 }
+

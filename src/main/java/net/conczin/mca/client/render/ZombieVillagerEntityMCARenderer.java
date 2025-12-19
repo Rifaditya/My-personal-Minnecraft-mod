@@ -42,3 +42,4 @@ public class ZombieVillagerEntityMCARenderer extends VillagerLikeEntityMCARender
         return state.infectionProgress > 0;
     }
 }
+

@@ -37,3 +37,4 @@ public class AdvancementTask extends Task {
         return advancement != null && player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 }
+

@@ -16,3 +16,4 @@ public class LimitedLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
         return size() > maxSize;
     }
 }
+

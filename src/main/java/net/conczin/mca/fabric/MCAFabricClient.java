@@ -92,3 +92,4 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
         return Minecraft.getInstance().player;
     }
 }
+

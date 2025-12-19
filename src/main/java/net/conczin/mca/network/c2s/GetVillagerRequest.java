@@ -71,3 +71,4 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
         return TYPE;
     }
 }
+

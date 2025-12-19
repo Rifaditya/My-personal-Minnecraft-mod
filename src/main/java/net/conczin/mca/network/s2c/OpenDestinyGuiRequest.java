@@ -33,3 +33,4 @@ public record OpenDestinyGuiRequest(int player, boolean allowTeleportation) impl
         return TYPE;
     }
 }
+

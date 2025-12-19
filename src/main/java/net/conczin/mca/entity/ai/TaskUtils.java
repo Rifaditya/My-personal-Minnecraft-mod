@@ -40,3 +40,4 @@ public interface TaskUtils {
         return blocks.stream().min(Comparator.comparing(origin::distSqr)).orElse(null);
     }
 }
+

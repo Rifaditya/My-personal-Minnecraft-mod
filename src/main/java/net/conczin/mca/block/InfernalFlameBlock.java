@@ -22,3 +22,4 @@ public class InfernalFlameBlock extends BaseFireBlock {
         return true;
     }
 }
+

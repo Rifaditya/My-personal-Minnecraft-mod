@@ -123,3 +123,4 @@ public class GrimReaperEntityModel<S extends GrimReaperRenderState> extends Huma
         return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg);
     }
 }
+

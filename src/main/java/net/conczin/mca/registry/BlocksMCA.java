@@ -44,3 +44,4 @@ public interface BlocksMCA {
         BLOCKS.forEach((name, block) -> helper.register(MCA.locate(name), block));
     }
 }
+

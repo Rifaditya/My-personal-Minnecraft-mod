@@ -32,3 +32,4 @@ public class NbtCompoundDefaultGetters {
         return def;
     }
 }
+

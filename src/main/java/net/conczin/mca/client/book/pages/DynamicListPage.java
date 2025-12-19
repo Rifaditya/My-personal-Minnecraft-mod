@@ -23,3 +23,4 @@ public class DynamicListPage extends CenteredListPage {
         super.open(back);
     }
 }
+

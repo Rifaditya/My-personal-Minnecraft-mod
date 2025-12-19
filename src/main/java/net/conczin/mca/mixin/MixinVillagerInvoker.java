@@ -10,3 +10,4 @@ public interface MixinVillagerInvoker {
     @Invoker("startTrading")
     void invokeStartTrading(Player player);
 }
+

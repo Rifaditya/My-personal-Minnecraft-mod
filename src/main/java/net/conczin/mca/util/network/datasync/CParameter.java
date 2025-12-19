@@ -106,3 +106,4 @@ public interface CParameter<T, TrackedType> {
 
     EntityDataAccessor<TrackedType> createParam(Class<? extends Entity> type);
 }
+

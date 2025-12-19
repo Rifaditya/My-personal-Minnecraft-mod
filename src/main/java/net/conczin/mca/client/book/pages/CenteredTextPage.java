@@ -32,3 +32,4 @@ public class CenteredTextPage extends TextPage {
         }
     }
 }
+

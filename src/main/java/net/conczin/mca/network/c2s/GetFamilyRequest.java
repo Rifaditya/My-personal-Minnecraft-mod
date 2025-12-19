@@ -46,3 +46,4 @@ public record GetFamilyRequest() implements HandleablePayload {
         return TYPE;
     }
 }
+

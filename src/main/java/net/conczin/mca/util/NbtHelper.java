@@ -79,3 +79,4 @@ public interface NbtHelper {
         return GlobalPos.CODEC.parse(NbtOps.INSTANCE, element).resultOrPartial(MCA.LOGGER::error).orElse(null);
     }
 }
+

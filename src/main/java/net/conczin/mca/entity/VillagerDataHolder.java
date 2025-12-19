@@ -14,3 +14,4 @@ public interface VillagerDataHolder {
 
     void setVillagerData(VillagerData data);
 }
+

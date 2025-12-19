@@ -41,3 +41,4 @@ public record DamageItemMessage(String itemIdentifier) implements HandleablePayl
         return TYPE;
     }
 }
+

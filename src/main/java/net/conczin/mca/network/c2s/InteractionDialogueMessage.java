@@ -40,3 +40,4 @@ public record InteractionDialogueMessage(
         return TYPE;
     }
 }
+

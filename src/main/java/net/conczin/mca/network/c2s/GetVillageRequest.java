@@ -42,3 +42,4 @@ public record GetVillageRequest() implements HandleablePayload {
         return TYPE;
     }
 }
+

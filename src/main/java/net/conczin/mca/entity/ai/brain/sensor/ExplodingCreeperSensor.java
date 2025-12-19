@@ -17,3 +17,4 @@ public class ExplodingCreeperSensor extends NearestVisibleLivingEntitySensor {
         return MemoryModuleType.NEAREST_HOSTILE;
     }
 }
+

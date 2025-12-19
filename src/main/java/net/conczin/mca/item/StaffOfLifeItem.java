@@ -45,3 +45,4 @@ public class StaffOfLifeItem extends TooltippedItem {
         return false;
     }
 }
+

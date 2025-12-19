@@ -70,3 +70,4 @@ public class CribEntityModel<S extends CribEntityRenderState> extends EntityMode
         // Crib doesn't have animations
     }
 }
+

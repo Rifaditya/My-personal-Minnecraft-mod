@@ -35,3 +35,4 @@ public class VillagerFateCriterion extends SimpleCriterionTrigger<VillagerFateCr
         }
     }
 }
+

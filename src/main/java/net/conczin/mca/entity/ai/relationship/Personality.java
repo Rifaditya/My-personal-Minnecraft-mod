@@ -48,3 +48,4 @@ public enum Personality {
         return Component.translatable("personalityDescription." + name().toLowerCase(Locale.ENGLISH));
     }
 }
+

@@ -45,3 +45,4 @@ public interface SchedulesMCA {
         return getTypeSchedule(entity, Config.getInstance().allowAnyNightOwl);
     }
 }
+

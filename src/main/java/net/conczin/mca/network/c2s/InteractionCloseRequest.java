@@ -32,3 +32,4 @@ public record InteractionCloseRequest(UUID villagerUUID) implements HandleablePa
         return TYPE;
     }
 }
+

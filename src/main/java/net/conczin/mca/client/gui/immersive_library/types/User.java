@@ -14,3 +14,4 @@ public record User(int userid, String username, int likes_received, List<LiteCon
         this.moderator = moderator;
     }
 }
+

@@ -60,3 +60,4 @@ public enum EquipmentSet {
         return feet;
     }
 }
+

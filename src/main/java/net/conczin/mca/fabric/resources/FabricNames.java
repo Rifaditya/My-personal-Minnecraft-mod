@@ -10,3 +10,4 @@ public class FabricNames extends Names implements IdentifiableResourceReloadList
         return ID;
     }
 }
+

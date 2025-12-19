@@ -30,3 +30,4 @@ public class ExtendedPageTurnWidget extends PageButton {
         context.blit(texture, getX(), getY(), i, j, 23, 13);
     }
 }
+

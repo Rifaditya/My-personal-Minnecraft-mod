@@ -10,3 +10,4 @@ public class FabricGiftLoader extends GiftLoader implements IdentifiableResource
         return ID;
     }
 }
+

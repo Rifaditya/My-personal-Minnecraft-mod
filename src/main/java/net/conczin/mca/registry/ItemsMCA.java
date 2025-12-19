@@ -206,3 +206,4 @@ public interface ItemsMCA {
         ITEMS.forEach(helper::register);
     }
 }
+

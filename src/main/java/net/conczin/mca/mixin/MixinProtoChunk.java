@@ -30,3 +30,4 @@ abstract class MixinProtoChunk extends ChunkAccess {
         }
     }
 }
+

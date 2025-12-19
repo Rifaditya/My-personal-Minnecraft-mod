@@ -499,3 +499,4 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
         static final PlayerModel[] VALUES = values();
     }
 }
+

@@ -15,3 +15,4 @@ public interface CTrackedEntity<T extends Entity> {
         return getTypeDataManager().get((T) this, key);
     }
 }
+

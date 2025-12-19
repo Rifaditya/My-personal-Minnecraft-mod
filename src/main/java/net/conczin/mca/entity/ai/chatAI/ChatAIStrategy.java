@@ -11,3 +11,4 @@ import java.util.Optional;
 public interface ChatAIStrategy {
     Optional<String> answer(ServerPlayer player, VillagerEntityMCA villager, String msg);
 }
+

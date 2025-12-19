@@ -110,3 +110,4 @@ public enum AgeState implements VillagerDimensions {
         return (ordinal() - 1) * getStageDuration() - getMaxAge();
     }
 }
+

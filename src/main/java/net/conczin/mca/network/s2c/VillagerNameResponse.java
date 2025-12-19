@@ -26,3 +26,4 @@ public record VillagerNameResponse(String name) implements HandleablePayload {
         return TYPE;
     }
 }
+

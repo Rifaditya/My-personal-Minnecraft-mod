@@ -53,3 +53,4 @@ public abstract class MixinHumanoidArmorLayer<T extends LivingEntity, A extends 
         }
     }
 }
+

@@ -64,3 +64,4 @@ public class InteractionParticle extends TextureSheetParticle {
         }
     }
 }
+

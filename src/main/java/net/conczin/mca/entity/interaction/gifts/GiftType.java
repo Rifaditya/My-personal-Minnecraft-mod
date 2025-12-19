@@ -204,3 +204,4 @@ public class GiftType {
         better = extendingType.better;
     }
 }
+

@@ -11,3 +11,4 @@ public abstract class ClientProxyAbstractImpl extends ClientProxy.Impl {
         return networkHandler;
     }
 }
+

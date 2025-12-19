@@ -46,3 +46,4 @@ public class FamilyCriterion extends SimpleCriterionTrigger<FamilyCriterion.Trig
         }
     }
 }
+

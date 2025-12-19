@@ -26,3 +26,4 @@ public class BlueprintItem extends TooltippedItem {
         return InteractionResultHolder.success(stack);
     }
 }
+

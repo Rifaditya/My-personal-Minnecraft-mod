@@ -32,3 +32,4 @@ public record VillagerMessage(Component prefix, Component message, UUID uuid) im
         return TYPE;
     }
 }
+

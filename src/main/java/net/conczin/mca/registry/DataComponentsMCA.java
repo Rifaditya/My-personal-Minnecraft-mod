@@ -46,3 +46,4 @@ public interface DataComponentsMCA {
         COMPONENTS.forEach(helper::register);
     }
 }
+

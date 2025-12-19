@@ -42,3 +42,4 @@ public record InteractionDialogueInitMessage(UUID villagerUUID) implements Handl
         return TYPE;
     }
 }
+

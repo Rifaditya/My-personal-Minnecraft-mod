@@ -43,3 +43,4 @@ public class CribItemModelProvider extends FabricModelProvider {
         }
     }
 }
+

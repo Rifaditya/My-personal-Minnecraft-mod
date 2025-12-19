@@ -70,3 +70,4 @@ public abstract class AbstractChoreTask extends Behavior<VillagerEntityMCA> {
         villager.getVillagerBrain().abandonJob();
     }
 }
+

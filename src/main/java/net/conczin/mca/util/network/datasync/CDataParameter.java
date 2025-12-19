@@ -73,3 +73,4 @@ public class CDataParameter<T> implements CParameter<T, T> {
         void accept(A a, B b, C c);
     }
 }
+

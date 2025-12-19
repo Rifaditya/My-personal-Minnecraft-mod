@@ -77,3 +77,4 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
         return Arrays.stream(buttons.get(key)).filter(b -> b.identifier().equals(id)).findFirst();
     }
 }
+

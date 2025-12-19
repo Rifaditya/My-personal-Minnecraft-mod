@@ -16,3 +16,4 @@ public class UpdatableInventory extends SimpleContainer {
         }
     }
 }
+

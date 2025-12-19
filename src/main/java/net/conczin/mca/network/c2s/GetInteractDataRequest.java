@@ -46,3 +46,4 @@ public record GetInteractDataRequest(int id) implements HandleablePayload {
         return TYPE;
     }
 }
+

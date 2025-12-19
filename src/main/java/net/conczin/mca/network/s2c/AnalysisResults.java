@@ -26,3 +26,4 @@ public record AnalysisResults(Analysis analysis) implements HandleablePayload {
         return TYPE;
     }
 }
+

@@ -34,3 +34,4 @@ public class WeddingRingItem extends RelationshipItem {
         return true;
     }
 }
+

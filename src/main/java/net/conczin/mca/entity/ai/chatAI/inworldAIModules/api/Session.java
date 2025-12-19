@@ -6,3 +6,4 @@ public record Session(String name, SessionCharacter[] sessionCharacters, String 
         }
     }
 }
+

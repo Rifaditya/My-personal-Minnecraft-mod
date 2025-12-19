@@ -74,3 +74,4 @@ public class Nationality extends SavedData {
         return id;
     }
 }
+

@@ -14,3 +14,4 @@ public class ApiReloadListener implements ResourceManagerReloadListener {
         API.instance.init(manager);
     }
 }
+

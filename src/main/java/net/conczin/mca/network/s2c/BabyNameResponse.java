@@ -26,3 +26,4 @@ public record BabyNameResponse(String name) implements HandleablePayload {
         return TYPE;
     }
 }
+

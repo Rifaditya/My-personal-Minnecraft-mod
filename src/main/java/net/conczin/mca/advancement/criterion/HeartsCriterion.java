@@ -44,3 +44,4 @@ public class HeartsCriterion extends SimpleCriterionTrigger<HeartsCriterion.Trig
         }
     }
 }
+

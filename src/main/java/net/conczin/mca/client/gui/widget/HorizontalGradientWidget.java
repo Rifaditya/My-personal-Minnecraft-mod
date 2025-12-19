@@ -47,3 +47,4 @@ public class HorizontalGradientWidget extends HorizontalColorPickerWidget {
         context.blit(MCA_GUI_ICONS_TEXTURE, (int) (getX() + valueX * width) - 8, (int) (getY() + valueY * height) - 8, 240, 0, 16, 16, 256, 256);
     }
 }
+

@@ -64,3 +64,4 @@ public class Names extends SimpleJsonResourceReloadListener {
         Arrays.stream(NAMES_MAP.keySet().toArray()).sorted().forEach(n -> REGION_NAMES.add((String) n));
     }
 }
+

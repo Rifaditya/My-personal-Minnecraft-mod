@@ -82,3 +82,4 @@ public record GetVillageResponse(
         return TYPE;
     }
 }
+

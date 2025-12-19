@@ -14,3 +14,4 @@ public interface MixinSensorType {
         return null;
     }
 }
+

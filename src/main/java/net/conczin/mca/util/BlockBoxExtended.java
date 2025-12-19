@@ -27,3 +27,4 @@ public class BlockBoxExtended extends BoundingBox {
         return Math.max(Math.max(getXSpan(), getYSpan()), getZSpan());
     }
 }
+

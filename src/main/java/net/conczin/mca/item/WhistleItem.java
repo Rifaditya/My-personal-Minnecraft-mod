@@ -25,3 +25,4 @@ public class WhistleItem extends TooltippedItem {
         return InteractionResultHolder.success(stack);
     }
 }
+

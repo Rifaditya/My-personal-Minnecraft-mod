@@ -39,3 +39,4 @@ public class CribLanguageProvider extends FabricLanguageProvider {
         }
     }
 }
+

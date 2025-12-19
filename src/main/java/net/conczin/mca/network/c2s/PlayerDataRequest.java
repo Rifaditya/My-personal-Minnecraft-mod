@@ -39,3 +39,4 @@ public record PlayerDataRequest(UUID uuid) implements HandleablePayload {
         return TYPE;
     }
 }
+

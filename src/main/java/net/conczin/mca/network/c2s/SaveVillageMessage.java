@@ -43,3 +43,4 @@ public record SaveVillageMessage(
         return TYPE;
     }
 }
+

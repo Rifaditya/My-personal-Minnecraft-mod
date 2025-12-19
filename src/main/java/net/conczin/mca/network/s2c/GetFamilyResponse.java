@@ -31,3 +31,4 @@ public record GetFamilyResponse(CompoundTag nbt) implements HandleablePayload {
         return TYPE;
     }
 }
+

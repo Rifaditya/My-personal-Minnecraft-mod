@@ -76,3 +76,4 @@ public class CivilRegistryBook extends Book {
         loadedPages.put(index, new SimpleListPage(text));
     }
 }
+

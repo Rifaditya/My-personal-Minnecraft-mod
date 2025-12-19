@@ -64,3 +64,4 @@ public class InteractionPredicate {
         return conditionKeys;
     }
 }
+

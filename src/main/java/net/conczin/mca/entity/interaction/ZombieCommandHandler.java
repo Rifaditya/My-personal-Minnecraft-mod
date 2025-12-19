@@ -30,3 +30,4 @@ public class ZombieCommandHandler extends EntityCommandHandler<ZombieVillagerEnt
         return super.handle(player, command);
     }
 }
+

@@ -111,3 +111,4 @@ public class AudioCache {
         return String.format(Locale.ROOT, "%0" + (bytes.length << 1) + "X", bi);
     }
 }
+

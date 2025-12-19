@@ -22,3 +22,4 @@ public record CustomSkinsChangedMessage() implements HandleablePayload {
         return TYPE;
     }
 }
+

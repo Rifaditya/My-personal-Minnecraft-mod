@@ -12,3 +12,4 @@ public enum Response {
         return "gift." + name().toLowerCase(Locale.ENGLISH);
     }
 }
+

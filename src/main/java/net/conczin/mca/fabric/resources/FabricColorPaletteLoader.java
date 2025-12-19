@@ -10,3 +10,4 @@ public class FabricColorPaletteLoader extends ColorPaletteLoader implements Iden
         return ID;
     }
 }
+

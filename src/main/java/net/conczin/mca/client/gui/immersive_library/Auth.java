@@ -89,3 +89,4 @@ public class Auth {
         Util.getPlatform().openUri(url);
     }
 }
+

@@ -430,3 +430,4 @@ public class Village implements Iterable<Building> {
         return world != null ? Optional.of(CivilRegistryManager.get(world, this)) : Optional.empty();
     }
 }
+

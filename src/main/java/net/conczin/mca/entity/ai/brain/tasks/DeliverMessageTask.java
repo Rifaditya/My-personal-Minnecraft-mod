@@ -139,3 +139,4 @@ public class DeliverMessageTask extends Behavior<VillagerEntityMCA> {
         villager.getBrain().eraseMemory(MemoryModuleType.LOOK_TARGET);
     }
 }
+

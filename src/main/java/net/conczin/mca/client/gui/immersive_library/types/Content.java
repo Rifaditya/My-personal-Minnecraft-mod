@@ -17,3 +17,4 @@ public record Content(int contentid, int userid, String username, int likes, Set
         this.data = data;
     }
 }
+

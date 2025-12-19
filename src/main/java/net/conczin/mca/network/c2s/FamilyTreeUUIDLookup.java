@@ -41,3 +41,4 @@ public record FamilyTreeUUIDLookup(String search) implements HandleablePayload {
         return TYPE;
     }
 }
+

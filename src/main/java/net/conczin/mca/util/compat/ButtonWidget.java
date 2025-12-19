@@ -18,3 +18,4 @@ public class ButtonWidget extends net.minecraft.client.gui.components.Button {
         setTooltip(Tooltip.create(tooltip));
     }
 }
+

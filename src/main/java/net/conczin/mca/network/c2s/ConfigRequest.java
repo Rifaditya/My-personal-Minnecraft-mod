@@ -24,3 +24,4 @@ public record ConfigRequest() implements HandleablePayload {
         return TYPE;
     }
 }
+

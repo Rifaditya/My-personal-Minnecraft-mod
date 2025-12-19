@@ -29,3 +29,4 @@ public record InteractionDialogueQuestionResponse(Component questionText, boolea
         return TYPE;
     }
 }
+

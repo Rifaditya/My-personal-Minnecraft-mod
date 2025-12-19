@@ -67,3 +67,4 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
         }
     }
 }
+

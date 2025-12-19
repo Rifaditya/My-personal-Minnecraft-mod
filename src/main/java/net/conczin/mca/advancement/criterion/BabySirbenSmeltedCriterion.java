@@ -33,3 +33,4 @@ public class BabySirbenSmeltedCriterion extends SimpleCriterionTrigger<BabySirbe
         }
     }
 }
+

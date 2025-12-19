@@ -43,3 +43,4 @@ public class ColorPaletteLoader extends SimplePreparableReloadListener<Map<Ident
         });
     }
 }
+

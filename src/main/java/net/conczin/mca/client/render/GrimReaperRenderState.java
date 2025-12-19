@@ -11,3 +11,4 @@ public class GrimReaperRenderState extends HumanoidRenderState {
     // Attack state for animation
     public ReaperAttackState attackState = ReaperAttackState.IDLE;
 }
+

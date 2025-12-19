@@ -18,3 +18,4 @@ public class FabricCribRecipeProvider extends FabricRecipeProvider {
         CribRecipeProvider.generate(recipeOutput);
     }
 }
+

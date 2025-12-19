@@ -33,3 +33,4 @@ abstract class MixinHorseBase extends Animal implements ContainerListener, Playe
         }
     }
 }
+

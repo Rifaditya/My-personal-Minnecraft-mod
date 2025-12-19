@@ -65,3 +65,4 @@ public class Mood {
         return building;
     }
 }
+

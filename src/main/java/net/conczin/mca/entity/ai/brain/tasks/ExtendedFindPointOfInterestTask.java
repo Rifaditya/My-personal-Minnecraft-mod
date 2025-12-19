@@ -166,3 +166,4 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
         }
     }
 }
+

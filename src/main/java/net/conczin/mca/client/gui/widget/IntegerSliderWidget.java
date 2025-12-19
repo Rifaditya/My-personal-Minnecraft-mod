@@ -34,3 +34,4 @@ public class IntegerSliderWidget extends ExtendedSliderWidget<Integer> {
         return ((double) getValue() - min) / (max - min);
     }
 }
+

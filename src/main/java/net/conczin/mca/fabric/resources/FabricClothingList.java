@@ -10,3 +10,4 @@ public class FabricClothingList extends ClothingList implements IdentifiableReso
         return ID;
     }
 }
+

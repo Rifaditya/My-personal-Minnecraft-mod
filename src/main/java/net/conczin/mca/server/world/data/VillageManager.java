@@ -364,3 +364,4 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         into.merge(from);
     }
 }
+

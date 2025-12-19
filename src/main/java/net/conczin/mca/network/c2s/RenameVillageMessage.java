@@ -27,3 +27,4 @@ public record RenameVillageMessage(int id, String name) implements HandleablePay
         return TYPE;
     }
 }
+

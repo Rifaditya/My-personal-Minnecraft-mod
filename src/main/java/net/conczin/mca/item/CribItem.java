@@ -75,3 +75,4 @@ public class CribItem extends Item {
         return InteractionResult.sidedSuccess(world.isClientSide());
     }
 }
+

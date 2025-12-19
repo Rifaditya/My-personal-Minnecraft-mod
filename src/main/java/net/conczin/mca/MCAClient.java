@@ -106,3 +106,4 @@ public class MCAClient {
         return areShadersAllowed("shaders");
     }
 }
+

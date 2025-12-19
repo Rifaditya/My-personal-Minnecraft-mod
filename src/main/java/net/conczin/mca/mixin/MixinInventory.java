@@ -27,3 +27,4 @@ abstract class MixinInventory implements Container, Nameable {
         }
     }
 }
+

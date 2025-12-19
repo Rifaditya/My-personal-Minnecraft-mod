@@ -39,3 +39,4 @@ public class RankCriterion extends SimpleCriterionTrigger<RankCriterion.TriggerI
         }
     }
 }
+

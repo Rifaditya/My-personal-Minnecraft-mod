@@ -25,3 +25,4 @@ public class ZombieVillagerEntityModelMCA<S extends VillagerLikeRenderState> ext
         rightArmwear.setRotation(rightArm.xRot, rightArm.yRot, rightArm.zRot);
     }
 }
+

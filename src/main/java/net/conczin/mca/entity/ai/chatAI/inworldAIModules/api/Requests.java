@@ -79,3 +79,4 @@ public class Requests {
     public record SendTriggerRequest(TriggerEvent triggerEvent, String endUserId) {
     }
 }
+

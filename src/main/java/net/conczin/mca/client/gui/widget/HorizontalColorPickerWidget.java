@@ -14,3 +14,4 @@ public class HorizontalColorPickerWidget extends ColorPickerWidget {
         this.valueY = 0.5;
     }
 }
+

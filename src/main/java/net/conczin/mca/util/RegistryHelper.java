@@ -42,3 +42,4 @@ public class RegistryHelper {
         return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.registry().location());
     }
 }
+

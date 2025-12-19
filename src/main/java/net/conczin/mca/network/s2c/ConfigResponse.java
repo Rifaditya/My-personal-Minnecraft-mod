@@ -41,3 +41,4 @@ public record ConfigResponse(String json) implements HandleablePayload {
         return TYPE;
     }
 }
+

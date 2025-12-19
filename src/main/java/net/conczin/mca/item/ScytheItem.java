@@ -45,7 +45,7 @@ public class ScytheItem extends SwordItem {
 
         if (state.is(TagsMCA.Blocks.TOMBSTONES)) {
             return TombstoneBlock.Data.of(world.getBlockEntity(pos)).filter(TombstoneBlock.Data::hasEntity).map(data -> {
-                if (!context.getLevel().isClientSide) {
+                if (!context.getlevel().isClientSide()) {
                     CriterionMCA.GENERIC_EVENT.trigger((ServerPlayer) context.getPlayer(), cure ? "staffOfLife" : "scytheRevive");
                 }
 
@@ -159,3 +159,4 @@ public class ScytheItem extends SwordItem {
         return stack.getItem() == ingredient.getItem();
     }
 }
+

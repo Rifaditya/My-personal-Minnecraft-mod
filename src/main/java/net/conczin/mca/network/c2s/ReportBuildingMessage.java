@@ -81,3 +81,4 @@ public record ReportBuildingMessage(Action action, String data) implements Handl
         FULL_SCAN
     }
 }
+

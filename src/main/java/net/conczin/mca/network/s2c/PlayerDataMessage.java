@@ -31,3 +31,4 @@ public record PlayerDataMessage(UUID uuid, CompoundTag nbt) implements Handleabl
         return TYPE;
     }
 }
+

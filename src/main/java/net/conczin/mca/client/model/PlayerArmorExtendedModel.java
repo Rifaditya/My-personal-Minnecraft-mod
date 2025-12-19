@@ -96,3 +96,4 @@ public class PlayerArmorExtendedModel<S extends VillagerLikeRenderState> extends
         applyVillagerDimensions(state, state.isCrouching);
     }
 }
+

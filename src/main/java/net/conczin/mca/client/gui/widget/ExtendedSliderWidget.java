@@ -54,3 +54,4 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
         context.renderComponentTooltip(Minecraft.getInstance().font, FlowingText.wrap(tooltipSupplier.get(), 160), mouseX, mouseY);
     }
 }
+

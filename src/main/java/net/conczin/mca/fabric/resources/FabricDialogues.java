@@ -10,3 +10,4 @@ public class FabricDialogues extends Dialogues implements IdentifiableResourceRe
         return ID;
     }
 }
+

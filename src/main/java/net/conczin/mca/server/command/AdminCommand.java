@@ -365,3 +365,4 @@ public class AdminCommand {
         commandSender.sendSystemMessage(Component.literal(GOLD + "[MCA] " + RESET + message));
     }
 }
+

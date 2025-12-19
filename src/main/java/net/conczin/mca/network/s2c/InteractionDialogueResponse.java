@@ -36,3 +36,4 @@ public record InteractionDialogueResponse(String question, List<String> answers)
         return TYPE;
     }
 }
+

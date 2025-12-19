@@ -33,3 +33,4 @@ public class VillagerEntityMCARenderer extends VillagerLikeEntityMCARenderer<Vil
         return new VillagerEntityModelMCA<>(LayerDefinition.create(data, 64, 64).bakeRoot());
     }
 }
+

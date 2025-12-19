@@ -103,3 +103,4 @@ public class SkinPorter {
     private record UVMapping(int x0, int y0, int x1, int y1, int offsetX, int offsetY, boolean flip) {
     }
 }
+

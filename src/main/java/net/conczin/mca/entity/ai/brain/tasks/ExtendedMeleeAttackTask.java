@@ -64,3 +64,4 @@ public class ExtendedMeleeAttackTask extends Behavior<Mob> {
         return mobEntity.getBrain().getMemoryInternal(target).get();
     }
 }
+

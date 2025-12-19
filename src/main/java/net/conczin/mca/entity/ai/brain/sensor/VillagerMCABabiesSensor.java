@@ -34,3 +34,4 @@ public class VillagerMCABabiesSensor extends Sensor<LivingEntity> {
         return entity.getBrain().getMemoryInternal(MemoryModuleType.NEAREST_VISIBLE_LIVING_ENTITIES).orElseGet(NearestVisibleLivingEntities::empty);
     }
 }
+

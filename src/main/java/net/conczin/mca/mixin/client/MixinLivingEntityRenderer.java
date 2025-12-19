@@ -21,3 +21,4 @@ public class MixinLivingEntityRenderer<T extends LivingEntity> {
         }
     }
 }
+

@@ -21,3 +21,4 @@ public class ToggleableTooltipButtonWidget extends TooltipButtonWidget {
         return i;
     }
 }
+

@@ -24,3 +24,4 @@ public interface ParticleTypesMCA {
         PARTICLES.forEach(helper::register);
     }
 }
+

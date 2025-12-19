@@ -51,3 +51,4 @@ public class Clothing extends SkinListEntry {
         return j;
     }
 }
+

@@ -56,3 +56,4 @@ public interface MessagesMCA {
         c.register(VillagerNameResponse.TYPE, VillagerNameResponse.STREAM_CODEC, false);
     }
 }
+

@@ -118,3 +118,4 @@ public class FishingTask extends AbstractChoreTask {
         }
     }
 }
+

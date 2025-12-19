@@ -10,3 +10,4 @@ public class FabricBuildingTypes extends BuildingTypes implements IdentifiableRe
         return ID;
     }
 }
+

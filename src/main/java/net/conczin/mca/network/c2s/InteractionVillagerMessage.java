@@ -34,3 +34,4 @@ public record InteractionVillagerMessage(String command, UUID villagerUUID) impl
         return TYPE;
     }
 }
+

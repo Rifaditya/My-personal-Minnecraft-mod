@@ -11,3 +11,4 @@ public class VillagerTrackerSearchScreen extends FamilyTreeSearchScreen {
         Network.sendToServer(new SetTargetMessage(name, villager));
     }
 }
+

@@ -29,3 +29,4 @@ public record FamilyTreeUUIDResponse(List<FamilyTreeSearchScreen.Entry> list) im
         return TYPE;
     }
 }
+

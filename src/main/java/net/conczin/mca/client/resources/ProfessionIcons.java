@@ -34,3 +34,4 @@ public class ProfessionIcons {
         ICONS.put("mca.cultist", Items.BOOK.getDefaultInstance());
     }
 }
+

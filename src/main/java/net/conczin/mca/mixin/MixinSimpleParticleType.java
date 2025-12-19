@@ -11,3 +11,4 @@ public interface MixinSimpleParticleType {
         return null;
     }
 }
+

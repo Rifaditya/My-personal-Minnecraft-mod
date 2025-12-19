@@ -25,3 +25,4 @@ public class StatusEffectDangerSet {
         IS_DANGER.add(MobEffects.MOVEMENT_SPEED);
     }
 }
+

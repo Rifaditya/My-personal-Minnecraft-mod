@@ -73,3 +73,4 @@ public class VillagerTrackerItem extends Item {
         tooltip.addAll(FlowingText.wrap(Component.translatable(getDescriptionId(stack) + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
     }
 }
+

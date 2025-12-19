@@ -32,3 +32,4 @@ public class GenericEventCriterion extends SimpleCriterionTrigger<GenericEventCr
         }
     }
 }
+

@@ -24,3 +24,4 @@ public record SerializablePair<L, R>(L left, R right) {
         );
     }
 }
+

@@ -33,3 +33,4 @@ public class StayTask extends Behavior<VillagerEntityMCA> {
         villager.getBrain().eraseMemory(MemoryModuleType.WALK_TARGET);
     }
 }
+

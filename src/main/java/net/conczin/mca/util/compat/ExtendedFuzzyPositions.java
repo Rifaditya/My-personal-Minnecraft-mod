@@ -16,3 +16,4 @@ public class ExtendedFuzzyPositions {
         return pos;
     }
 }
+

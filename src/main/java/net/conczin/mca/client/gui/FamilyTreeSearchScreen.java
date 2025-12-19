@@ -151,3 +151,4 @@ public class FamilyTreeSearchScreen extends Screen {
         );
     }
 }
+

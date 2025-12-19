@@ -20,3 +20,4 @@ public interface MixinVillagerProfession {
         return null;
     }
 }
+

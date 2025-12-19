@@ -10,3 +10,4 @@ public class FabricTasks extends Tasks implements IdentifiableResourceReloadList
         return ID;
     }
 }
+

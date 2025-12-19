@@ -45,3 +45,4 @@ public class BuildingTask extends Task {
         return Component.translatable("task.build", Component.translatable("buildingType." + building));
     }
 }
+

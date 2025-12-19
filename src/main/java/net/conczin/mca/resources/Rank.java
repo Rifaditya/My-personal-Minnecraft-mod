@@ -45,3 +45,4 @@ public enum Rank {
         return "gui.village.rank." + name().toLowerCase(Locale.ENGLISH);
     }
 }
+

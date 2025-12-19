@@ -37,3 +37,4 @@ public class ClothingLayer<S extends VillagerLikeRenderState, M extends Humanoid
         });
     }
 }
+

@@ -30,3 +30,4 @@ public record VillagerNameRequest(Gender gender) implements HandleablePayload {
         return TYPE;
     }
 }
+

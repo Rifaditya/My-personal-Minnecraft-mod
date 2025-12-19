@@ -25,3 +25,4 @@ public interface ActivitiesMCA {
         ACTIVITIES.forEach(helper::register);
     }
 }
+

@@ -140,3 +140,4 @@ public class CribEntityRenderer extends EntityRenderer<CribEntity, CribEntityRen
         return state.texture;
     }
 }
+

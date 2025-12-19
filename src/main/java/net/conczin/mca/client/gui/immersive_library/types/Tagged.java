@@ -14,3 +14,4 @@ public interface Tagged {
         return false;
     }
 }
+

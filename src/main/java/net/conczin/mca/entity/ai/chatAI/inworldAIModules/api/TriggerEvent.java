@@ -4,3 +4,4 @@ public record TriggerEvent(String trigger, Parameter[] parameters) {
     public record Parameter(String name, String value) {
     }
 }
+

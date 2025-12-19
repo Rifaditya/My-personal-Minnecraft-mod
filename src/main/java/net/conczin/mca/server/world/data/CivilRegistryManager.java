@@ -45,3 +45,4 @@ public class CivilRegistryManager extends SavedData {
         return to <= from ? List.of() : entries.subList(from, to);
     }
 }
+

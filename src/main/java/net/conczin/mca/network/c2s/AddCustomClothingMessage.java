@@ -46,3 +46,4 @@ public record AddCustomClothingMessage(String identifier, boolean isHair, String
         return TYPE;
     }
 }
+

@@ -45,3 +45,4 @@ public interface ClientHandler {
 
     void handleCivilRegistryResponse(CivilRegistryResponse response);
 }
+

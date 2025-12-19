@@ -59,3 +59,4 @@ public class MoodGroup {
         return moods.get(level);
     }
 }
+

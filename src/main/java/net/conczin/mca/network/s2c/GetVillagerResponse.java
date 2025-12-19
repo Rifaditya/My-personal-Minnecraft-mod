@@ -31,3 +31,4 @@ public record GetVillagerResponse(CompoundTag data) implements HandleablePayload
         return TYPE;
     }
 }
+

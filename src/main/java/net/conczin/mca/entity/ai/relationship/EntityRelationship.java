@@ -168,3 +168,4 @@ public interface EntityRelationship {
         return getPartnerUUID().orElse(new UUID(0, 0)).equals(uuid) && isEngaged();
     }
 }
+

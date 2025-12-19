@@ -59,3 +59,4 @@ public class CEnumParameter<T extends Enum<T>> implements CParameter<T, Integer>
         return SynchedEntityData.defineId(type, EntityDataSerializers.INT);
     }
 }
+

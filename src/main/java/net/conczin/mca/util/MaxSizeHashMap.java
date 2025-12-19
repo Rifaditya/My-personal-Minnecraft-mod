@@ -15,3 +15,4 @@ public class MaxSizeHashMap<K, V> extends LinkedHashMap<K, V> {
         return size() > maxSize;
     }
 }
+

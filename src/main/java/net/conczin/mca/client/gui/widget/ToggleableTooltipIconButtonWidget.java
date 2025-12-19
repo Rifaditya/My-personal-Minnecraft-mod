@@ -35,3 +35,4 @@ public class ToggleableTooltipIconButtonWidget extends ToggleableTooltipButtonWi
         context.blit(ICON_TEXTURES, this.getX(), this.getY(), u, v + offset, this.width, this.height);
     }
 }
+

@@ -40,3 +40,4 @@ public record SetTargetMessage(String targetName, UUID targetUUID) implements Ha
         return TYPE;
     }
 }
+

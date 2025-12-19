@@ -37,3 +37,4 @@ public record GetFamilyTreeResponse(UUID uuid, Map<UUID, FamilyTreeNode> family)
         return TYPE;
     }
 }
+

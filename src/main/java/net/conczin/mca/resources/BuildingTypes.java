@@ -59,3 +59,4 @@ public class BuildingTypes extends SimpleJsonResourceReloadListener implements I
         return buildingTypesClient.values().iterator();
     }
 }
+

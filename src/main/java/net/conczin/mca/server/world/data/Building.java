@@ -468,3 +468,4 @@ public class Building {
         INVALID_TYPE
     }
 }
+

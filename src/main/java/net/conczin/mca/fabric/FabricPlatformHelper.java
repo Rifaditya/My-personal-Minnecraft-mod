@@ -9,3 +9,4 @@ public class FabricPlatformHelper extends PlatformHelper {
         return FabricLoader.getInstance().isModLoaded(namespace);
     }
 }
+

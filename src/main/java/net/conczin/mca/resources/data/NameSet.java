@@ -47,3 +47,4 @@ public final class NameSet {
         return toTitleCase(first) + separator() + toTitleCase(second);
     }
 }
+

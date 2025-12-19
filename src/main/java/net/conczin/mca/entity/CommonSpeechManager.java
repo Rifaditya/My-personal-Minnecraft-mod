@@ -8,3 +8,4 @@ public class CommonSpeechManager {
     public final LimitedLinkedHashMap<ComponentContents, String> translations = new LimitedLinkedHashMap<>(100);
     public String lastResolvedKey;
 }
+

@@ -43,3 +43,4 @@ public class TaskRegistry {
         return decoder.apply(json);
     }
 }
+

@@ -94,3 +94,4 @@ public class GrimReaperRestGoal extends Goal {
         }
     }
 }
+

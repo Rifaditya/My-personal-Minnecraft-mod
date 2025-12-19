@@ -72,3 +72,4 @@ public class GrimReaperIdleGoal extends Goal {
         super.stop();
     }
 }
+

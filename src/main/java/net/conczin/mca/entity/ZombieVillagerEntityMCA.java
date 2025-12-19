@@ -198,7 +198,7 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
     public void die(DamageSource cause) {
         super.die(cause);
 
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             return;
         }
 
@@ -274,3 +274,4 @@ public class ZombieVillagerEntityMCA extends ZombieVillager implements VillagerL
         return !isPersistenceRequired();
     }
 }
+

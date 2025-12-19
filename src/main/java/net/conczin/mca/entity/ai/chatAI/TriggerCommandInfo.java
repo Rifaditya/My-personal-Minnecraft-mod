@@ -23,3 +23,4 @@ public class TriggerCommandInfo {
         this(command, description, call, (p, v) -> true);
     }
 }
+

@@ -88,3 +88,4 @@ public class ColorPickerWidget extends AbstractWidget {
         void apply(A a, B b);
     }
 }
+

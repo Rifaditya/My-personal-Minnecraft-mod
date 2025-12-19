@@ -47,3 +47,4 @@ public record GetInteractDataResponse(
         return TYPE;
     }
 }
+

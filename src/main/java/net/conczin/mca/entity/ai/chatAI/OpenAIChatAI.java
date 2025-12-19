@@ -318,3 +318,4 @@ public class OpenAIChatAI implements ChatAIStrategy {
     public record Answer(StructuredResponse answer, String error) {
     }
 }
+

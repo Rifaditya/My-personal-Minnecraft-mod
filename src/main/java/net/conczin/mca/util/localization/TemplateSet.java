@@ -47,3 +47,4 @@ class TemplateSet {
         return buffer.toString();
     }
 }
+

@@ -23,3 +23,4 @@ public class ItemButtonWidget extends TooltipButtonWidget {
         context.renderItem(item, getX() + (width - size) / 2, getY() + (height - size) / 2);
     }
 }
+

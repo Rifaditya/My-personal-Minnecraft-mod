@@ -84,3 +84,4 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         return TYPE;
     }
 }
+

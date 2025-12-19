@@ -80,3 +80,4 @@ public interface ProfessionsMCA {
         CAN_NOT_TRADE.add(VillagerProfession.NITWIT);
     }
 }
+

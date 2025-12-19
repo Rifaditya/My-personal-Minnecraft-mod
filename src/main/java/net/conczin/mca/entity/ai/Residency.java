@@ -218,3 +218,4 @@ public class Residency {
         }, () -> entity.sendChatMessage(player, "interaction.gohome.fail.nohome"));
     }
 }
+

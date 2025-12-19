@@ -30,3 +30,4 @@ public record BabyNameRequest(Gender gender) implements HandleablePayload {
         return TYPE;
     }
 }
+

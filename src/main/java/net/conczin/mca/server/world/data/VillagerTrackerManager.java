@@ -56,3 +56,4 @@ public class VillagerTrackerManager extends SavedData {
         return entries.get(id);
     }
 }
+

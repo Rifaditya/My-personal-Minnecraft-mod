@@ -111,3 +111,4 @@ public class HuntingTask extends AbstractChoreTask {
         }
     }
 }
+

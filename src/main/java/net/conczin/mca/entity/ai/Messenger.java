@@ -148,3 +148,4 @@ public interface Messenger extends EntityWrapper {
         sendEventMessage(((Entity) this).level(), message);
     }
 }
+

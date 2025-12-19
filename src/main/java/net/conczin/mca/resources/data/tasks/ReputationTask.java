@@ -44,3 +44,4 @@ public class ReputationTask extends Task {
         return Component.translatable("task.reputation", reputation);
     }
 }
+

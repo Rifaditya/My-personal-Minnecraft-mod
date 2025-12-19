@@ -36,3 +36,4 @@ public class Schedule {
         return "Schedule{" + name + "}";
     }
 }
+

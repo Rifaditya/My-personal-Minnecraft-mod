@@ -152,3 +152,4 @@ public class VillagerEntityModelMCA<S extends VillagerLikeRenderState> extends V
         rightLegwear.visible = model.rightLeg.visible;
     }
 }
+

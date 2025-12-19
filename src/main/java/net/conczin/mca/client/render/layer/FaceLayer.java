@@ -48,3 +48,4 @@ public class FaceLayer<S extends VillagerLikeRenderState, M extends HumanoidMode
         return cached("skins/face/" + variant + "/" + gender + "/" + index + blinkTexture + ".png", MCA::locate);
     }
 }
+

@@ -193,7 +193,7 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         }
 
         // Randomly portal behind the player who just attacked.
-        if (!level().isClientSide && random.nextFloat() >= 0.30F && attacker != null) {
+        if (!level().isClientSide() && random.nextFloat() >= 0.30F && attacker != null) {
             double deltaX = this.getX() - attacker.getX();
             double deltaZ = this.getZ() - attacker.getZ();
             double distance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
@@ -275,3 +275,4 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         bossInfo.removePlayer(player);
     }
 }
+

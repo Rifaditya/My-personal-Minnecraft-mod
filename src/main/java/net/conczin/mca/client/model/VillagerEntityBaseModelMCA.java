@@ -159,3 +159,4 @@ public class VillagerEntityBaseModelMCA<S extends VillagerLikeRenderState> exten
         this.breastSize = breastSize;
     }
 }
+

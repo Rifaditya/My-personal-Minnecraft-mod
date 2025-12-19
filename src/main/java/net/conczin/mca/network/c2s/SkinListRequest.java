@@ -42,3 +42,4 @@ public record SkinListRequest() implements HandleablePayload {
         return TYPE;
     }
 }
+

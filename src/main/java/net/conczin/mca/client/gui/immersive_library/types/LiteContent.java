@@ -15,3 +15,4 @@ public record LiteContent(int contentid, int userid, String username, int likes,
         this.version = version;
     }
 }
+

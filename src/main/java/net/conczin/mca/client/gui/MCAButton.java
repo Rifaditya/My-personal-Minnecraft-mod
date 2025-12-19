@@ -127,3 +127,4 @@ public final class MCAButton {
         return getConstraints().allMatch(constraints::contains);
     }
 }
+

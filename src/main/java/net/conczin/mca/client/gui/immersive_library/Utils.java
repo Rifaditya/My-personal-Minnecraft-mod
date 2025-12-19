@@ -52,3 +52,4 @@ public class Utils {
         return errors < pixels && brightness > 160.0;
     }
 }
+

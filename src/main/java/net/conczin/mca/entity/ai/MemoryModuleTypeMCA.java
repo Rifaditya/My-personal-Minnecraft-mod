@@ -36,3 +36,4 @@ public interface MemoryModuleTypeMCA {
         MEMORY_MODULES.forEach(helper::register);
     }
 }
+

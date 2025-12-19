@@ -41,3 +41,4 @@ public record RemoveCustomClothingMessage(Type kind, String identifier) implemen
         HAIR
     }
 }
+

@@ -138,3 +138,4 @@ public class LazyFindPointOfInterestTask extends AcquirePoi {
         }
     }
 }
+

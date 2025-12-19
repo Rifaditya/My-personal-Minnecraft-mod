@@ -13,3 +13,4 @@ public class CribDatagen implements DataGeneratorEntrypoint {
         pack.addProvider(CribItemModelProvider::new);
     }
 }
+

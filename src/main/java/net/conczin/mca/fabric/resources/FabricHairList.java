@@ -10,3 +10,4 @@ public class FabricHairList extends HairList implements IdentifiableResourceRelo
         return ID;
     }
 }
+

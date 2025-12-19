@@ -49,3 +49,4 @@ public record FlowingText(List<FormattedCharSequence> lines, float scale) {
         }
     }
 }
+

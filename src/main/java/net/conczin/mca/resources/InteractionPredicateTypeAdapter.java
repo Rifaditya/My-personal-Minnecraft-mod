@@ -16,3 +16,4 @@ public class InteractionPredicateTypeAdapter implements JsonDeserializer<Interac
         return InteractionPredicate.fromJson(json.getAsJsonObject());
     }
 }
+

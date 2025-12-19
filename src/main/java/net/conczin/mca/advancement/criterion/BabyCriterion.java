@@ -39,3 +39,4 @@ public class BabyCriterion extends SimpleCriterionTrigger<BabyCriterion.TriggerI
         }
     }
 }
+

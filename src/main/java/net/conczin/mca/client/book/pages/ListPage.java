@@ -40,3 +40,4 @@ public abstract class ListPage extends Page {
 
     abstract int getEntriesPerPage();
 }
+

@@ -22,3 +22,4 @@ public class NamedTextFieldWidget extends EditBox {
         context.drawString(textRenderer, orderedText, (getX() - textRenderer.width(orderedText) - 4), getY() + (height - 8) / 2, 0xffffff);
     }
 }
+

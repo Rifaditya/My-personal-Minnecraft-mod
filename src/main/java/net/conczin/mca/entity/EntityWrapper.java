@@ -7,3 +7,4 @@ public interface EntityWrapper {
         return (Mob) this;
     }
 }
+

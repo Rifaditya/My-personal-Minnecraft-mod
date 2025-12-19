@@ -54,3 +54,4 @@ public class HairLayer<S extends VillagerLikeRenderState, M extends HumanoidMode
                 0);
     }
 }
+

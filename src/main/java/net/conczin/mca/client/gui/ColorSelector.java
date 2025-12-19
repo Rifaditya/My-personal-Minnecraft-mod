@@ -74,3 +74,4 @@ class ColorSelector {
         return 0xFF000000 | getBlue() << 16 | getGreen() << 8 | getRed();
     }
 }
+

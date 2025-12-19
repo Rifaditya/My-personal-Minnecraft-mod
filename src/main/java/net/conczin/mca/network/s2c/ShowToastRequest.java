@@ -36,3 +36,4 @@ public record ShowToastRequest(String title, String message) implements Handleab
         return TYPE;
     }
 }
+

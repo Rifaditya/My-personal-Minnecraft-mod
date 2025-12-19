@@ -36,3 +36,4 @@ public record CallToPlayerMessage(UUID uuid) implements HandleablePayload {
         return TYPE;
     }
 }
+

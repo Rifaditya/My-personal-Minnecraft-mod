@@ -44,3 +44,4 @@ public class BlockEntityTypesMCA {
         T create(BlockPos pos, BlockState state);
     }
 }
+

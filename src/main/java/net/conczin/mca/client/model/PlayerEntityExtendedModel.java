@@ -163,3 +163,4 @@ public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extend
         rightPants.visible = model.rightLeg.visible;
     }
 }
+

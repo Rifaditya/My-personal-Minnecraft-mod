@@ -62,3 +62,4 @@ public class ExtendedForgetCompletedPointOfInterestTask {
         return blockState.is(BlockTags.BEDS) && blockState.getValue(BedBlock.OCCUPIED) && !entity.isSleeping();
     }
 }
+

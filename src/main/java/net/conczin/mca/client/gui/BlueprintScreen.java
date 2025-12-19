@@ -638,3 +638,4 @@ public class BlueprintScreen extends ExtendedScreen {
         this.tasks = tasks;
     }
 }
+

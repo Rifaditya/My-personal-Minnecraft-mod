@@ -60,3 +60,4 @@ public class MatchmakersRingItem extends Item implements SpecialCaseGift {
         return true;
     }
 }
+

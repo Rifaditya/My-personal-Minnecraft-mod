@@ -282,3 +282,4 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
         entity.getVillagerBrain().modifyMoodValue(hearts);
     }
 }
+
