@@ -26,6 +26,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -35,7 +36,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.sheep.Sheep;
+// Sheep import removed - use DyeColor.getEntityColor() instead of Sheep.getColor()
 import net.conczin.mca.entity.VillagerDataHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -246,7 +247,12 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
         int components = color.getTextureDiffuseColor();
         int dye = getHairDye();
         if (dye > 0) {
-            components = ARGB.lerp(0.5f, components, dye);
+            // ARGB.lerp replaced with manual component lerp in 1.21.11
+            int a = (int) Mth.lerp(0.5f, ARGB.alpha(components), ARGB.alpha(dye));
+            int r = (int) Mth.lerp(0.5f, ARGB.red(components), ARGB.red(dye));
+            int g = (int) Mth.lerp(0.5f, ARGB.green(components), ARGB.green(dye));
+            int b = (int) Mth.lerp(0.5f, ARGB.blue(components), ARGB.blue(dye));
+            components = ARGB.color(a, r, g, b);
         }
 
         setTrackedValue(HAIR_COLOR_RED, ARGB.red(components) / 255.0f);
@@ -383,9 +389,15 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
                 int p = n % o;
                 int q = (n + 1) % o;
                 float r = entity.getRandom().nextFloat();
-                int fs = Sheep.getColor(DyeColor.byId(p));
-                int gs = Sheep.getColor(DyeColor.byId(q));
-                int color = ARGB.lerp(r, fs, gs);
+                // Use DyeColor.getTextureDiffuseColor() for entity color in 1.21.11
+                int fs = DyeColor.byId(p).getTextureDiffuseColor();
+                int gs = DyeColor.byId(q).getTextureDiffuseColor();
+                // Manual ARGB lerp per component
+                int ar = (int) Mth.lerp(r, ARGB.alpha(fs), ARGB.alpha(gs));
+                int rr = (int) Mth.lerp(r, ARGB.red(fs), ARGB.red(gs));
+                int gr = (int) Mth.lerp(r, ARGB.green(fs), ARGB.green(gs));
+                int br = (int) Mth.lerp(r, ARGB.blue(fs), ARGB.blue(gs));
+                int color = ARGB.color(ar, rr, gr, br);
                 setTrackedValue(HAIR_COLOR_RED, ARGB.red(color) / 255.0f);
                 setTrackedValue(HAIR_COLOR_GREEN, ARGB.green(color) / 255.0f);
                 setTrackedValue(HAIR_COLOR_BLUE, ARGB.blue(color) / 255.0f);
