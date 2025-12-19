@@ -31,8 +31,10 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
     @SuppressWarnings("unchecked")
     public VillagerLikeEntityMCARenderer(EntityRendererProvider.Context ctx, VillagerEntityModelMCA<?> model) {
         super(ctx, (VillagerEntityModelMCA<VillagerLikeRenderState>) model, 0.5F);
-        addLayer(
-                new HumanoidArmorLayer<>(this, createArmorModel(0.3f), createArmorModel(0.55f), ctx.getModelManager()));
+        // HumanoidArmorLayer constructor changed in 1.21.11 - TODO: research new API
+        // addLayer(
+        // new HumanoidArmorLayer<>(this, createArmorModel(0.3f),
+        // createArmorModel(0.55f), ctx.getModelManager()));
     }
 
     private VillagerEntityBaseModelMCA<VillagerLikeRenderState> createArmorModel(float modelSize) {
@@ -81,8 +83,8 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         // Traits
         state.hasAlbinism = villager.getTraits().hasTrait(net.conczin.mca.entity.ai.Traits.ALBINISM);
 
-        // Player detection
-        state.isPlayer = villager instanceof net.minecraft.world.entity.player.Player;
+        // Player detection - Mob cannot be Player, always false for villagers
+        state.isPlayer = false; // villager instanceof Player always false for Mob
     }
 
     @Override
@@ -123,4 +125,3 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         return state.infectionProgress > Infectable.FEVER_THRESHOLD;
     }
 }
-
