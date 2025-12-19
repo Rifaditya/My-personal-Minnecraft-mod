@@ -441,19 +441,24 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
     }
 
     default void syncFromEditor(CompoundTag nbt) {
+        // TODO: 1.21.11 API change - readAdditionalSaveData now takes ValueInput, not
+        // CompoundTag
+        // This method needs redesign to work with the new NBT API
+        // For now, copy the type data manager values directly
         Mob entity = asEntity();
-        entity.readAdditionalSaveData(nbt);
+        // entity.readAdditionalSaveData(nbt); // Cannot use - API changed
 
-        if (nbt.contains("CustomName", 8)) {
-            String s = nbt.getString("CustomName");
-
+        // Handle custom name manually
+        if (nbt.contains("CustomName")) {
+            String s = nbt.getString("CustomName").orElse("");
             try {
-                entity.setCustomName(Component.Serializer.fromJson(s, entity.registryAccess()));
+                if (!s.isEmpty()) {
+                    entity.setCustomName(Component.Serializer.fromJson(s, entity.registryAccess()));
+                }
             } catch (Exception exception) {
                 MCA.LOGGER.warn("Failed to parse entity custom name {}", s, exception);
             }
         }
-
     }
 
     default void copyVillagerAttributesFrom(VillagerLike<?> other) {
