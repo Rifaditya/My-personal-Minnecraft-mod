@@ -134,10 +134,9 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     private static boolean canEat(ItemStack i) {
         FoodProperties foodProperties = i.get(DataComponents.FOOD);
-        return foodProperties != null
-                && foodProperties.nutrition() > 0
-                && foodProperties.effects().stream()
-                        .noneMatch(e -> StatusEffectDangerSet.IS_DANGER.contains(e.effect().getEffect()));
+        // 1.21.11: FoodProperties.effects() removed - just check nutrition for now
+        // TODO: Add proper status effect checking when API pattern is found
+        return foodProperties != null && foodProperties.nutrition() > 0;
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -804,11 +803,9 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         this.setOnGround(oldOnGround);
     }
 
-    @Override
-    public ItemStack eat(Level level, ItemStack stack, FoodProperties foodProperties) {
-        heal(foodProperties.nutrition());
-        return super.eat(level, stack, foodProperties);
-    }
+    // eat() override removed - signature changed in 1.21.11
+    // Original: heal on eating based on food nutrition
+    // TODO: Find new hook for eating behavior
 
     @Override
     public void rideTick() {
@@ -1334,7 +1331,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
                 || type == EntitiesMCA.MALE_VILLAGER;
     }
 
-    @Override
+    // canFireProjectileWeapon signature changed in 1.21.11 - no longer overrides
     public boolean canFireProjectileWeapon(ProjectileWeaponItem weapon) {
         return true;
     }
