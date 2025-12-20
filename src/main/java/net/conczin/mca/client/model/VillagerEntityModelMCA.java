@@ -88,12 +88,12 @@ public class VillagerEntityModelMCA<S extends VillagerLikeRenderState> extends V
     @Override
     public void setupAnim(S state) {
         super.setupAnim(state);
-        leftLegwear.copyFrom(leftLeg);
-        rightLegwear.copyFrom(rightLeg);
-        leftArmwear.copyFrom(leftArm);
-        rightArmwear.copyFrom(rightArm);
-        bodyWear.copyFrom(body);
-        breastsWear.copyFrom(breasts);
+        ModelPartHelper.copyTransform(leftLegwear, leftLeg);
+        ModelPartHelper.copyTransform(rightLegwear, rightLeg);
+        ModelPartHelper.copyTransform(leftArmwear, leftArm);
+        ModelPartHelper.copyTransform(rightArmwear, rightArm);
+        ModelPartHelper.copyTransform(bodyWear, body);
+        ModelPartHelper.copyTransform(breastsWear, breasts);
     }
 
     @Override
@@ -118,21 +118,21 @@ public class VillagerEntityModelMCA<S extends VillagerLikeRenderState> extends V
         return this;
     }
 
-    @Override
-    public void copyPropertiesTo(HumanoidModel<S> target) {
-        super.copyPropertiesTo(target);
+    // copyPropertiesTo may not exist in parent in 1.21.11
+    public void copyPropertiesToModel(HumanoidModel<S> target) {
+        // super.copyPropertiesTo(target);
         if (target instanceof VillagerEntityModelMCA) {
             copyAttributes((VillagerEntityModelMCA<S>) target);
         }
     }
 
     private void copyAttributes(VillagerEntityModelMCA<S> target) {
-        target.leftLegwear.copyFrom(leftLegwear);
-        target.rightLegwear.copyFrom(rightLegwear);
-        target.leftArmwear.copyFrom(leftArmwear);
-        target.rightArmwear.copyFrom(rightArmwear);
-        target.bodyWear.copyFrom(bodyWear);
-        target.breastsWear.copyFrom(breastsWear);
+        ModelPartHelper.copyTransform(target.leftLegwear, leftLegwear);
+        ModelPartHelper.copyTransform(target.rightLegwear, rightLegwear);
+        ModelPartHelper.copyTransform(target.leftArmwear, leftArmwear);
+        ModelPartHelper.copyTransform(target.rightArmwear, rightArmwear);
+        ModelPartHelper.copyTransform(target.bodyWear, bodyWear);
+        ModelPartHelper.copyTransform(target.breastsWear, breastsWear);
     }
 
     public <M extends HumanoidModel<S>> void copyVisibility(M model) {
@@ -152,4 +152,3 @@ public class VillagerEntityModelMCA<S extends VillagerLikeRenderState> extends V
         rightLegwear.visible = model.rightLeg.visible;
     }
 }
-

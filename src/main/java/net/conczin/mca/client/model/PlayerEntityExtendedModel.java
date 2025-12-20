@@ -58,33 +58,30 @@ public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extend
     }
 
     private void copyAttributes(PlayerEntityExtendedModel<S> target) {
-        target.leftPants.copyFrom(leftPants);
-        target.rightPants.copyFrom(rightPants);
-        target.leftSleeve.copyFrom(leftSleeve);
-        target.rightSleeve.copyFrom(rightSleeve);
-        target.jacket.copyFrom(jacket);
-        target.breastsWear.copyFrom(breastsWear);
+        ModelPartHelper.copyTransform(target.leftPants, leftPants);
+        ModelPartHelper.copyTransform(target.rightPants, rightPants);
+        ModelPartHelper.copyTransform(target.leftSleeve, leftSleeve);
+        ModelPartHelper.copyTransform(target.rightSleeve, rightSleeve);
+        ModelPartHelper.copyTransform(target.jacket, jacket);
+        ModelPartHelper.copyTransform(target.breastsWear, breastsWear);
 
         copyCommonAttributes(target);
 
         target.breasts.visible = breasts.visible;
-        target.breasts.copyFrom(breasts);
+        ModelPartHelper.copyTransform(target.breasts, breasts);
     }
 
     private void copyAttributes(PlayerArmorExtendedModel<S> target) {
         copyCommonAttributes(target);
 
         target.breasts.visible = breasts.visible;
-        target.breasts.copyFrom(breasts);
+        ModelPartHelper.copyTransform(target.breasts, breasts);
     }
 
-    @Override
-    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-        // Idk anymore
-        breastsWear.visible = jacket.visible;
-
-        renderCommon(matrices, vertices, light, overlay, color);
-    }
+    // renderToBuffer is now final in Model - commented out
+    // Use renderCommon directly from render layer
+    // breastsWear.visible = jacket.visible;
+    // renderCommon(matrices, vertices, light, overlay, color);
 
     @Override
     public ModelPart getBreastPart() {
@@ -138,12 +135,12 @@ public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extend
         applyVillagerDimensions(state, state.isCrouching);
 
         // Copy wear parts from main parts
-        leftPants.copyFrom(leftLeg);
-        rightPants.copyFrom(rightLeg);
-        leftSleeve.copyFrom(leftArm);
-        rightSleeve.copyFrom(rightArm);
-        jacket.copyFrom(body);
-        breastsWear.copyFrom(breasts);
+        ModelPartHelper.copyTransform(leftPants, leftLeg);
+        ModelPartHelper.copyTransform(rightPants, rightLeg);
+        ModelPartHelper.copyTransform(leftSleeve, leftArm);
+        ModelPartHelper.copyTransform(rightSleeve, rightArm);
+        ModelPartHelper.copyTransform(jacket, body);
+        ModelPartHelper.copyTransform(breastsWear, breasts);
     }
 
     public <M extends HumanoidModel<S>> void copyVisibility(M model) {
@@ -163,4 +160,3 @@ public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extend
         rightPants.visible = model.rightLeg.visible;
     }
 }
-

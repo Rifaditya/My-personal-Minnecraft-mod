@@ -40,13 +40,11 @@ public class PlayerArmorExtendedModel<S extends VillagerLikeRenderState> extends
         copyCommonAttributes(target);
 
         target.breasts.visible = breasts.visible;
-        target.breasts.copyFrom(breasts);
+        ModelPartHelper.copyTransform(target.breasts, breasts);
     }
 
-    @Override
-    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-        renderCommon(matrices, vertices, light, overlay, color);
-    }
+    // renderToBuffer is now final in Model - commented out
+    // Use renderCommon directly from render layer
 
     @Override
     public ModelPart getBreastPart() {
@@ -96,4 +94,3 @@ public class PlayerArmorExtendedModel<S extends VillagerLikeRenderState> extends
         applyVillagerDimensions(state, state.isCrouching);
     }
 }
-
