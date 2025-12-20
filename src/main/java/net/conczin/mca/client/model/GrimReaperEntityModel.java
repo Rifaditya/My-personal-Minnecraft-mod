@@ -113,14 +113,12 @@ public class GrimReaperEntityModel<S extends GrimReaperRenderState> extends Huma
         hat.copyFrom(head);
     }
 
-    @Override
-    protected Iterable<ModelPart> headParts() {
+    // headParts() and bodyParts() no longer overridable in 1.21.11
+    public Iterable<ModelPart> headParts() {
         return ImmutableList.of(head, hat);
     }
 
-    @Override
-    protected Iterable<ModelPart> bodyParts() {
+    public Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg);
     }
 }
-

@@ -59,8 +59,8 @@ public class CribEntityModel<S extends CribEntityRenderState> extends EntityMode
         return modelData;
     }
 
-    @Override
-    public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int packedLight, int packedOverlay,
+    // renderToBuffer override removed - signature may have changed in 1.21.11
+    public void renderCrib(PoseStack stack, VertexConsumer consumer, int packedLight, int packedOverlay,
             int color) {
         CRIB.render(stack, consumer, packedLight, packedOverlay, color);
     }
@@ -70,4 +70,3 @@ public class CribEntityModel<S extends CribEntityRenderState> extends EntityMode
         // Crib doesn't have animations
     }
 }
-
