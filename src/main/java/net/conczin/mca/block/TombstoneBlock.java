@@ -474,27 +474,44 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
 
+        // 1.21.11 changed BlockEntity save/load to use ValueInput/ValueOutput instead
+        // of CompoundTag
         @Override
-        protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-            entityData = tag.contains("EntityData", Tag.TAG_COMPOUND) ? Optional.of(new EntityData(tag))
-                    : Optional.empty();
-            resurrectionProgress = tag.getInt("ResurrectionProgress");
-            cure = tag.getBoolean("Cure");
+        protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput valueOutput) {
+            super.saveAdditional(valueOutput);
+            // EntityData needs separate handling - store as nested data
+            entityData.ifPresent(data -> {
+                valueOutput.put("EntityData", data.nbt);
+                valueOutput.putString("EntityName", data.name);
+                valueOutput.putInt("EntityGender", data.gender.ordinal());
+            });
+            valueOutput.putInt("ResurrectionProgress", resurrectionProgress);
+            valueOutput.putBoolean("Cure", cure);
         }
 
         @Override
-        public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-            entityData.ifPresent(data -> data.writeNbt(nbt));
-            nbt.putInt("ResurrectionProgress", resurrectionProgress);
-            nbt.putBoolean("Cure", cure);
+        public void loadAdditional(net.minecraft.world.level.storage.ValueInput valueInput) {
+            super.loadAdditional(valueInput);
+            // Check if EntityData exists and load it
+            var entityDataTag = valueInput.getCompound("EntityData");
+            if (entityDataTag.isPresent()) {
+                String name = valueInput.getString("EntityName").orElse("");
+                int genderId = valueInput.getIntOr("EntityGender", 0);
+                entityData = Optional.of(new EntityData(entityDataTag.get(), name, Gender.byId(genderId)));
+            } else {
+                entityData = Optional.empty();
+            }
+            resurrectionProgress = valueInput.getIntOr("ResurrectionProgress", 0);
+            cure = valueInput.getBooleanOr("Cure", false);
         }
 
-        @Override
-        public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-            CompoundTag tag = new CompoundTag();
-            saveAdditional(tag, registries);
-            return tag;
-        }
+        // getUpdateTag may also need updating - check if still needed
+        // @Override
+        // public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        // CompoundTag tag = new CompoundTag();
+        // saveAdditional(tag, registries);
+        // return tag;
+        // }
 
         @Override
         public ClientboundBlockEntityDataPacket getUpdatePacket() {
