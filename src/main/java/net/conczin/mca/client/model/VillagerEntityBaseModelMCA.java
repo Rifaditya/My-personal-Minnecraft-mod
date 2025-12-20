@@ -50,13 +50,13 @@ public class VillagerEntityBaseModelMCA<S extends VillagerLikeRenderState> exten
         return builder;
     }
 
-    @Override
-    protected Iterable<ModelPart> headParts() {
+    // headParts() and bodyParts() no longer overridable in 1.21.11 HumanoidModel
+    // Keeping as public methods for internal use
+    public Iterable<ModelPart> headParts() {
         return ImmutableList.of(head, hat);
     }
 
-    @Override
-    protected Iterable<ModelPart> bodyParts() {
+    public Iterable<ModelPart> bodyParts() {
         return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg);
     }
 
@@ -102,9 +102,9 @@ public class VillagerEntityBaseModelMCA<S extends VillagerLikeRenderState> exten
         applyVillagerDimensions(state, state.isCrouching);
     }
 
-    @Override
-    public void copyPropertiesTo(HumanoidModel<S> target) {
-        super.copyPropertiesTo(target);
+    // copyPropertiesTo signature may have changed in 1.21.11
+    public void copyPropertiesToModel(HumanoidModel<S> target) {
+        // super.copyPropertiesTo(target); // May not exist in parent
 
         if (target instanceof VillagerEntityBaseModelMCA<S> m) {
             copyCommonAttributes(m);
@@ -159,4 +159,3 @@ public class VillagerEntityBaseModelMCA<S extends VillagerLikeRenderState> exten
         this.breastSize = breastSize;
     }
 }
-

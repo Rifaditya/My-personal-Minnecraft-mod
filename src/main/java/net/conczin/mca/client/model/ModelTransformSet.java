@@ -12,8 +12,10 @@ public interface ModelTransformSet {
     Transformer get(String key);
 
     default ModelTransformSet interpolate(ModelTransformSet to, float delta) {
-        if (delta <= 0) return this; // skip on the ends
-        if (delta >= 1) return to;
+        if (delta <= 0)
+            return this; // skip on the ends
+        if (delta >= 1)
+            return to;
         // variables can't be modified by lambdas, but arrays can
         Transformer[] components = new Transformer[2];
         Transformer combined = (part, op, scale) -> {
@@ -21,8 +23,10 @@ public interface ModelTransformSet {
             components[1].applyTo(part, Op.LERP, 1 - delta);
         };
         return key -> {
-            components[0] = Preconditions.checkNotNull(get(key), "Cannot interpolate because the source set was missing key `" + key + "`");
-            components[1] = Preconditions.checkNotNull(to.get(key), "Cannot interpolate because the target set was missing key `" + key + "`");
+            components[0] = Preconditions.checkNotNull(get(key),
+                    "Cannot interpolate because the source set was missing key `" + key + "`");
+            components[1] = Preconditions.checkNotNull(to.get(key),
+                    "Cannot interpolate because the target set was missing key `" + key + "`");
             return combined;
         };
     }
@@ -68,15 +72,17 @@ public interface ModelTransformSet {
             return with(key, 0, 0, 0, pitch, yaw, roll, Op.KEEP, op);
         }
 
-        public Builder with(String key, float x, float y, float z, float pitch, float yaw, float roll, Op pivot, Op rotate) {
+        public Builder with(String key, float x, float y, float z, float pitch, float yaw, float roll, Op pivot,
+                Op rotate) {
             PartPose transform = createTransform(x, y, z, pitch, yaw, roll);
             transforms.put(key, (part, op, delta) -> {
-                part.x = op.apply(delta, part.x, pivot.apply(delta, part.x, transform.x));
-                part.y = op.apply(delta, part.y, pivot.apply(delta, part.y, transform.y));
-                part.z = op.apply(delta, part.z, pivot.apply(delta, part.z, transform.z));
-                part.xRot = op.apply(delta, part.xRot, rotate.apply(delta, part.xRot, transform.xRot));
-                part.yRot = op.apply(delta, part.yRot, rotate.apply(delta, part.yRot, transform.yRot));
-                part.zRot = op.apply(delta, part.zRot, rotate.apply(delta, part.zRot, transform.zRot));
+                // PartPose fields are now private in 1.21.11 - use getter methods
+                part.x = op.apply(delta, part.x, pivot.apply(delta, part.x, transform.x()));
+                part.y = op.apply(delta, part.y, pivot.apply(delta, part.y, transform.y()));
+                part.z = op.apply(delta, part.z, pivot.apply(delta, part.z, transform.z()));
+                part.xRot = op.apply(delta, part.xRot, rotate.apply(delta, part.xRot, transform.xRot()));
+                part.yRot = op.apply(delta, part.yRot, rotate.apply(delta, part.yRot, transform.yRot()));
+                part.zRot = op.apply(delta, part.zRot, rotate.apply(delta, part.zRot, transform.zRot()));
             });
             return this;
         }
@@ -86,4 +92,3 @@ public interface ModelTransformSet {
         }
     }
 }
-
