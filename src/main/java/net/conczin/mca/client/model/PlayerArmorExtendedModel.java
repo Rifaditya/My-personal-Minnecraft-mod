@@ -27,9 +27,9 @@ public class PlayerArmorExtendedModel<S extends VillagerLikeRenderState> extends
         this.breasts = root.getChild(BREASTS);
     }
 
-    @Override
-    public void copyPropertiesTo(HumanoidModel<S> target) {
-        super.copyPropertiesTo(target);
+    // copyPropertiesTo signature changed in 1.21.11 - no longer overrides
+    public void copyPropertiesToModel(HumanoidModel<S> target) {
+        // super.copyPropertiesTo(target);
 
         if (target instanceof PlayerEntityExtendedModel<S> playerTarget) {
             copyAttributes(playerTarget);
@@ -56,14 +56,14 @@ public class PlayerArmorExtendedModel<S extends VillagerLikeRenderState> extends
         return body;
     }
 
-    @Override
+    // headParts() and bodyParts() no longer accessible in parent
     public Iterable<ModelPart> getCommonHeadParts() {
-        return headParts();
+        return ImmutableList.of(head, hat);
     }
 
     @Override
     public Iterable<ModelPart> getCommonBodyParts() {
-        return bodyParts();
+        return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg);
     }
 
     @Override
