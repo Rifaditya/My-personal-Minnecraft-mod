@@ -41,7 +41,9 @@ class ModelPartHelper {
 public interface CommonVillagerModel<S extends VillagerLikeRenderState> {
     static VillagerLike<?> getVillager(Level world, UUID uuid) {
         if (MCAClient.fallbackVillager == null) {
-            MCAClient.fallbackVillager = EntitiesMCA.MALE_VILLAGER.create(world);
+            // EntityType.create now requires EntitySpawnReason in 1.21.11
+            MCAClient.fallbackVillager = EntitiesMCA.MALE_VILLAGER.create(world,
+                    net.minecraft.world.entity.EntitySpawnReason.LOAD);
         }
         return MCAClient.playerData.getOrDefault(uuid, MCAClient.fallbackVillager);
     }
