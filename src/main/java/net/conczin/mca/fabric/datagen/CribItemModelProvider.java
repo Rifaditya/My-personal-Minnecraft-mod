@@ -4,7 +4,8 @@ import net.conczin.mca.MCA;
 import net.conczin.mca.entity.CribWoodType;
 import net.conczin.mca.registry.ItemsMCA;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+// FabricModelProvider moved to client.datagen in Fabric API
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
@@ -35,12 +36,15 @@ public class CribItemModelProvider extends FabricModelProvider {
                     return crib.getColor() == color && crib.getWood() == wood;
                 }).findFirst().orElse(ItemsMCA.CRIBS.getFirst());
 
-                ModelTemplate cribModel = new ModelTemplate(Optional.of(Identifier.withDefaultNamespace("item/generated")), Optional.empty(), TextureSlot.LAYER0, TextureSlot.LAYER1);
+                ModelTemplate cribModel = new ModelTemplate(
+                        Optional.of(Identifier.withDefaultNamespace("item/generated")), Optional.empty(),
+                        TextureSlot.LAYER0, TextureSlot.LAYER1);
 
-                cribModel.create(ModelLocationUtils.getModelLocation(item), TextureMapping.layered(MCA.locate("item/crib/beds/" + color.getName()),
-                        MCA.locate("item/crib/frames/" + wood.toString().toLowerCase(Locale.ROOT))), itemModelGenerator.output);
+                cribModel.create(ModelLocationUtils.getModelLocation(item),
+                        TextureMapping.layered(MCA.locate("item/crib/beds/" + color.getName()),
+                                MCA.locate("item/crib/frames/" + wood.toString().toLowerCase(Locale.ROOT))),
+                        itemModelGenerator.output);
             }
         }
     }
 }
-
