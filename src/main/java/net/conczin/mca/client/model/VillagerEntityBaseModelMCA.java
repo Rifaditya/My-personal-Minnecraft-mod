@@ -110,14 +110,12 @@ public class VillagerEntityBaseModelMCA<S extends VillagerLikeRenderState> exten
             copyCommonAttributes(m);
 
             m.breasts.visible = breasts.visible;
-            m.breasts.copyFrom(breasts);
+            ModelPartHelper.copyTransform(m.breasts, breasts);
         }
     }
 
-    @Override
-    public void renderToBuffer(PoseStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
-        renderCommon(matrices, vertices, light, overlay, color);
-    }
+    // renderToBuffer is now final in Model - use renderCommon directly
+    // Original: renderCommon(matrices, vertices, light, overlay, color);
 
     @Override
     public ModelPart getBreastPart() {

@@ -16,6 +16,25 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 /**
+ * Utility method to copy model part transformations - ModelPart.copyFrom() was
+ * removed in 1.21.11
+ */
+class ModelPartHelper {
+    public static void copyTransform(ModelPart target, ModelPart source) {
+        target.x = source.x;
+        target.y = source.y;
+        target.z = source.z;
+        target.xRot = source.xRot;
+        target.yRot = source.yRot;
+        target.zRot = source.zRot;
+        target.xScale = source.xScale;
+        target.yScale = source.yScale;
+        target.zScale = source.zScale;
+        target.visible = source.visible;
+    }
+}
+
+/**
  * CommonVillagerModel - updated for 1.21.11 API
  * Now uses RenderState-extending types instead of entity types
  */
@@ -106,4 +125,3 @@ public interface CommonVillagerModel<S extends VillagerLikeRenderState> {
         target.setBreastSize(getBreastSize());
     }
 }
-

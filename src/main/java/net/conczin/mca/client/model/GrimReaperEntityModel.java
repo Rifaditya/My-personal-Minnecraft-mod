@@ -110,7 +110,7 @@ public class GrimReaperEntityModel<S extends GrimReaperRenderState> extends Huma
             set.get("scythe_handle").applyTo(scythe);
         }
 
-        hat.copyFrom(head);
+        ModelPartHelper.copyTransform(hat, head);
     }
 
     // headParts() and bodyParts() no longer overridable in 1.21.11
