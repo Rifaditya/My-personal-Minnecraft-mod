@@ -81,7 +81,9 @@ public class ReaperSpawner {
             return;
         }
 
-        MCA.LOGGER.info("Attempting to spawn reaper at {} in {}", pos, world.dimension().location());
+        // In 1.21.11, use MCADasikEdition.LOGGER instead of MCA.LOGGER\n //
+        // MCADasikEdition.LOGGER.info(\"Attempting to spawn reaper at {} in {}\", pos,
+        // world.dimension().location());
 
         if (!isNightTime(world)) {
             warn(world, pos, "reaper.day");

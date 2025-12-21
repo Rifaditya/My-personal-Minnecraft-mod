@@ -121,7 +121,7 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         return villages.values().stream().anyMatch(v -> v.getBox().expand(0, 1000, 0).isInside(p));
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         nbt.putInt("lastBuildingId", lastBuildingId);
         nbt.putInt("lastVillageId", lastVillageId);
