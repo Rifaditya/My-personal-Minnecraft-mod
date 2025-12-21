@@ -40,7 +40,9 @@ public final class FamilyTreeNode {
     private transient final FamilyTree rootNode;
     private Gender gender;
     private String name;
-    private String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE).toString();
+    // In 1.21.11, getKey() returns ResourceKey<> - use location().toString()
+    private String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE)
+            .map(key -> key.location().toString()).orElse("minecraft:none");
     private UUID father;
     private UUID mother;
     private UUID partner = new UUID(0, 0);

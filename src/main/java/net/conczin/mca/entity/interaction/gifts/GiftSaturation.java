@@ -35,11 +35,18 @@ public class GiftSaturation {
     }
 
     public void readFromNbt(ListTag nbt) {
-        values = NbtHelper.toList(nbt, v -> Identifier.parse(v.getAsString()));
+        // In 1.21.11, Tag.getAsString() doesn't exist - cast to StringTag and use
+        // asString()
+        values = NbtHelper.toList(nbt, v -> Identifier.parse(((StringTag) v).asString().orElse("")));
     }
 
     public ListTag toNbt() {
-        return NbtHelper.fromList(values, v -> StringTag.valueOf(v.toString()));
+        // In 1.21.11, use NbtOps for creating string tags
+        ListTag list = new ListTag();
+        for (Identifier v : values) {
+            list.add(net.minecraft.nbt.NbtOps.INSTANCE.createString(v.toString()));
+        }
+        return list;
     }
 
     public void pop() {
@@ -48,4 +55,3 @@ public class GiftSaturation {
         }
     }
 }
-
