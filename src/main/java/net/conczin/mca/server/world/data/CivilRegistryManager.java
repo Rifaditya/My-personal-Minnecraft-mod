@@ -21,9 +21,9 @@ public class CivilRegistryManager extends SavedData {
     }
 
     CivilRegistryManager(CompoundTag nbt, HolderLookup.Provider provider) {
-        // In 1.21.11, Tag.getAsString() doesn't exist - cast to StringTag first
+        // In 1.21.11, StringTag.getAsString() -> asString() returns Optional
         entries.addAll(NbtHelper.toList(nbt.get("entries"),
-                element -> Component.Serializer.fromJson(((StringTag) element).getAsString(), provider)));
+                element -> Component.Serializer.fromJson(((StringTag) element).asString().orElse(""), provider)));
     }
 
     public static CivilRegistryManager get(ServerLevel world, Village village) {

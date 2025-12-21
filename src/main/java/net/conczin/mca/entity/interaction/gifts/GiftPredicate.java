@@ -34,64 +34,51 @@ public class GiftPredicate {
     public static final Map<String, Factory<JsonElement>> CONDITION_TYPES = new HashMap<>();
 
     static {
-        register("profession", (json, name) ->
-                Identifier.parse(GsonHelper.convertToString(json, name)), profession -> (villager, stack, player) -> BuiltInRegistries.VILLAGER_PROFESSION.getKey(villager.getProfession()).equals(profession) ? 1.0f : 0.0f);
-        register("age_group", (json, name) ->
-                AgeState.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)), group -> (villager, stack, player) -> villager.getAgeState() == group ? 1.0f : 0.0f);
-        register("gender", (json, name) ->
-                Gender.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)), gender -> (villager, stack, player) -> villager.getGenetics().getGender() == gender ? 1.0f : 0.0f);
-        register("min_health", GsonHelper::convertToFloat, health ->
-                (villager, stack, player) ->
-                        villager.getHealth() > health ? 1.0f : 0.0f
-        );
-        register("is_married", GsonHelper::convertToBoolean, married ->
-                (villager, stack, player) ->
-                        villager.getRelationships().isMarried() == married ? 1.0f : 0.0f
-        );
-        register("has_home", GsonHelper::convertToBoolean, hasHome ->
-                (villager, stack, player) ->
-                        villager.getResidency().getHome().isPresent() == hasHome ? 1.0f : 0.0f
-        );
-        register("has_village", GsonHelper::convertToBoolean, hasVillage ->
-                (villager, stack, player) ->
-                        villager.getResidency().getHomeVillage().isPresent() == hasVillage ? 1.0f : 0.0f
-        );
-        register("min_infection_progress", GsonHelper::convertToFloat, progress ->
-                (villager, stack, player) ->
-                        villager.getInfectionProgress() > progress ? 1.0f : 0.0f
-        );
-        register("mood", (json, name) ->
-                GsonHelper.convertToString(json, name).toLowerCase(Locale.ENGLISH), mood ->
-                (villager, stack, player) ->
-                        villager.getVillagerBrain().getMood().getName().equals(mood) ? 1.0f : 0.0f
-        );
-        register("personality", (json, name) ->
-                Personality.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)), personality ->
-                (villager, stack, player) ->
-                        villager.getVillagerBrain().getPersonality() == personality ? 1.0f : 0.0f
-        );
-        register("is_pregnant", GsonHelper::convertToBoolean, pregnant ->
-                (villager, stack, player) ->
-                        villager.getRelationships().getPregnancy().isPregnant() == pregnant ? 1.0f : 0.0f
-        );
-        register("min_pregnancy_progress", GsonHelper::convertToInt, progress ->
-                (villager, stack, player) ->
-                        villager.getRelationships().getPregnancy().getBabyAge() > progress ? 1.0f : 0.0f
-        );
-        register("pregnancy_child_gender", (json, name) ->
-                Gender.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)), gender ->
-                (villager, stack, player) ->
-                        villager.getRelationships().getPregnancy().getGender() == gender ? 1.0f : 0.0f
-        );
-        register("current_chore", (json, name) ->
-                Chore.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)), chore ->
-                (villager, stack, player) ->
-                        villager.getVillagerBrain().getCurrentJob() == chore ? 1.0f : 0.0f
-        );
+        register("profession", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
+                profession -> (villager, stack, player) -> BuiltInRegistries.VILLAGER_PROFESSION
+                        .getKey(villager.getProfession()).equals(profession) ? 1.0f : 0.0f);
+        register("age_group",
+                (json, name) -> AgeState.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)),
+                group -> (villager, stack, player) -> villager.getAgeState() == group ? 1.0f : 0.0f);
+        register("gender",
+                (json, name) -> Gender.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)),
+                gender -> (villager, stack, player) -> villager.getGenetics().getGender() == gender ? 1.0f : 0.0f);
+        register("min_health", GsonHelper::convertToFloat,
+                health -> (villager, stack, player) -> villager.getHealth() > health ? 1.0f : 0.0f);
+        register("is_married", GsonHelper::convertToBoolean, married -> (villager, stack,
+                player) -> villager.getRelationships().isMarried() == married ? 1.0f : 0.0f);
+        register("has_home", GsonHelper::convertToBoolean, hasHome -> (villager, stack,
+                player) -> villager.getResidency().getHome().isPresent() == hasHome ? 1.0f : 0.0f);
+        register("has_village", GsonHelper::convertToBoolean, hasVillage -> (villager, stack,
+                player) -> villager.getResidency().getHomeVillage().isPresent() == hasVillage ? 1.0f : 0.0f);
+        register("min_infection_progress", GsonHelper::convertToFloat,
+                progress -> (villager, stack, player) -> villager.getInfectionProgress() > progress ? 1.0f : 0.0f);
+        register("mood", (json, name) -> GsonHelper.convertToString(json, name).toLowerCase(Locale.ENGLISH),
+                mood -> (villager, stack, player) -> villager.getVillagerBrain().getMood().getName().equals(mood) ? 1.0f
+                        : 0.0f);
+        register("personality",
+                (json, name) -> Personality.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)),
+                personality -> (villager, stack,
+                        player) -> villager.getVillagerBrain().getPersonality() == personality ? 1.0f : 0.0f);
+        register("is_pregnant", GsonHelper::convertToBoolean, pregnant -> (villager, stack,
+                player) -> villager.getRelationships().getPregnancy().isPregnant() == pregnant ? 1.0f : 0.0f);
+        register("min_pregnancy_progress", GsonHelper::convertToInt, progress -> (villager, stack,
+                player) -> villager.getRelationships().getPregnancy().getBabyAge() > progress ? 1.0f : 0.0f);
+        register("pregnancy_child_gender",
+                (json, name) -> Gender.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)),
+                gender -> (villager, stack,
+                        player) -> villager.getRelationships().getPregnancy().getGender() == gender ? 1.0f : 0.0f);
+        register("current_chore",
+                (json, name) -> Chore.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)),
+                chore -> (villager, stack, player) -> villager.getVillagerBrain().getCurrentJob() == chore ? 1.0f
+                        : 0.0f);
         register("item", (json, name) -> {
             Identifier id = Identifier.parse(GsonHelper.convertToString(json, name));
-            Item item = BuiltInRegistries.ITEM.getOptional(id).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + id + "'"));
-            return Ingredient.of(new ItemStack(item));
+            Item item = BuiltInRegistries.ITEM.getOptional(id)
+                    .orElseThrow(() -> new JsonSyntaxException("Unknown item '" + id + "'"));
+            // In 1.21.11, Ingredient.of(ItemStack) changed - use Ingredient.of(item)
+            // directly
+            return Ingredient.of(item);
         }, (Ingredient ingredient) -> (villager, stack, player) -> ingredient.test(stack) ? 1.0f : 0.0f);
         register("tag", (json, name) -> {
             Identifier id = Identifier.parse(GsonHelper.convertToString(json, name));
@@ -99,14 +86,14 @@ public class GiftPredicate {
             if (tag == null) {
                 throw new JsonSyntaxException("Unknown item tag '" + id + "'");
             }
-
+            // In 1.21.11, Ingredient.of(TagKey) changed - use fromTag() or direct
+            // constructor
             return Ingredient.of(tag);
         }, (Ingredient ingredient) -> (villager, stack, player) -> ingredient.test(stack) ? 1.0f : 0.0f);
-        register("trait", (json, name) ->
-                Traits.Trait.valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)), trait ->
-                (villager, stack, player) ->
-                        villager.getTraits().hasTrait(trait) ? 1.0f : 0.0f
-        );
+        register("trait",
+                (json, name) -> Traits.Trait
+                        .valueOf(GsonHelper.convertToString(json, name).toUpperCase(Locale.ENGLISH)),
+                trait -> (villager, stack, player) -> villager.getTraits().hasTrait(trait) ? 1.0f : 0.0f);
         register("hearts_min", GsonHelper::convertToInt, hearts -> (villager, stack, player) -> {
             assert player != null;
             int h = villager.getVillagerBrain().getMemoriesForPlayer(player).getHearts();
@@ -127,34 +114,37 @@ public class GiftPredicate {
             long ticks = villager.getLongTermMemory().getMemory(id);
             return divideAndAdd(json, ticks);
         });
-        register("emeralds", GsonHelper::convertToInt, amount -> (villager, stack, player) -> (player != null && player.getInventory().countItem(Items.EMERALD) >= amount) ? 1.0f : 0.0f);
-        register("village_has_building", GsonHelper::convertToString, name ->
-                (villager, stack, player) ->
-                        villager.getResidency().getHomeVillage().filter(v -> v.hasBuilding(name)).isPresent() ? 1.0f : 0.0f
-        );
-        register("rank", GsonHelper::convertToString, name ->
-                (villager, stack, player) ->
-                        villager.getResidency().getHomeVillage().filter(v -> Tasks.getRank(v, player) == Rank.fromName(name)).isPresent() ? 1.0f : 0.0f
-        );
-        register("time_min", GsonHelper::convertToLong, time ->
-                (villager, stack, player) -> villager.level().getDayTime() % 24000L >= time ? 1.0f : 0.0f);
-        register("time_max", GsonHelper::convertToLong, time ->
-                (villager, stack, player) -> villager.level().getDayTime() % 24000L <= time ? 1.0f : 0.0f);
-        register("biome", (json, name) ->
-                Identifier.parse(GsonHelper.convertToString(json, name)), biome ->
-                (villager, stack, player) ->
-                        villager.level().getBiome(villager.blockPosition())
-                                .unwrap().left().filter(b -> b.location().equals(biome)).isPresent() ? 1.0f : 0.0f
-        );
-        register("advancement", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)), id -> (villager, stack, player) -> {
-            assert player != null;
-            AdvancementHolder advancement = Objects.requireNonNull(player.getServer()).getAdvancements().get(id);
-            return (advancement != null && player.getAdvancements().getOrStartProgress(advancement).isDone()) ? 1.0f : 0.0f;
-        });
-        register("constraints", (json, name) -> Constraint.fromStringList(GsonHelper.convertToString(json, name)), constraints -> (villager, stack, player) -> {
-            Set<Constraint> c = Constraint.allMatching(villager, player);
-            return c.containsAll(constraints) ? 1.0f : 0.0f;
-        });
+        register("emeralds", GsonHelper::convertToInt, amount -> (villager, stack,
+                player) -> (player != null && player.getInventory().countItem(Items.EMERALD) >= amount) ? 1.0f : 0.0f);
+        register("village_has_building", GsonHelper::convertToString, name -> (villager, stack,
+                player) -> villager.getResidency().getHomeVillage().filter(v -> v.hasBuilding(name)).isPresent() ? 1.0f
+                        : 0.0f);
+        register("rank", GsonHelper::convertToString,
+                name -> (villager, stack,
+                        player) -> villager.getResidency().getHomeVillage()
+                                .filter(v -> Tasks.getRank(v, player) == Rank.fromName(name)).isPresent() ? 1.0f
+                                        : 0.0f);
+        register("time_min", GsonHelper::convertToLong,
+                time -> (villager, stack, player) -> villager.level().getDayTime() % 24000L >= time ? 1.0f : 0.0f);
+        register("time_max", GsonHelper::convertToLong,
+                time -> (villager, stack, player) -> villager.level().getDayTime() % 24000L <= time ? 1.0f : 0.0f);
+        register("biome", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
+                biome -> (villager, stack, player) -> villager.level().getBiome(villager.blockPosition())
+                        .unwrap().left().filter(b -> b.location().equals(biome)).isPresent() ? 1.0f : 0.0f);
+        register("advancement", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
+                id -> (villager, stack, player) -> {
+                    assert player != null;
+                    AdvancementHolder advancement = Objects.requireNonNull(player.getServer()).getAdvancements()
+                            .get(id);
+                    return (advancement != null && player.getAdvancements().getOrStartProgress(advancement).isDone())
+                            ? 1.0f
+                            : 0.0f;
+                });
+        register("constraints", (json, name) -> Constraint.fromStringList(GsonHelper.convertToString(json, name)),
+                constraints -> (villager, stack, player) -> {
+                    Set<Constraint> c = Constraint.allMatching(villager, player);
+                    return c.containsAll(constraints) ? 1.0f : 0.0f;
+                });
     }
 
     private final int satisfactionBoost;
@@ -171,11 +161,10 @@ public class GiftPredicate {
     public static float divideAndAdd(JsonObject json, long value) {
         return Mth.clamp(
                 value
-                / (json.has("dividend") ? json.get("dividend").getAsFloat() : 1.0f)
-                + (json.has("add") ? json.get("add").getAsFloat() : 0.0f),
+                        / (json.has("dividend") ? json.get("dividend").getAsFloat() : 1.0f)
+                        + (json.has("add") ? json.get("add").getAsFloat() : 0.0f),
                 0.0f,
-                json.has("max") ? json.get("max").getAsFloat() : 1.0f
-        );
+                json.has("max") ? json.get("max").getAsFloat() : 1.0f);
     }
 
     public static <T> void register(String name, BiFunction<JsonElement, String, T> jsonParser, Factory<T> predicate) {
@@ -230,4 +219,3 @@ public class GiftPredicate {
         }
     }
 }
-

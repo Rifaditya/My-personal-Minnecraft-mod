@@ -100,7 +100,9 @@ public class Pregnancy {
     }
 
     public VillagerEntityMCA createChild(Gender gender, VillagerEntityMCA partner) {
-        VillagerEntityMCA child = Objects.requireNonNull(gender.getVillagerType().create(mother.level()));
+        // In 1.21.11, EntityType.create() requires Level and EntitySpawnReason
+        VillagerEntityMCA child = Objects
+                .requireNonNull(gender.getVillagerType().create(mother.level(), EntitySpawnReason.BREEDING));
 
         child.getGenetics().combine(partner.getGenetics(), mother.getGenetics());
         child.getTraits().inherit(partner.getTraits());
@@ -116,7 +118,8 @@ public class Pregnancy {
                 .forEach(CriterionMCA.FAMILY::trigger);
 
         // civil entry
-        mother.getResidency().getHomeVillage().flatMap(Village::getCivilRegistry).ifPresent(r -> r.addText(Component.translatable("events.baby", mother.getName(), partner.getName())));
+        mother.getResidency().getHomeVillage().flatMap(Village::getCivilRegistry)
+                .ifPresent(r -> r.addText(Component.translatable("events.baby", mother.getName(), partner.getName())));
 
         return child;
     }
@@ -134,7 +137,7 @@ public class Pregnancy {
     public void procreate(Entity spouse) {
         RandomSource random = mother.getRandom();
 
-        //make sure this villager is registered in the family tree
+        // make sure this villager is registered in the family tree
         int count = 1;
         while (random.nextFloat() < Config.getInstance().twinBabyChance && count < 8) {
             count++;
@@ -155,4 +158,3 @@ public class Pregnancy {
         }
     }
 }
-
