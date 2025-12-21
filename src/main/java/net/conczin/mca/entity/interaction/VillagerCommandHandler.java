@@ -171,11 +171,14 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
                 return true;
             }
             case "pardon" -> {
-                entity.setProfession(VillagerProfession.NONE);
+                // In 1.21.11, VillagerProfession.NONE is ResourceKey, need to get from registry
+                entity.setProfession(net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
+                        .getValue(VillagerProfession.NONE));
                 return true;
             }
             case "stay_in_village" -> {
-                entity.setProfession(VillagerProfession.NONE);
+                entity.setProfession(net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
+                        .getValue(VillagerProfession.NONE));
                 entity.setDespawnDelay(0);
                 return true;
             }
@@ -211,7 +214,8 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
             case "profession" -> {
                 switch (arg) {
                     case "none" -> {
-                        entity.setProfession(VillagerProfession.NONE);
+                        entity.setProfession(net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
+                                .getValue(VillagerProfession.NONE));
                         entity.sendChatMessage(player, "profession.set.none");
                     }
                     case "guard" -> {
