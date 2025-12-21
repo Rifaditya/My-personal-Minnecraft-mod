@@ -21,9 +21,20 @@ public class CivilRegistryManager extends SavedData {
     }
 
     CivilRegistryManager(CompoundTag nbt, HolderLookup.Provider provider) {
-        // In 1.21.11, StringTag.getAsString() -> asString() returns Optional
-        entries.addAll(NbtHelper.toList(nbt.get("entries"),
-                element -> Component.Serializer.fromJson(((StringTag) element).asString().orElse(""), provider)));
+        // In 1.21.11, need to get string value from ListTag elements
+        // StringTag may have different API - use toString/value pattern
+        ListTag list = (ListTag) nbt.get("entries");
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                String json = list.getString(i).orElse("");
+                if (!json.isEmpty()) {
+                    Component component = Component.Serializer.fromJson(json, provider);
+                    if (component != null) {
+                        entries.add(component);
+                    }
+                }
+            }
+        }
     }
 
     public static CivilRegistryManager get(ServerLevel world, Village village) {
@@ -35,9 +46,14 @@ public class CivilRegistryManager extends SavedData {
     // temporarily
     // TODO: Refactor to use SavedDataType with CODEC pattern as in 1.21.11
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
-        // In 1.21.11, StringTag.valueOf may be replaced by StringTag.of()
-        ListTag elements = NbtHelper.fromList(entries,
-                a -> StringTag.of(Component.Serializer.toJson(a, provider)));
+        // In 1.21.11, create StringTag via NbtOps or direct constructor
+        ListTag elements = new ListTag();
+        for (Component entry : entries) {
+            String json = Component.Serializer.toJson(entry, provider);
+            // Use NbtOps to encode the string as a StringTag element
+            net.minecraft.nbt.Tag strTag = net.minecraft.nbt.NbtOps.INSTANCE.createString(json);
+            elements.add(strTag);
+        }
         nbt.put("entries", elements);
         return nbt;
     }
