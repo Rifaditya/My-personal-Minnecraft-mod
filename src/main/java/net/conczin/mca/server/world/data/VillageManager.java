@@ -55,12 +55,15 @@ public class VillageManager extends SavedData implements Iterable<Village> {
 
     VillageManager(ServerLevel world, CompoundTag nbt) {
         this.world = world;
-        lastBuildingId = nbt.getInt("lastBuildingId");
-        lastVillageId = nbt.getInt("lastVillageId");
-        reapers = nbt.contains("reapers", Tag.TAG_COMPOUND) ? new ReaperSpawner(this, nbt.getCompound("reapers"))
+        // In 1.21.11, getInt() returns Optional<Integer>
+        lastBuildingId = nbt.getInt("lastBuildingId").orElse(0);
+        lastVillageId = nbt.getInt("lastVillageId").orElse(0);
+        // In 1.21.11, contains() only takes the key, not the type
+        reapers = nbt.contains("reapers") ? new ReaperSpawner(this, nbt.getCompound("reapers").orElseThrow())
                 : new ReaperSpawner(this);
 
-        ListTag villageList = nbt.getList("villages", Tag.TAG_COMPOUND);
+        // In 1.21.11, getList() only takes the key, returns Optional
+        ListTag villageList = nbt.getList("villages").orElse(new ListTag());
         for (int i = 0; i < villageList.size(); i++) {
             Village village = new Village(villageList.getCompound(i), world);
             if (village.getBuildings().isEmpty()) {
