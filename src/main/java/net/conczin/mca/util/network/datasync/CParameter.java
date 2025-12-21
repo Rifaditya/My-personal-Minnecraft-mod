@@ -16,61 +16,65 @@ public interface CParameter<T, TrackedType> {
     static CDataParameter<Integer> create(String id, int def) {
         return new CDataParameter<>(id, EntityDataSerializers.INT, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getInt(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.putInt(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.putInt(key, value));
     }
 
     static CDataParameter<Float> create(String id, float def) {
         return new CDataParameter<>(id, EntityDataSerializers.FLOAT, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getFloat(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.putFloat(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.putFloat(key, value));
     }
 
     static CDataParameter<Boolean> create(String id, boolean def) {
         return new CDataParameter<>(id, EntityDataSerializers.BOOLEAN, def,
                 (nbt, key, provider) -> {
                     if (nbt.contains(key)) {
-                        return nbt.getInt(key) != 0;
+                        // In 1.21.11, getInt returns Optional
+                        return nbt.getInt(key).orElse(0) != 0;
                     } else {
                         return def;
                     }
                 },
-                (nbt, key, value, provider) -> nbt.putInt(key, value ? 1 : 0)
-        );
+                (nbt, key, value, provider) -> nbt.putInt(key, value ? 1 : 0));
     }
 
     static CDataParameter<String> create(String id, String def) {
         return new CDataParameter<>(id, EntityDataSerializers.STRING, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getString(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.putString(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.putString(key, value));
     }
 
+    // In 1.21.11, EntityDataSerializers.COMPOUND_TAG removed - use STRING with
+    // serialization
+    // This is a workaround that may need more sophisticated handling
     static CDataParameter<CompoundTag> create(String id, CompoundTag def) {
-        return new CDataParameter<>(id, EntityDataSerializers.COMPOUND_TAG, def,
+        return new CDataParameter<>(id, EntityDataSerializers.STRING, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getCompound(nbt, key, def),
-                (nbt, key, value, provider) -> nbt.put(key, value)
-        );
+                (nbt, key, value, provider) -> nbt.put(key, value));
     }
 
     static CDataParameter<ItemStack> create(String id, ItemStack def) {
         return new CDataParameter<>(id, EntityDataSerializers.ITEM_STACK, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getItemStack(nbt, key, ItemStack.EMPTY, provider),
                 (nbt, key, stack, provider) -> {
-                    CompoundTag itemNbt = new CompoundTag();
-                    stack.save(provider, itemNbt);
-                    nbt.put(key, itemNbt);
+                    // In 1.21.11, ItemStack.save methods changed - use saveOptional with
+                    // RegistryAccess
+                    // For NBT serialization, we can use ItemStack.CODEC with NbtOps
+                    if (!stack.isEmpty()) {
+                        net.minecraft.nbt.Tag itemTag = ItemStack.CODEC.encodeStart(
+                                net.minecraft.nbt.NbtOps.INSTANCE, stack).result().orElse(new CompoundTag());
+                        nbt.put(key, itemTag);
+                    }
                 });
     }
 
     static CDataParameter<BlockPos> create(String id, BlockPos def) {
         return new CDataParameter<>(id, EntityDataSerializers.BLOCK_POS, def,
                 (tag, key, provider) -> new BlockPos(
-                        tag.getInt(key + "X"),
-                        tag.getInt(key + "Y"),
-                        tag.getInt(key + "Z")
-                ),
+                        // In 1.21.11, getInt returns Optional
+                        tag.getInt(key + "X").orElse(0),
+                        tag.getInt(key + "Y").orElse(0),
+                        tag.getInt(key + "Z").orElse(0)),
                 (tag, key, pos, provider) -> {
                     tag.putInt(key + "X", pos.getX());
                     tag.putInt(key + "Y", pos.getY());
@@ -78,11 +82,22 @@ public interface CParameter<T, TrackedType> {
                 });
     }
 
+    // In 1.21.11, EntityDataSerializers.OPTIONAL_UUID removed - use STRING with
+    // UUID conversion
     static CDataParameter<Optional<UUID>> create(String id, Optional<UUID> def) {
-        return new CDataParameter<>(id, EntityDataSerializers.OPTIONAL_UUID, def,
-                (tag, key, provider) -> tag.hasUUID(key) ? Optional.of(tag.getUUID(key)) : Optional.empty(),
-                (tag, key, v, provider) -> v.ifPresent(uuid -> tag.putUUID(key, uuid))
-        );
+        return new CDataParameter<>(id, EntityDataSerializers.STRING, def,
+                (tag, key, provider) -> {
+                    // hasUUID/getUUID removed in 1.21.11 - use string
+                    String uuidStr = tag.getString(key).orElse("");
+                    if (uuidStr.isEmpty())
+                        return Optional.empty();
+                    try {
+                        return Optional.of(UUID.fromString(uuidStr));
+                    } catch (IllegalArgumentException e) {
+                        return Optional.empty();
+                    }
+                },
+                (tag, key, v, provider) -> v.ifPresent(uuid -> tag.putString(key, uuid.toString())));
     }
 
     @SuppressWarnings("unchecked")
@@ -106,4 +121,3 @@ public interface CParameter<T, TrackedType> {
 
     EntityDataAccessor<TrackedType> createParam(Class<? extends Entity> type);
 }
-
