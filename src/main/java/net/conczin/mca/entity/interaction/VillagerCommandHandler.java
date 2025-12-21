@@ -78,7 +78,8 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
                 if (entity.isPassenger()) {
                     entity.stopRiding();
                 } else {
-                    entity.startRiding(player, true);
+                    // startRiding now takes 3 params in 1.21.11: (Entity, force, sendPacket)
+                    entity.startRiding(player, true, false);
                 }
                 player.connection.send(new ClientboundSetPassengersPacket(player));
                 return false;
@@ -92,7 +93,8 @@ public class VillagerCommandHandler extends EntityCommandHandler<VillagerEntityM
                             .stream()
                             .filter(horse -> !horse.isVehicle())
                             .min(Comparator.comparingDouble(a -> a.distanceToSqr(entity))).ifPresentOrElse(horse -> {
-                                entity.startRiding(horse, false);
+                                // startRiding now takes 3 params in 1.21.11
+                                entity.startRiding(horse, false, false);
                                 entity.sendChatMessage(player, "interaction.ridehorse.success");
                             }, () -> entity.sendChatMessage(player, "interaction.ridehorse.fail.notnearby"));
                 }
