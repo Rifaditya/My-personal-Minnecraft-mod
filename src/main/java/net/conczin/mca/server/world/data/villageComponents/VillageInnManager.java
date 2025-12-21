@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader;
 import net.minecraft.world.level.BlockGetter;
 
 import java.util.ArrayList;
@@ -27,7 +27,8 @@ public class VillageInnManager {
     public void updateInn(ServerLevel world) {
         village.getBuildingsOfType("inn").forEach(b -> {
             if (world.random.nextFloat() < Config.getInstance().adventurerAtInnChancePerMinute) {
-                List<BlockPos> values = new ArrayList<>(b.getBlocks().values().stream().flatMap(Collection::stream).toList());
+                List<BlockPos> values = new ArrayList<>(
+                        b.getBlocks().values().stream().flatMap(Collection::stream).toList());
                 Collections.shuffle(values);
                 for (BlockPos p : values) {
                     if (trySpawnAdventurer(world, p.above())) {
@@ -40,7 +41,8 @@ public class VillageInnManager {
 
     private boolean doesNotSuffocateAt(BlockGetter world, BlockPos pos) {
         for (BlockPos blockPos : BlockPos.betweenClosed(pos, pos.above())) {
-            if (world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty()) continue;
+            if (world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty())
+                continue;
             return false;
         }
         return true;
@@ -62,14 +64,16 @@ public class VillageInnManager {
                     trader.setDespawnDelay(Config.getInstance().adventurerStayTime);
                 }
             } else if (i == 1 && Config.getInstance().innSpawnsCultists) {
-                VillagerEntityMCA adventurer = Gender.getRandom().getVillagerType().spawn(world, blockPos, EntitySpawnReason.EVENT);
+                VillagerEntityMCA adventurer = Gender.getRandom().getVillagerType().spawn(world, blockPos,
+                        EntitySpawnReason.EVENT);
                 if (adventurer != null) {
                     name = adventurer.getName().getString();
                     adventurer.setProfession(ProfessionsMCA.CULTIST);
                     adventurer.setDespawnDelay(Config.getInstance().adventurerStayTime);
                 }
             } else if (Config.getInstance().innSpawnsAdventurers) {
-                VillagerEntityMCA adventurer = Gender.getRandom().getVillagerType().spawn(world, blockPos, EntitySpawnReason.EVENT);
+                VillagerEntityMCA adventurer = Gender.getRandom().getVillagerType().spawn(world, blockPos,
+                        EntitySpawnReason.EVENT);
                 if (adventurer != null) {
                     name = adventurer.getName().getString();
                     adventurer.setProfession(ProfessionsMCA.ADVENTURER);
@@ -87,4 +91,3 @@ public class VillageInnManager {
         return false;
     }
 }
-

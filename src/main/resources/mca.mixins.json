@@ -13,7 +13,6 @@
     "MixinHorseBase",
     "MixinInventory",
     "MixinMemoryModuleType",
-    "MixinMilkBucketItem",
     "MixinPlayer",
     "MixinProtoChunk",
     "MixinSensorType",
