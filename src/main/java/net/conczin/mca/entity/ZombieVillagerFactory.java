@@ -87,17 +87,27 @@ public class ZombieVillagerFactory {
 
     public ZombieVillagerEntityMCA build() {
         Gender gender = this.gender.orElseGet(Gender::getRandom);
-        ZombieVillagerEntityMCA zombie = gender.getZombieType().create(world);
+        // EntityType.create now requires EntitySpawnReason in 1.21.11
+        ZombieVillagerEntityMCA zombie = gender.getZombieType().create(world, EntitySpawnReason.LOAD);
         assert zombie != null;
         zombie.getGenetics().setGender(gender);
         zombie.setCustomName(Component.literal(name.orElseGet(() -> Names.pickCitizenName(gender, zombie))));
         // absMoveTo replaced with moveTo in 1.21.11\n position.ifPresent(pos ->
         // zombie.moveTo(pos.x(), pos.y(), pos.z()));
         VillagerData data = zombie.getVillagerData();
-        zombie.setVillagerData(new VillagerData(
-                type.orElseGet(data::getType),
-                profession.orElse(VillagerProfession.NONE),
-                level.orElseGet(data::getLevel)));
+        // VillagerData API changed in 1.21.11: use withType/withProfession/withLevel
+        // builder methods
+        VillagerData newData = data;
+        if (type.isPresent()) {
+            newData = newData.withType(net.minecraft.core.Holder.direct(type.get()));
+        }
+        if (profession.isPresent()) {
+            newData = newData.withProfession(net.minecraft.core.Holder.direct(profession.get()));
+        }
+        if (level.isPresent()) {
+            newData = newData.withLevel(level.getAsInt());
+        }
+        zombie.setVillagerData(newData);
         return zombie;
     }
 }
