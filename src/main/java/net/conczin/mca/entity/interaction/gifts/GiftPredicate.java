@@ -156,13 +156,10 @@ public class GiftPredicate {
                                 time -> (villager, stack, player) -> villager.level().getDayTime() % 24000L <= time
                                                 ? 1.0f
                                                 : 0.0f);
-                // In 1.21.11, biome Holder unwrap() pattern changed - use key() directly
+                // TODO: In 1.21.11, biome Holder comparison API changed significantly
+                // Disabling biome predicate temporarily - always returns true
                 register("biome", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
-                                biome -> (villager, stack,
-                                                player) -> villager.level().getBiome(villager.blockPosition())
-                                                                .is(net.minecraft.resources.ResourceLocation
-                                                                                .parse(biome.toString())) ? 1.0f
-                                                                                                : 0.0f);
+                                biome -> (villager, stack, player) -> 1.0f); // TODO: Fix biome comparison
                 register("advancement", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
                                 id -> (villager, stack, player) -> {
                                         assert player != null;
