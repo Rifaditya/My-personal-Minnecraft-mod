@@ -31,10 +31,13 @@ public class CivilRegistryManager extends SavedData {
                 "mca_civil_registry_" + village.getId());
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
+    // temporarily
+    // TODO: Refactor to use SavedDataType with CODEC pattern as in 1.21.11
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
+        // In 1.21.11, StringTag.valueOf may be replaced by StringTag.of()
         ListTag elements = NbtHelper.fromList(entries,
-                a -> StringTag.valueOf(Component.Serializer.toJson(a, provider)));
+                a -> StringTag.of(Component.Serializer.toJson(a, provider)));
         nbt.put("entries", elements);
         return nbt;
     }
