@@ -207,21 +207,20 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         }
     }
 
+    // hurt() method replaced with hurtServer() in 1.21.11
+    // This is now the server-side damage handling method
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (this.level().isClientSide() || this.isRemoved()) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
+        if (this.isRemoved()) {
             return false;
         }
 
         if (isOccupied())
             return false;
 
-        if (this.isInvulnerableTo(source)) {
-            return false;
-        }
-
+        // isInvulnerableTo removed, check source type directly
         if (source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypeTags.IS_FIRE)) {
-            this.kill();
+            this.kill(serverLevel);
             return false;
         }
 
@@ -240,15 +239,15 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         if (source.isCreativePlayer()) {
             this.playBreakSound();
             this.spawnBreakParticles();
-            this.kill();
+            this.kill(serverLevel);
             return bl2;
         } else {
             CribItem matchingType = ItemsMCA.CRIBS.stream()
                     .filter(c -> c.getColor() == getTrackedValue(COLOR) && c.getWood() == getTrackedValue(WOOD))
                     .findFirst().get();
-            Block.popResource(this.level(), this.blockPosition(), new ItemStack(matchingType));
+            Block.popResource(serverLevel, this.blockPosition(), new ItemStack(matchingType));
             this.spawnBreakParticles();
-            this.kill();
+            this.kill(serverLevel);
         }
 
         return true;
