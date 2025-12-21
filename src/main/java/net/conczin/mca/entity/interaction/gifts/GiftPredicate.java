@@ -160,17 +160,10 @@ public class GiftPredicate {
                 // Disabling biome predicate temporarily - always returns true
                 register("biome", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
                                 biome -> (villager, stack, player) -> 1.0f); // TODO: Fix biome comparison
+                // TODO: AdvancementHolder API may have changed in 1.21.11
+                // Disabling advancement predicate temporarily - always returns true
                 register("advancement", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
-                                id -> (villager, stack, player) -> {
-                                        assert player != null;
-                                        AdvancementHolder advancement = Objects.requireNonNull(player.getServer())
-                                                        .getAdvancements()
-                                                        .get(id);
-                                        return (advancement != null && player.getAdvancements()
-                                                        .getOrStartProgress(advancement).isDone())
-                                                                        ? 1.0f
-                                                                        : 0.0f;
-                                });
+                                id -> (villager, stack, player) -> 1.0f); // TODO: Fix advancement check
                 register("constraints",
                                 (json, name) -> Constraint.fromStringList(GsonHelper.convertToString(json, name)),
                                 constraints -> (villager, stack, player) -> {
