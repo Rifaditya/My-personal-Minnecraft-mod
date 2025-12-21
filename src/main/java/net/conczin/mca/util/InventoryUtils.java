@@ -27,7 +27,8 @@ public interface InventoryUtils {
     static int getFirstSlotContainingItem(Container inv, Predicate<ItemStack> predicate) {
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.getItem(i);
-            if (!predicate.test(stack)) continue;
+            if (!predicate.test(stack))
+                continue;
             return i;
         }
         return -1;
@@ -38,16 +39,19 @@ public interface InventoryUtils {
             final ItemStack stack = inv.getItem(i);
             final Item item = stack.getItem();
 
-            if (item.getClass() == clazz) return true;
+            if (item.getClass() == clazz)
+                return true;
         }
         return false;
     }
 
     /**
-     * Gets the best quality (max damage) item of the specified type that is in the inventory.
+     * Gets the best quality (max damage) item of the specified type that is in the
+     * inventory.
      *
      * @param type The class of item that will be returned.
-     * @return The item stack containing the item of the specified type with the highest max damage.
+     * @return The item stack containing the item of the specified type with the
+     *         highest max damage.
      */
     static ItemStack getBestItemOfType(Container inv, @Nullable Class<?> type) {
         return type == null ? ItemStack.EMPTY : inv.getItem(getBestItemOfTypeSlot(inv, type));
@@ -103,7 +107,8 @@ public interface InventoryUtils {
     }
 
     static void readFromNBT(RegistryAccess registryAccess, SimpleContainer inv, CompoundTag nbt) {
-        inv.fromTag(nbt.getList("Inventory", 10), registryAccess);
+        // In 1.21.11, getList() takes only key and returns Optional
+        inv.fromTag(nbt.getList("Inventory").orElse(new net.minecraft.nbt.ListTag()), registryAccess);
     }
 
     static double approximateDamage(ItemStack stack, LivingEntity entity) {
@@ -112,4 +117,3 @@ public interface InventoryUtils {
         return comp == null ? base : comp.compute(base, EquipmentSlot.MAINHAND);
     }
 }
-

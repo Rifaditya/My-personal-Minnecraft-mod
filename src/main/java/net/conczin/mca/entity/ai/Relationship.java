@@ -43,11 +43,15 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
     public static final Predicate IS_MARRIED = (villager, player) -> villager.getRelationships().isMarriedTo(player);
     public static final Predicate IS_ENGAGED = (villager, player) -> villager.getRelationships().isEngagedWith(player);
     public static final Predicate IS_PROMISED = (villager, player) -> villager.getRelationships().isPromisedTo(player);
-    public static final Predicate IS_RELATIVE = (villager, player) -> villager.getRelationships().getFamilyEntry().isRelative(player);
+    public static final Predicate IS_RELATIVE = (villager, player) -> villager.getRelationships().getFamilyEntry()
+            .isRelative(player);
     public static final Predicate IS_FAMILY = IS_MARRIED.or(IS_RELATIVE);
-    public static final Predicate IS_PARENT = (villager, player) -> villager.getRelationships().getFamilyEntry().isParent(player);
-    public static final Predicate IS_KID = (villager, player) -> FamilyTree.get(villager.getRelationships().getWorld()).getOrEmpty(player).filter(n -> n.isParent(villager.getRelationships().getUUID())).isPresent();
-    public static final Predicate IS_ORPHAN = (villager, player) -> villager.getRelationships().getFamilyEntry().getParents().allMatch(FamilyTreeNode::isDeceased);
+    public static final Predicate IS_PARENT = (villager, player) -> villager.getRelationships().getFamilyEntry()
+            .isParent(player);
+    public static final Predicate IS_KID = (villager, player) -> FamilyTree.get(villager.getRelationships().getWorld())
+            .getOrEmpty(player).filter(n -> n.isParent(villager.getRelationships().getUUID())).isPresent();
+    public static final Predicate IS_ORPHAN = (villager, player) -> villager.getRelationships().getFamilyEntry()
+            .getParents().allMatch(FamilyTreeNode::isDeceased);
     protected final T entity;
     private final GiftSaturation giftSaturation = new GiftSaturation();
 
@@ -107,7 +111,8 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
 
     public void onDeath(DamageSource cause) {
         boolean beRemembered = getFamilyEntry().willBeRemembered();
-        boolean beLoved = entity.getVillagerBrain().getMemories().values().stream().anyMatch(m -> m.getHearts() > Config.getInstance().heartsRequiredToAutoSpawnGravestone);
+        boolean beLoved = entity.getVillagerBrain().getMemories().values().stream()
+                .anyMatch(m -> m.getHearts() > Config.getInstance().heartsRequiredToAutoSpawnGravestone);
 
         if (beRemembered || beLoved || !entity.isHostile()) {
             getFamilyEntry().setDeceased(true);
@@ -115,7 +120,8 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
             ServerLevel world = (ServerLevel) entity.level();
 
             // look for a gravestone
-            Optional<BlockPos> nearest = GraveyardManager.get(world).findNearest(entity.blockPosition(), GraveyardManager.TombstoneState.EMPTY, 10);
+            Optional<BlockPos> nearest = GraveyardManager.get(world).findNearest(entity.blockPosition(),
+                    GraveyardManager.TombstoneState.EMPTY, 10);
 
             // if no one was found, try to place one
             if ((beRemembered || beLoved) && nearest.isEmpty()) {
@@ -124,7 +130,8 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
 
             // fill it and yeet the villager into depression
             nearest.ifPresentOrElse(pos -> {
-                if (entity.level().getBlockState(pos).is(TagsMCA.Blocks.TOMBSTONES) && entity.level().getBlockEntity(pos) instanceof TombstoneBlock.Data tombstone) {
+                if (entity.level().getBlockState(pos).is(TagsMCA.Blocks.TOMBSTONES)
+                        && entity.level().getBlockEntity(pos) instanceof TombstoneBlock.Data tombstone) {
                     onTragedy(cause, pos);
                     tombstone.setEntity(entity);
                 } else {
@@ -151,7 +158,8 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
         if (!entity.isHostile()) {
             WorldUtils
                     .getCloseEntities(entity.level(), entity, 32, VillagerEntityMCA.class)
-                    .forEach(villager -> villager.getRelationships().onTragedy(cause, burialSite, RelationshipType.STRANGER, entity));
+                    .forEach(villager -> villager.getRelationships().onTragedy(cause, burialSite,
+                            RelationshipType.STRANGER, entity));
         }
 
         onTragedy(cause, burialSite, RelationshipType.SELF, entity);
@@ -185,7 +193,8 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
     }
 
     public void readFromNbt(CompoundTag nbt) {
-        giftSaturation.readFromNbt(nbt.getList("GiftSaturationQueue", 8));
+        // In 1.21.11, getList() takes only key and returns Optional
+        giftSaturation.readFromNbt(nbt.getList("GiftSaturationQueue").orElse(new net.minecraft.nbt.ListTag()));
     }
 
     public void writeToNbt(CompoundTag nbt) {
@@ -211,8 +220,8 @@ public class Relationship<T extends Mob & VillagerLike<T>> implements EntityRela
         }
 
         default BiPredicate<VillagerLike<?>, ServerPlayer> asConstraint() {
-            return (villager, player) -> villager instanceof CompassionateEntity<?> && (test((CompassionateEntity<?>) villager, player));
+            return (villager, player) -> villager instanceof CompassionateEntity<?>
+                    && (test((CompassionateEntity<?>) villager, player));
         }
     }
 }
-
