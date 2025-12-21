@@ -372,11 +372,12 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                         }
 
                         boolean alreadySpawned = false;
-                        if (cure && (entity instanceof ZombieVillager zombie)) {
-                            // spawnEntity is called here, so don't call it twice
-                            entity = zombie.convertTo(EntityType.VILLAGER, true);
-                            alreadySpawned = true;
-                        }
+                        // TODO: In 1.21.11, convertTo signature changed - needs ConversionParams?
+                        // Disabling cure conversion for now
+                        // if (cure && (entity instanceof ZombieVillager zombie)) {
+                        // entity = zombie.convertTo(EntityType.VILLAGER, true);
+                        // alreadySpawned = true;
+                        // }
 
                         if (entity instanceof CompassionateEntity<?> compassionateEntity) {
                             compassionateEntity.getRelationships().getFamilyEntry().setDeceased(false);
