@@ -146,13 +146,15 @@ public final class FamilyTreeNode {
         markDirty();
     }
 
+    @SuppressWarnings("unchecked")
     public VillagerProfession getProfession() {
-        // Simplified for 1.21.11 - direct lookup with null check
-        var opt = BuiltInRegistries.VILLAGER_PROFESSION.getOptional(getProfessionId());
-        if (opt.isPresent()) {
-            return (VillagerProfession) opt.get().value();
+        // Simplified for 1.21.11 - direct lookup, return null if not found
+        try {
+            var opt = BuiltInRegistries.VILLAGER_PROFESSION.get(Identifier.tryParse(profession));
+            return (VillagerProfession) opt;
+        } catch (Exception e) {
+            return null;
         }
-        return VillagerProfession.NONE;
     }
 
     public void setProfession(VillagerProfession profession) {
