@@ -25,15 +25,18 @@ import java.util.*;
 import static net.conczin.mca.entity.ai.MemoryModuleTypeMCA.LAST_GRIEVE;
 
 /**
- * Handles memory and complex bodily functions. Such as walking, and not being a nitwit.
+ * Handles memory and complex bodily functions. Such as walking, and not being a
+ * nitwit.
  */
 public class VillagerBrain<E extends Mob & VillagerLike<E>> {
     private static final CDataParameter<CompoundTag> MEMORIES = CParameter.create("Memories", new CompoundTag());
-    private static final CEnumParameter<Personality> PERSONALITY = CParameter.create("Personality", Personality.UNASSIGNED);
+    private static final CEnumParameter<Personality> PERSONALITY = CParameter.create("Personality",
+            Personality.UNASSIGNED);
     private static final CDataParameter<Integer> MOOD = CParameter.create("Mood", 0);
     private static final CEnumParameter<MoveState> MOVE_STATE = CParameter.create("MoveState", MoveState.MOVE);
     private static final CEnumParameter<Chore> ACTIVE_CHORE = CParameter.create("ActiveChore", Chore.NONE);
-    private static final CDataParameter<Optional<UUID>> CHORE_ASSIGNING_PLAYER = CParameter.create("ChoreAssigningPlayer", Optional.empty());
+    private static final CDataParameter<Optional<UUID>> CHORE_ASSIGNING_PLAYER = CParameter
+            .create("ChoreAssigningPlayer", Optional.empty());
     private static final CDataParameter<Boolean> PANICKING = CParameter.create("IsPanicking", false);
     private static final CDataParameter<Boolean> WEAR_ARMOR = CParameter.create("WearArmor", false);
 
@@ -54,17 +57,17 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
                 ACTIVE_CHORE,
                 CHORE_ASSIGNING_PLAYER,
                 PANICKING,
-                WEAR_ARMOR
-        );
+                WEAR_ARMOR);
     }
 
     public void think() {
         // When you relog, it should continue doing the chores.
-        // Chore saves but Activity doesn't, so this checks if the activity is not on there and puts it on there.
+        // Chore saves but Activity doesn't, so this checks if the activity is not on
+        // there and puts it on there.
 
         if (entity.getTrackedValue(ACTIVE_CHORE) != Chore.NONE) {
             // find something to do
-            //todo here switch between rest and chore
+            // todo here switch between rest and chore
             entity.getBrain().getActiveNonCoreActivity().ifPresent(activity -> {
                 if (!activity.equals(ActivitiesMCA.CHORE)) {
                     entity.getBrain().setActiveActivityIfPossible(ActivitiesMCA.CHORE);
@@ -85,8 +88,8 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
         if (entity.tickCount % Math.max(1, Config.getInstance().interactionFatigueCooldown) == 0) {
             CompoundTag nbt = entity.getTrackedValue(MEMORIES);
             if (nbt != null) {
-                for (String uuid : nbt.getAllKeys()) {
-                    Memories memories = Memories.fromCNBT(entity, nbt.getCompound(uuid));
+                for (String uuid : nbt.keySet()) {
+                    Memories memories = Memories.fromCNBT(entity, nbt.getCompound(uuid).orElse(new CompoundTag()));
                     int fatigue = memories.getInteractionFatigue();
                     if (fatigue > 0) {
                         memories.setInteractionFatigue(fatigue - 1);
@@ -130,7 +133,8 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
 
     public void randomize() {
         entity.setTrackedValue(PERSONALITY, Personality.getRandom());
-        entity.setTrackedValue(MOOD, entity.level().random.nextInt(MoodGroup.MAX_LEVEL - MoodGroup.NORMAL_MIN_LEVEL + 1) + MoodGroup.NORMAL_MIN_LEVEL);
+        entity.setTrackedValue(MOOD, entity.level().random.nextInt(MoodGroup.MAX_LEVEL - MoodGroup.NORMAL_MIN_LEVEL + 1)
+                + MoodGroup.NORMAL_MIN_LEVEL);
     }
 
     public void updateMemories(Memories memories) {
@@ -144,8 +148,9 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
     public Map<UUID, Memories> getMemories() {
         CompoundTag nbt = entity.getTrackedValue(MEMORIES);
         Map<UUID, Memories> memories = new HashMap<>();
-        for (String uuid : nbt.getAllKeys()) {
-            memories.put(UUID.fromString(uuid), Memories.fromCNBT(entity, nbt.getCompound(uuid)));
+        for (String uuid : nbt.keySet()) {
+            memories.put(UUID.fromString(uuid),
+                    Memories.fromCNBT(entity, nbt.getCompound(uuid).orElse(new CompoundTag())));
         }
         return memories;
     }
@@ -153,7 +158,8 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
     public Memories getMemoriesForPlayer(Player player) {
         CompoundTag nbt = entity.getTrackedValue(MEMORIES);
         nbt = nbt == null ? new CompoundTag() : nbt;
-        CompoundTag compoundTag = nbt.getCompound(player.getUUID().toString());
+        // In 1.21.11, getCompound returns Optional
+        CompoundTag compoundTag = nbt.getCompound(player.getUUID().toString()).orElse(new CompoundTag());
         Memories returnMemories = Memories.fromCNBT(entity, compoundTag);
         if (returnMemories == null) {
             returnMemories = new Memories(this, player.level().getDayTime(), player.getUUID());
@@ -246,7 +252,8 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
      * Read the move state from the active memory.
      */
     public void updateMoveState() {
-        if (getMoveState() == MoveState.FOLLOW && entity.getBrain().getMemoryInternal(MemoryModuleTypeMCA.PLAYER_FOLLOWING).isEmpty()) {
+        if (getMoveState() == MoveState.FOLLOW
+                && entity.getBrain().getMemoryInternal(MemoryModuleTypeMCA.PLAYER_FOLLOWING).isEmpty()) {
             if (entity.getBrain().getMemoryInternal(MemoryModuleTypeMCA.STAYING).isPresent()) {
                 entity.setTrackedValue(MOVE_STATE, MoveState.STAY);
             } else if (entity.getBrain().getMemoryInternal(MemoryModuleTypeMCA.PLAYER_FOLLOWING).isPresent()) {
@@ -264,13 +271,13 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
             return;
         }
 
-        //spawn particles
+        // spawn particles
         if (hearts > 0) {
             entity.level().broadcastEntityEvent(entity, Status.MCA_VILLAGER_POS_INTERACTION);
         } else {
             entity.level().broadcastEntityEvent(entity, Status.MCA_VILLAGER_NEG_INTERACTION);
 
-            //sensitive people doubles the loss
+            // sensitive people doubles the loss
             if (entity.getVillagerBrain().getPersonality() == Personality.SENSITIVE) {
                 hearts *= 2;
             }
@@ -282,4 +289,3 @@ public class VillagerBrain<E extends Mob & VillagerLike<E>> {
         entity.getVillagerBrain().modifyMoodValue(hearts);
     }
 }
-
