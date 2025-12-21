@@ -147,16 +147,18 @@ public final class FamilyTreeNode {
     }
 
     public VillagerProfession getProfession() {
-        // In 1.21.11, Registry.getOptional returns Optional<Reference<T>>, use get() on
-        // Reference
-        return BuiltInRegistries.VILLAGER_PROFESSION.getOptional(getProfessionId())
-                .map(ref -> ref.value()).orElse(VillagerProfession.NONE);
+        // Simplified for 1.21.11 - direct lookup with null check
+        var opt = BuiltInRegistries.VILLAGER_PROFESSION.getOptional(getProfessionId());
+        if (opt.isPresent()) {
+            return (VillagerProfession) opt.get().value();
+        }
+        return VillagerProfession.NONE;
     }
 
     public void setProfession(VillagerProfession profession) {
-        // In 1.21.11, use ResourceKey.location() for key lookups
-        var key = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
-        this.profession = key != null ? key.location().toString() : "minecraft:none";
+        // Simplified for 1.21.11 - just store the profession name
+        // TODO: Find proper way to get ResourceLocation from VillagerProfession
+        this.profession = "minecraft:" + profession.name().toLowerCase(java.util.Locale.ROOT);
         markDirty();
     }
 
