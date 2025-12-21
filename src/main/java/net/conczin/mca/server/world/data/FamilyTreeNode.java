@@ -40,9 +40,9 @@ public final class FamilyTreeNode {
     private transient final FamilyTree rootNode;
     private Gender gender;
     private String name;
-    // In 1.21.11, getKey() returns ResourceKey<> - use location().toString()
-    private String profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE)
-            .map(key -> key.location().toString()).orElse("minecraft:none");
+    // Simplified for 1.21.11 - use constant string instead of registry lookup at
+    // init
+    private String profession = "minecraft:none";
     private UUID father;
     private UUID mother;
     private UUID partner = new UUID(0, 0);
@@ -74,7 +74,7 @@ public final class FamilyTreeNode {
                 c -> parseUUID(((CompoundTag) c).getString("uuid").orElse(""))));
         profession = nbt.getString("profession")
                 .orElse(BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE)
-                        .map(key -> key.location().toString()).orElse("minecraft:none"));
+                        .orElseThrow().location().toString());
         deceased = nbt.getBoolean("isDeceased").orElse(false);
         String spouseStr = nbt.getString("spouse").orElse("");
         if (!spouseStr.isEmpty()) {
@@ -149,11 +149,14 @@ public final class FamilyTreeNode {
     }
 
     public VillagerProfession getProfession() {
-        return BuiltInRegistries.VILLAGER_PROFESSION.get(getProfessionId());
+        // In 1.21.11, Registry.get() returns Optional<Reference<>>
+        return BuiltInRegistries.VILLAGER_PROFESSION.getOptional(getProfessionId()).orElse(VillagerProfession.NONE);
     }
 
     public void setProfession(VillagerProfession profession) {
-        this.profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession).toString();
+        // In 1.21.11, getKey() returns Optional<ResourceKey<>>
+        this.profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession)
+                .orElseThrow().location().toString();
         markDirty();
     }
 
