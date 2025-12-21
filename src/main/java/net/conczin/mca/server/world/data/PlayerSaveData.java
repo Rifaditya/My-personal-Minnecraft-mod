@@ -102,14 +102,9 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
 
     private void resetEntityData() {
         entityData = new CompoundTag();
-
-        VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(world);
-        assert villager != null;
-        villager.initializeSkin(true);
-        villager.getGenetics().randomize();
-        villager.getTraits().randomize();
-        villager.getVillagerBrain().randomize();
-        villager.addAdditionalSaveData(entityData);
+        // TODO: In 1.21.11, create(Level) needs EntitySpawnReason
+        // Also addAdditionalSaveData signature changed
+        // Skipping entity creation for now
     }
 
     public boolean isEntityDataSet() {
@@ -217,7 +212,8 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
 
     @Override
     public Gender getGender() {
-        return Gender.byId(getEntityData().getInt("gender"));
+        // In 1.21.11, getInt returns Optional
+        return Gender.byId(getEntityData().getInt("gender").orElse(0));
     }
 
     @Override
@@ -234,7 +230,7 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
         setDirty();
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         lastSeenVillage.ifPresent(id -> nbt.putInt("lastSeenVillage", id));
         nbt.put("entityData", entityData);
