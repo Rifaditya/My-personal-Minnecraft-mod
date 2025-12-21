@@ -33,8 +33,7 @@ public final class FamilyTreeNode {
             },
             (in) -> {
                 return new FamilyTreeNode(null, ByteBufCodecs.COMPOUND_TAG.decode(in));
-            }
-    );
+            });
     private final boolean isPlayer;
     private final UUID id;
     private final Set<UUID> children = new HashSet<>();
@@ -48,7 +47,8 @@ public final class FamilyTreeNode {
     private RelationshipState relationshipState = RelationshipState.SINGLE;
     private boolean deceased;
 
-    public FamilyTreeNode(FamilyTree rootNode, UUID id, String name, boolean isPlayer, Gender gender, UUID father, UUID mother) {
+    public FamilyTreeNode(FamilyTree rootNode, UUID id, String name, boolean isPlayer, Gender gender, UUID father,
+            UUID mother) {
         this.rootNode = rootNode;
         this.id = id;
         this.name = name;
@@ -61,20 +61,22 @@ public final class FamilyTreeNode {
     public FamilyTreeNode(FamilyTree rootNode, CompoundTag nbt) {
         this(
                 rootNode,
-                nbt.getUUID("id"),
-                nbt.getString("name"),
-                nbt.getBoolean("isPlayer"),
-                Gender.byId(nbt.getInt("gender")),
-                nbt.getUUID("father"),
-                nbt.getUUID("mother")
-        );
-        children.addAll(NbtHelper.toList(nbt.getList("children", Tag.TAG_COMPOUND), c -> ((CompoundTag) c).getUUID("uuid")));
-        profession = nbt.getString("profession");
-        deceased = nbt.getBoolean("isDeceased");
+                // In 1.21.11, CompoundTag getters return Optional
+                nbt.getUUID("id").orElse(new UUID(0, 0)),
+                nbt.getString("name").orElse(""),
+                nbt.getBoolean("isPlayer").orElse(false),
+                Gender.byId(nbt.getInt("gender").orElse(0)),
+                nbt.getUUID("father").orElse(new UUID(0, 0)),
+                nbt.getUUID("mother").orElse(new UUID(0, 0)));
+        children.addAll(NbtHelper.toList(nbt.getList("children").orElse(new net.minecraft.nbt.ListTag()),
+                c -> ((CompoundTag) c).getUUID("uuid").orElse(new UUID(0, 0))));
+        profession = nbt.getString("profession")
+                .orElse(BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE).toString());
+        deceased = nbt.getBoolean("isDeceased").orElse(false);
         if (nbt.hasUUID("spouse")) {
-            partner = nbt.getUUID("spouse");
+            partner = nbt.getUUID("spouse").orElse(new UUID(0, 0));
         }
-        relationshipState = RelationshipState.byId(nbt.getInt("marriageState"));
+        relationshipState = RelationshipState.byId(nbt.getInt("marriageState").orElse(0));
     }
 
     public static boolean isValid(@Nullable UUID uuid) {
@@ -89,13 +91,14 @@ public final class FamilyTreeNode {
         gather(current, family, depth, FamilyTreeNode::streamChildren);
     }
 
-    private static void gather(@Nullable FamilyTreeNode entry, Set<UUID> output, int depth, Function<FamilyTreeNode, Stream<UUID>> walker) {
+    private static void gather(@Nullable FamilyTreeNode entry, Set<UUID> output, int depth,
+            Function<FamilyTreeNode, Stream<UUID>> walker) {
         if (entry == null || depth <= 0) {
             return;
         }
         walker.apply(entry).forEach(id -> {
             if (!new UUID(0, 0).equals(id)) {
-                output.add(id); //zero UUIDs are no real members
+                output.add(id); // zero UUIDs are no real members
             }
             if (depth > 1) {
                 entry.getRoot().getOrEmpty(id).ifPresent(e -> gather(e, output, depth - 1, walker));
@@ -145,11 +148,9 @@ public final class FamilyTreeNode {
     }
 
     public String getProfessionName() {
-        String professionName = (
-                getProfessionId().getNamespace().equalsIgnoreCase("minecraft") ?
-                        (getProfessionId().getPath().equals("none") ? "mca.none" : getProfessionId().getPath()) :
-                        getProfessionId().toString()
-        ).replace(":", ".");
+        String professionName = (getProfessionId().getNamespace().equalsIgnoreCase("minecraft")
+                ? (getProfessionId().getPath().equals("none") ? "mca.none" : getProfessionId().getPath())
+                : getProfessionId().toString()).replace(":", ".");
 
         return MCA.isBlankString(professionName) ? "mca.none" : professionName;
     }
@@ -185,14 +186,15 @@ public final class FamilyTreeNode {
         return relationshipState;
     }
 
-    //debug usage only
+    // debug usage only
     public void setRelationshipState(RelationshipState relationshipState) {
         this.relationshipState = relationshipState;
     }
 
     public void updatePartner(@Nullable Entity newPartner, @Nullable RelationshipState state) {
-        //cancel relationship with previous partner
-        if (!this.partner.equals(new UUID(0, 0)) && (newPartner == null || !this.partner.equals(newPartner.getUUID()))) {
+        // cancel relationship with previous partner
+        if (!this.partner.equals(new UUID(0, 0))
+                && (newPartner == null || !this.partner.equals(newPartner.getUUID()))) {
             getRoot().getOrEmpty(this.partner).ifPresent(n -> {
                 n.partner = new UUID(0, 0);
                 n.relationshipState = RelationshipState.SINGLE;
@@ -212,7 +214,8 @@ public final class FamilyTreeNode {
 
     public void updatePartner(FamilyTreeNode spouse) {
         this.partner = spouse.id();
-        this.relationshipState = spouse.isPlayer ? RelationshipState.MARRIED_TO_PLAYER : RelationshipState.MARRIED_TO_VILLAGER;
+        this.relationshipState = spouse.isPlayer ? RelationshipState.MARRIED_TO_PLAYER
+                : RelationshipState.MARRIED_TO_VILLAGER;
         markDirty();
     }
 
@@ -244,11 +247,12 @@ public final class FamilyTreeNode {
     }
 
     // returns indirect relatives like siblings and their respective family
-    // potential slow for large families, getRelatives() is preferred if indirect family members are not relevant
+    // potential slow for large families, getRelatives() is preferred if indirect
+    // family members are not relevant
     public Stream<UUID> getAllRelatives(int depth) {
         Set<UUID> family = new HashSet<>();
 
-        //recursive family fetching
+        // recursive family fetching
         Set<UUID> todo = new HashSet<>();
         todo.add(id);
         for (int d = 0; d < depth; d++) {
@@ -258,7 +262,7 @@ public final class FamilyTreeNode {
                     rootNode.getOrEmpty(uuid).ifPresent(node -> {
                         family.add(uuid);
 
-                        //add parents and children
+                        // add parents and children
                         node.streamParents().forEach(nextTodo::add);
                         node.streamChildren().forEach(nextTodo::add);
                     });
@@ -267,7 +271,7 @@ public final class FamilyTreeNode {
             todo = nextTodo;
         }
 
-        //the caller is not meant
+        // the caller is not meant
         family.remove(id);
 
         return family.stream();
@@ -277,11 +281,11 @@ public final class FamilyTreeNode {
     public Stream<UUID> getRelatives(int parentDepth, int childrenDepth) {
         Set<UUID> family = new HashSet<>();
 
-        //fetch parents and children
+        // fetch parents and children
         gatherParents(this, family, parentDepth);
         gatherChildren(this, family, childrenDepth);
 
-        //and the caller is not meant either
+        // and the caller is not meant either
         family.remove(id);
 
         return family.stream();
@@ -334,14 +338,14 @@ public final class FamilyTreeNode {
         int parents = (isValid(father) ? 1 : 0) + (isValid(mother) ? 1 : 0);
 
         if (parents == 1) {
-            //fill up last slot, independent on gender
+            // fill up last slot, independent on gender
             if (!isValid(father)) {
                 return setFather(parent);
             } else if (!isValid(mother)) {
                 return setMother(parent);
             }
         } else {
-            //fill up gender respective slot
+            // fill up gender respective slot
             if (parent.gender() == Gender.MALE) {
                 return setFather(parent);
             } else {
@@ -394,7 +398,8 @@ public final class FamilyTreeNode {
 
     // entries with these conditions are usually generated
     public boolean probablyGenerated() {
-        return mother.equals(new UUID(0, 0)) && father.equals(new UUID(0, 0)) && children.size() == 1 && deceased && !isPlayer();
+        return mother.equals(new UUID(0, 0)) && father.equals(new UUID(0, 0)) && children.size() == 1 && deceased
+                && !isPlayer();
     }
 
     // true if there is at least one non-generated relative
@@ -427,4 +432,3 @@ public final class FamilyTreeNode {
         return nbt;
     }
 }
-
