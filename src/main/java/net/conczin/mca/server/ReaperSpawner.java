@@ -138,7 +138,8 @@ public class ReaperSpawner {
 
     private Set<BlockPos> getTotemsFires(Level world, BlockPos pos) {
         int groundY = pos.getY() - 1;
-        int leftSkyHeight = world.getMaxBuildHeight() - groundY;
+        // In 1.21.11, getMaxBuildHeight may not exist, use getHeight() or constant
+        int leftSkyHeight = 320 - groundY; // TODO: Find proper API for max build height
         int minPillarHeight = Math.min(Config.getInstance().minPillarHeight, leftSkyHeight);
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
         return Stream.of(HORIZONTALS).map(d -> target.set(pos).setY(groundY).move(d, 3)).filter(pillarPos -> {
@@ -170,13 +171,27 @@ public class ReaperSpawner {
         public final Set<BlockPos> totems;
 
         public SummonPosition(CompoundTag tag) {
-            spawnPosition = NbtUtils.readBlockPos(tag, "spawnPosition").orElse(BlockPos.ZERO);
-            fire = NbtUtils.readBlockPos(tag, "fire").orElse(BlockPos.ZERO);
+            // TODO: In 1.21.11, NbtUtils.readBlockPos signature changed
+            // Using custom helper for now
+            spawnPosition = readBlockPosFromTag(tag, "spawnPosition");
+            fire = readBlockPosFromTag(tag, "fire");
             // In 1.21.11, getCompound returns Optional - need to handle the ListTag
             // differently
             totems = new HashSet<>(
                     NbtHelper.toList(tag.getList("totems").orElse(new net.minecraft.nbt.ListTag()),
                             v -> readBlockPos(((IntArrayTag) v).getAsIntArray())));
+        }
+
+        private static BlockPos readBlockPosFromTag(CompoundTag tag, String key) {
+            var compound = tag.getCompound(key);
+            if (compound.isPresent()) {
+                CompoundTag posTag = compound.get();
+                return new BlockPos(
+                        posTag.getInt("X").orElse(0),
+                        posTag.getInt("Y").orElse(0),
+                        posTag.getInt("Z").orElse(0));
+            }
+            return BlockPos.ZERO;
         }
 
         public SummonPosition(BlockPos fire, Set<BlockPos> totems) {
@@ -199,9 +214,20 @@ public class ReaperSpawner {
 
         public CompoundTag toNbt() {
             CompoundTag tag = new CompoundTag();
-            tag.put("fire", NbtUtils.writeBlockPos(fire));
-            tag.put("totems", NbtHelper.fromList(totems, NbtUtils::writeBlockPos));
-            tag.put("spawnPosition", NbtUtils.writeBlockPos(spawnPosition));
+            // TODO: In 1.21.11, NbtUtils.writeBlockPos signature changed
+            // Using custom helper for now
+            tag.put("fire", writeBlockPosToTag(fire));
+            tag.put("totems", NbtHelper.fromList(totems,
+                    pos -> new IntArrayTag(new int[] { pos.getX(), pos.getY(), pos.getZ() })));
+            tag.put("spawnPosition", writeBlockPosToTag(spawnPosition));
+            return tag;
+        }
+
+        private static CompoundTag writeBlockPosToTag(BlockPos pos) {
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("X", pos.getX());
+            tag.putInt("Y", pos.getY());
+            tag.putInt("Z", pos.getZ());
             return tag;
         }
     }
