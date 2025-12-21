@@ -20,7 +20,8 @@ import net.minecraft.world.level.ItemLike;
 public class TradeOffersMCA {
     public static void bootstrap() {
         // Register trades for ADVENTURER profession using Fabric API
-        TradeOfferHelper.registerVillagerOffers(ProfessionsMCA.ADVENTURER, 1, (trades, rebalanced) -> {
+        // Lambda takes single param: Consumer<List<VillagerTrades.ItemListing>>
+        TradeOfferHelper.registerVillagerOffers(ProfessionsMCA.ADVENTURER, 1, trades -> {
             trades.add(new SellItemFactory(Items.SLIME_BALL, 1, 1, 16, 1));
             trades.add(new SellItemFactory(Items.LEATHER_HORSE_ARMOR, 3, 1, 4, 10));
             trades.add(new SellItemFactory(Items.SADDLE, 4, 1, 3, 5));
@@ -34,7 +35,7 @@ public class TradeOffersMCA {
         });
 
         // Register trades for CULTIST profession using Fabric API
-        TradeOfferHelper.registerVillagerOffers(ProfessionsMCA.CULTIST, 1, (trades, rebalanced) -> {
+        TradeOfferHelper.registerVillagerOffers(ProfessionsMCA.CULTIST, 1, trades -> {
             trades.add(new SellItemFactory(ItemsMCA.SIRBEN_BABY_BOY, 5, 1, 1, 1));
             trades.add(new SellItemFactory(ItemsMCA.SIRBEN_BABY_GIRL, 5, 1, 1, 1));
             trades.add(new BuyForOneEmeraldFactory(ItemsMCA.BABY_BOY, 1, 1, 1));
