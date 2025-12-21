@@ -65,7 +65,8 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         // In 1.21.11, getList() only takes the key, returns Optional
         ListTag villageList = nbt.getList("villages").orElse(new ListTag());
         for (int i = 0; i < villageList.size(); i++) {
-            Village village = new Village(villageList.getCompound(i), world);
+            // In 1.21.11, ListTag.getCompound() returns Optional<CompoundTag>
+            Village village = new Village(villageList.getCompound(i).orElseThrow(), world);
             if (village.getBuildings().isEmpty()) {
                 MCA.LOGGER.warn("Empty village detected ({}), removing...", village.getName());
                 setDirty();
