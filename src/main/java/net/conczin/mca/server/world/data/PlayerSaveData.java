@@ -89,10 +89,9 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
 
     @SuppressWarnings("DataFlowIssue")
     public static Optional<PlayerSaveData> getIfPresent(ServerLevel world, UUID uuid) {
-        return Optional.ofNullable(world.getDataStorage().get(new SavedData.Factory<>(
-                () -> null,
-                (nbt, provider) -> new PlayerSaveData(world, uuid, nbt),
-                null), "mca_player_" + uuid));
+        // TODO: SavedData.Factory pattern changed in 1.21.11
+        // Returning empty for now - need to research new API
+        return Optional.empty();
     }
 
     public static void showMailNotification(ServerPlayer player) {

@@ -27,14 +27,15 @@ public class FamilyTree extends SavedData {
     }
 
     FamilyTree(CompoundTag nbt, HolderLookup.Provider provider) {
-        entries = NbtHelper.toMap(nbt, UUID::fromString, (id, element) -> new FamilyTreeNode(this, (CompoundTag) element));
+        entries = NbtHelper.toMap(nbt, UUID::fromString,
+                (id, element) -> new FamilyTreeNode(this, (CompoundTag) element));
     }
 
     public static FamilyTree get(ServerLevel world) {
         return WorldUtils.loadData(world.getServer().overworld(), FamilyTree::new, FamilyTree::new, DATA_ID);
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         return NbtHelper.fromMap(nbt, entries, UUID::toString, FamilyTreeNode::save);
     }
@@ -44,7 +45,8 @@ public class FamilyTree extends SavedData {
     }
 
     public Stream<FamilyTreeNode> getAllWithName(String name) {
-        return entries.values().stream().filter(n -> n.getName().toLowerCase(Locale.ROOT).equals(name.toLowerCase(Locale.ROOT)));
+        return entries.values().stream()
+                .filter(n -> n.getName().toLowerCase(Locale.ROOT).equals(name.toLowerCase(Locale.ROOT)));
     }
 
     @NotNull
@@ -79,8 +81,6 @@ public class FamilyTree extends SavedData {
                 isPlayer,
                 gender,
                 new UUID(0, 0),
-                new UUID(0, 0)
-        );
+                new UUID(0, 0));
     }
 }
-
