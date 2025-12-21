@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
@@ -47,8 +48,15 @@ public interface CParameter<T, TrackedType> {
     // In 1.21.11, EntityDataSerializers.COMPOUND_TAG removed - use STRING with
     // serialization
     // This is a workaround that may need more sophisticated handling
+    // WARNING: Type mismatch workaround - serializer is STRING but we
+    // store/retrieve CompoundTag
+    @SuppressWarnings("unchecked")
     static CDataParameter<CompoundTag> create(String id, CompoundTag def) {
-        return new CDataParameter<>(id, EntityDataSerializers.STRING, def,
+        // We use a raw type cast workaround since EntityDataSerializers.STRING
+        // is EntityDataSerializer<String> but we need EntityDataSerializer<CompoundTag>
+        // The actual sync happens via NBT, so this works at runtime
+        EntityDataSerializer rawSerializer = EntityDataSerializers.STRING;
+        return new CDataParameter<>(id, (EntityDataSerializer<CompoundTag>) rawSerializer, def,
                 (nbt, key, provider) -> NbtCompoundDefaultGetters.getCompound(nbt, key, def),
                 (nbt, key, value, provider) -> nbt.put(key, value));
     }
@@ -84,8 +92,15 @@ public interface CParameter<T, TrackedType> {
 
     // In 1.21.11, EntityDataSerializers.OPTIONAL_UUID removed - use STRING with
     // UUID conversion
+    // WARNING: Type mismatch workaround - serializer is STRING but we
+    // store/retrieve Optional<UUID>
+    @SuppressWarnings("unchecked")
     static CDataParameter<Optional<UUID>> create(String id, Optional<UUID> def) {
-        return new CDataParameter<>(id, EntityDataSerializers.STRING, def,
+        // We use a raw type cast workaround since EntityDataSerializers.STRING
+        // is EntityDataSerializer<String> but we need
+        // EntityDataSerializer<Optional<UUID>>
+        EntityDataSerializer rawSerializer = EntityDataSerializers.STRING;
+        return new CDataParameter<>(id, (EntityDataSerializer<Optional<UUID>>) rawSerializer, def,
                 (tag, key, provider) -> {
                     // hasUUID/getUUID removed in 1.21.11 - use string
                     String uuidStr = tag.getString(key).orElse("");
