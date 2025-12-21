@@ -10,6 +10,7 @@ import net.minecraft.advancements.criterion.ContextAwarePredicate;
 import net.minecraft.advancements.criterion.EntityPredicate;
 import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Optional;
@@ -28,14 +29,14 @@ public class FamilyCriterion extends SimpleCriterionTrigger<FamilyCriterion.Trig
     }
 
     public record TriggerInstance(Optional<ContextAwarePredicate> player, MinMaxBounds.Ints children,
-                                  MinMaxBounds.Ints grandchildren) implements SimpleCriterionTrigger.SimpleInstance {
-        public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create((instance) ->
-                instance.group(
-                        EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
-                        MinMaxBounds.Ints.CODEC.optionalFieldOf("children", MinMaxBounds.Ints.ANY).forGetter(TriggerInstance::children),
-                        MinMaxBounds.Ints.CODEC.optionalFieldOf("grandchildren", MinMaxBounds.Ints.ANY).forGetter(TriggerInstance::grandchildren)
-                ).apply(instance, TriggerInstance::new)
-        );
+            MinMaxBounds.Ints grandchildren) implements SimpleCriterionTrigger.SimpleInstance {
+        public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+                EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                MinMaxBounds.Ints.CODEC.optionalFieldOf("children", MinMaxBounds.Ints.ANY)
+                        .forGetter(TriggerInstance::children),
+                MinMaxBounds.Ints.CODEC.optionalFieldOf("grandchildren", MinMaxBounds.Ints.ANY)
+                        .forGetter(TriggerInstance::grandchildren))
+                .apply(instance, TriggerInstance::new));
 
         public static Criterion<TriggerInstance> family(MinMaxBounds.Ints children, MinMaxBounds.Ints grandchildren) {
             return CriterionMCA.FAMILY.createCriterion(new TriggerInstance(Optional.empty(), children, grandchildren));
@@ -46,4 +47,3 @@ public class FamilyCriterion extends SimpleCriterionTrigger<FamilyCriterion.Trig
         }
     }
 }
-
