@@ -76,8 +76,9 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         return !getTrackedValue(BABY).equals(ItemStack.EMPTY) || infant != null;
     }
 
+    // canBeCollidedWith renamed/removed in 1.21.11 - use canCollideWith instead
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canCollideWith(Entity entity) {
         return true;
     }
 
@@ -98,17 +99,24 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
 
     @Override
     protected void readAdditionalSaveData(ValueInput nbt) {
+        // In 1.21.11, ValueInput uses read() methods that return Optional
+        // For now, keep using contains() and getInt/getCompound shortcuts
+        // TODO: May need further adaptation for ValueInput API
         if (nbt.contains("Baby")) {
-            setTrackedValue(BABY, ItemStack.parseOptional(level().registryAccess(), nbt.getCompound("Baby")));
-            if (getTrackedValue(BABY).equals(ItemStack.EMPTY)) {
-                MCA.LOGGER.warn("Issue deserializing baby item from crib NBT!");
-            }
+            // getCompound returns Optional in 1.21.11
+            nbt.read("Baby").ifPresent(babyTag -> {
+                ItemStack baby = ItemStack.parseOptional(level().registryAccess(), (CompoundTag) babyTag);
+                setTrackedValue(BABY, baby);
+                if (baby.equals(ItemStack.EMPTY)) {
+                    MCA.LOGGER.warn("Issue deserializing baby item from crib NBT!");
+                }
+            });
         }
         if (nbt.contains("Wood")) {
-            setTrackedValue(WOOD, CribWoodType.values()[nbt.getInt("Wood")]);
+            nbt.getInt("Wood").ifPresent(wood -> setTrackedValue(WOOD, CribWoodType.values()[wood]));
         }
         if (nbt.contains("Color")) {
-            setTrackedValue(COLOR, DyeColor.values()[nbt.getInt("Color")]);
+            nbt.getInt("Color").ifPresent(color -> setTrackedValue(COLOR, DyeColor.values()[color]));
         }
     }
 
@@ -155,9 +163,9 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         } else if (!getTrackedValue(BABY).equals(ItemStack.EMPTY)) {
             player.getInventory().add(getTrackedValue(BABY));
             setTrackedValue(BABY, ItemStack.EMPTY);
-        } else if (player.getInventory().getSelected() != ItemStack.EMPTY
-                && player.getInventory().getSelected().getItem() instanceof BabyItem) {
-            setTrackedValue(BABY, player.getInventory().getSelected());
+        } else if (player.getMainHandItem() != ItemStack.EMPTY
+                && player.getMainHandItem().getItem() instanceof BabyItem) {
+            setTrackedValue(BABY, player.getMainHandItem());
             player.getInventory().removeItem(getTrackedValue(BABY));
         } else if (player.getFirstPassenger() != null
                 && player.getFirstPassenger() instanceof VillagerEntityMCA rider) {
