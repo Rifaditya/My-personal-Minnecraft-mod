@@ -72,9 +72,7 @@ public final class FamilyTreeNode {
                 parseUUID(nbt.getString("mother").orElse("")));
         children.addAll(NbtHelper.toList(nbt.getList("children").orElse(new net.minecraft.nbt.ListTag()),
                 c -> parseUUID(((CompoundTag) c).getString("uuid").orElse(""))));
-        profession = nbt.getString("profession")
-                .orElse(BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE)
-                        .orElseThrow().location().toString());
+        profession = nbt.getString("profession").orElse("minecraft:none");
         deceased = nbt.getBoolean("isDeceased").orElse(false);
         String spouseStr = nbt.getString("spouse").orElse("");
         if (!spouseStr.isEmpty()) {
@@ -149,14 +147,16 @@ public final class FamilyTreeNode {
     }
 
     public VillagerProfession getProfession() {
-        // In 1.21.11, Registry.get() returns Optional<Reference<>>
-        return BuiltInRegistries.VILLAGER_PROFESSION.getOptional(getProfessionId()).orElse(VillagerProfession.NONE);
+        // In 1.21.11, Registry.getOptional returns Optional<Reference<T>>, use get() on
+        // Reference
+        return BuiltInRegistries.VILLAGER_PROFESSION.getOptional(getProfessionId())
+                .map(ref -> ref.value()).orElse(VillagerProfession.NONE);
     }
 
     public void setProfession(VillagerProfession profession) {
-        // In 1.21.11, getKey() returns Optional<ResourceKey<>>
-        this.profession = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession)
-                .orElseThrow().location().toString();
+        // In 1.21.11, use ResourceKey.location() for key lookups
+        var key = BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession);
+        this.profession = key != null ? key.location().toString() : "minecraft:none";
         markDirty();
     }
 
@@ -433,17 +433,18 @@ public final class FamilyTreeNode {
     public CompoundTag save() {
         CompoundTag nbt = new CompoundTag();
         nbt.putString("name", name);
-        nbt.putUUID("id", id);
+        // In 1.21.11, putUUID doesn't exist - use putString with UUID.toString()
+        nbt.putString("id", id.toString());
         nbt.putBoolean("isPlayer", isPlayer);
         nbt.putBoolean("isDeceased", deceased);
         nbt.putInt("gender", gender.getId());
-        nbt.putUUID("father", father);
-        nbt.putUUID("mother", mother);
-        nbt.putUUID("spouse", partner);
+        nbt.putString("father", father.toString());
+        nbt.putString("mother", mother.toString());
+        nbt.putString("spouse", partner.toString());
         nbt.putInt("marriageState", relationshipState.ordinal());
         nbt.put("children", NbtHelper.fromList(children, child -> {
             CompoundTag n = new CompoundTag();
-            n.putUUID("uuid", child);
+            n.putString("uuid", child.toString());
             return n;
         }));
         return nbt;
