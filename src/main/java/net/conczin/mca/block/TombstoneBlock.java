@@ -542,10 +542,11 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
             }
 
             EntityData(CompoundTag nbt) {
+                // In 1.21.11, getCompound/getString/getInt return Optional
                 this(
-                        nbt.getCompound("EntityData"),
-                        nbt.getString("EntityName"),
-                        Gender.byId(nbt.getInt("EntityGender")));
+                        nbt.getCompound("EntityData").orElse(new CompoundTag()),
+                        nbt.getString("EntityName").orElse(""),
+                        Gender.byId(nbt.getInt("EntityGender").orElse(0)));
             }
 
             void writeNbt(CompoundTag nbt) {
