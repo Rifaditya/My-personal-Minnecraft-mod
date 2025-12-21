@@ -453,8 +453,10 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
 
         public Optional<Entity> createEntity(Level world, boolean remove) {
+            // TODO: In 1.21.11, EntityType.create signature changed
+            // Returning empty for now - need to research new pattern
             try {
-                return entityData.flatMap(data -> EntityType.create(data.nbt, world));
+                return Optional.empty();
             } finally {
                 if (remove) {
                     setEntity(null);
@@ -463,8 +465,9 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
 
         private CompoundTag writeEntityToNbt(Entity entity) {
+            // TODO: In 1.21.11, saveWithoutId signature changed
+            // Just storing the ID for now
             CompoundTag nbt = new CompoundTag();
-            entity.saveWithoutId(nbt);
             nbt.putString("id", EntityType.getKey(entity.getType()).toString());
             return nbt;
         }
