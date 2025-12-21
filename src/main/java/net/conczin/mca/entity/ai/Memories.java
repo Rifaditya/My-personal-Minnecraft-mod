@@ -29,12 +29,15 @@ public class Memories {
             return null;
         }
 
-        Memories memories = new Memories(villager.getVillagerBrain(), villager.level().getDayTime(), tag.getUUID("playerUUID"));
+        // In 1.21.11, getUUID/putUUID removed - use string serialization
+        // getInt/getLong return Optional
+        UUID playerUUID = UUID.fromString(tag.getString("playerUUID").orElse(""));
+        Memories memories = new Memories(villager.getVillagerBrain(), villager.level().getDayTime(), playerUUID);
 
-        memories.hearts = tag.getInt("hearts");
-        memories.interactionFatigue = tag.getInt("interactionFatigue");
-        memories.dialogueType = DialogueType.byId(tag.getInt("dialogueType"));
-        memories.lastSeen = tag.getLong("lastSeen");
+        memories.hearts = tag.getInt("hearts").orElse(0);
+        memories.interactionFatigue = tag.getInt("interactionFatigue").orElse(0);
+        memories.dialogueType = DialogueType.byId(tag.getInt("dialogueType").orElse(0));
+        memories.lastSeen = tag.getLong("lastSeen").orElse(0L);
 
         return memories;
     }
@@ -91,7 +94,8 @@ public class Memories {
     public CompoundTag toCNBT() {
         CompoundTag nbt = new CompoundTag();
 
-        nbt.putUUID("playerUUID", playerUUID);
+        // In 1.21.11, putUUID removed - use string serialization
+        nbt.putString("playerUUID", playerUUID.toString());
         nbt.putInt("hearts", hearts);
         nbt.putInt("interactionFatigue", interactionFatigue);
         nbt.putInt("dialogueType", dialogueType.ordinal());
@@ -101,4 +105,3 @@ public class Memories {
     }
 
 }
-

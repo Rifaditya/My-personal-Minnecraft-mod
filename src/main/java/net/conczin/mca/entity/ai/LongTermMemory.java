@@ -10,7 +10,8 @@ import java.util.Map;
 
 /**
  * The long term memory stored String keys for a given amount of time
- * While not powerful in terms of features it allows adding more intelligence to villager interactions
+ * While not powerful in terms of features it allows adding more intelligence to
+ * villager interactions
  */
 public class LongTermMemory {
     final HashMap<String, Long> memories = new HashMap<>();
@@ -43,14 +44,15 @@ public class LongTermMemory {
     }
 
     public void readFromNbt(CompoundTag nbt) {
-        CompoundTag memory = nbt.getCompound("longTermMemory");
+        // In 1.21.11, getCompound returns Optional, getAllKeys() replaced with keys()
+        CompoundTag memory = nbt.getCompound("longTermMemory").orElse(new CompoundTag());
         memories.clear();
-        for (String key : memory.getAllKeys()) {
-            memories.put(key, memory.getLong(key));
+        for (String key : memory.keySet()) {
+            memories.put(key, memory.getLong(key).orElse(0L));
         }
     }
 
-    //remember forever
+    // remember forever
     public void remember(String id) {
         remember(id, Integer.MAX_VALUE);
     }
@@ -78,4 +80,3 @@ public class LongTermMemory {
         return getMemory(id) > 0;
     }
 }
-
