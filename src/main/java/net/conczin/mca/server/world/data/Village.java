@@ -69,14 +69,16 @@ public class Village implements Iterable<Building> {
         taxes = v.getFloat("taxesFloat").orElse(0f);
         beds = v.getInt("beds").orElse(0);
         // In 1.21.11, IntTag/LongTag may need to be cast to NumericTag for
-        // getAsInt/getAsLong
+        // In 1.21.11, NumericTag.getAsInt/getAsLong return Optional, must use or
+        // primitive getters
         reputation = NbtHelper.toMap(v.getCompound("reputation").orElse(new CompoundTag()), UUID::fromString,
-                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> ((NumericTag) i2).getAsInt()));
-        // In 1.21.11, Tag::getAsString is not valid - use lambda with cast to StringTag
+                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString,
+                        i2 -> ((NumericTag) i2).getAsNumber().intValue()));
+        // In 1.21.11, StringTag.getAsString() -> asString() returns Optional
         residentNames = NbtHelper.toMap(v.getCompound("residentNames").orElse(new CompoundTag()), UUID::fromString,
-                i -> ((StringTag) i).getAsString());
+                i -> ((StringTag) i).asString().orElse(""));
         residentHomes = NbtHelper.toMap(v.getCompound("residentHomes").orElse(new CompoundTag()), UUID::fromString,
-                i -> ((NumericTag) i).getAsLong());
+                i -> ((NumericTag) i).getAsNumber().longValue());
 
         if (v.contains("populationThresholdFloat")) {
             populationThreshold = v.getFloat("populationThresholdFloat").orElse(0.75f);
