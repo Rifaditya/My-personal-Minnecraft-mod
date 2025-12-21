@@ -20,8 +20,11 @@ import net.minecraft.world.level.ItemLike;
 public class TradeOffersMCA {
     public static void bootstrap() {
         // Register trades for ADVENTURER profession using Fabric API
-        // Lambda takes single param: Consumer<List<VillagerTrades.ItemListing>>
-        TradeOfferHelper.registerVillagerOffers(ProfessionsMCA.ADVENTURER, 1, trades -> {
+        // In 1.21.11, registerVillagerOffers takes ResourceKey<VillagerProfession>
+        // Use BuiltInRegistries to get the ResourceKey from the profession
+        net.minecraft.resources.ResourceKey<net.minecraft.world.entity.npc.villager.VillagerProfession> adventurerKey = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
+                .getResourceKey(ProfessionsMCA.ADVENTURER).orElseThrow();
+        TradeOfferHelper.registerVillagerOffers(adventurerKey, 1, trades -> {
             trades.add(new SellItemFactory(Items.SLIME_BALL, 1, 1, 16, 1));
             trades.add(new SellItemFactory(Items.LEATHER_HORSE_ARMOR, 3, 1, 4, 10));
             trades.add(new SellItemFactory(Items.SADDLE, 4, 1, 3, 5));
@@ -35,7 +38,9 @@ public class TradeOffersMCA {
         });
 
         // Register trades for CULTIST profession using Fabric API
-        TradeOfferHelper.registerVillagerOffers(ProfessionsMCA.CULTIST, 1, trades -> {
+        net.minecraft.resources.ResourceKey<net.minecraft.world.entity.npc.villager.VillagerProfession> cultistKey = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
+                .getResourceKey(ProfessionsMCA.CULTIST).orElseThrow();
+        TradeOfferHelper.registerVillagerOffers(cultistKey, 1, trades -> {
             trades.add(new SellItemFactory(ItemsMCA.SIRBEN_BABY_BOY, 5, 1, 1, 1));
             trades.add(new SellItemFactory(ItemsMCA.SIRBEN_BABY_GIRL, 5, 1, 1, 1));
             trades.add(new BuyForOneEmeraldFactory(ItemsMCA.BABY_BOY, 1, 1, 1));
