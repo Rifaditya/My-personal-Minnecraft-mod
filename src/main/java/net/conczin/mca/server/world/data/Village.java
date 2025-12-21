@@ -68,13 +68,15 @@ public class Village implements Iterable<Building> {
         name = v.getString("name").orElse("");
         taxes = v.getFloat("taxesFloat").orElse(0f);
         beds = v.getInt("beds").orElse(0);
+        // In 1.21.11, IntTag/LongTag may need to be cast to NumericTag for
+        // getAsInt/getAsLong
         reputation = NbtHelper.toMap(v.getCompound("reputation").orElse(new CompoundTag()), UUID::fromString,
-                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> ((IntTag) i2).getAsInt()));
+                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> ((NumericTag) i2).getAsInt()));
         // In 1.21.11, Tag::getAsString is not valid - use lambda with cast to StringTag
         residentNames = NbtHelper.toMap(v.getCompound("residentNames").orElse(new CompoundTag()), UUID::fromString,
-                i -> ((net.minecraft.nbt.StringTag) i).getAsString());
+                i -> ((StringTag) i).getAsString());
         residentHomes = NbtHelper.toMap(v.getCompound("residentHomes").orElse(new CompoundTag()), UUID::fromString,
-                i -> ((LongTag) i).getAsLong());
+                i -> ((NumericTag) i).getAsLong());
 
         if (v.contains("populationThresholdFloat")) {
             populationThreshold = v.getFloat("populationThresholdFloat").orElse(0.75f);
@@ -92,7 +94,8 @@ public class Village implements Iterable<Building> {
 
         ListTag b = v.getList("buildings").orElse(new ListTag());
         for (int i = 0; i < b.size(); i++) {
-            Building building = new Building(b.getCompound(i));
+            // In 1.21.11, ListTag.getCompound(i) returns Optional
+            Building building = new Building(b.getCompound(i).orElse(new CompoundTag()));
 
             if (world == null || BuildingTypes.getInstance().getBuildingTypes().containsKey(building.getType())) {
                 buildings.put(building.getId(), building);
