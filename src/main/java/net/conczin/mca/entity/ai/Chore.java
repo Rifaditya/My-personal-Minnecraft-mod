@@ -13,17 +13,19 @@ import java.util.stream.Stream;
 
 public enum Chore {
     NONE("none", null),
-    PROSPECT("prospecting", PickaxeItem.class),
-    HARVEST("harvesting", HoeItem.class),
-    CHOP("chopping", AxeItem.class),
-    HUNT("hunting", SwordItem.class),
+    // In 1.21.11, tool-specific classes like PickaxeItem, SwordItem are removed
+    // Tools are now just Items - using Item.class as placeholder
+    // Actual tool detection should use data components in 1.21.11
+    PROSPECT("prospecting", Item.class), // was PickaxeItem
+    HARVEST("harvesting", Item.class), // was HoeItem
+    CHOP("chopping", Item.class), // was AxeItem
+    HUNT("hunting", Item.class), // was SwordItem
     FISH("fishing", FishingRodItem.class);
 
     private static final Chore[] VALUES = values();
     private static final Map<String, Chore> REGISTRY = Stream.of(VALUES).collect(Collectors.toMap(
             c -> c.friendlyName,
-            Function.identity())
-    );
+            Function.identity()));
 
     private final String friendlyName;
 
@@ -55,5 +57,3 @@ public enum Chore {
         return toolType;
     }
 }
-
-

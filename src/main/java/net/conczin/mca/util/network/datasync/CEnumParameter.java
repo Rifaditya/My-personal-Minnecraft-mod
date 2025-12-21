@@ -40,7 +40,9 @@ public class CEnumParameter<T extends Enum<T>> implements CParameter<T, Integer>
 
     @Override
     public T load(CompoundTag nbt, RegistryAccess registryAccess) {
-        return nbt.contains(id, Tag.TAG_ANY_NUMERIC) ? fromIndex(nbt.getInt(id)) : defaultValue;
+        // In 1.21.11, contains() single param, TAG_ANY_NUMERIC removed, getInt returns
+        // Optional
+        return nbt.contains(id) ? fromIndex(nbt.getInt(id).orElse(-1)) : defaultValue;
     }
 
     @Override
@@ -59,4 +61,3 @@ public class CEnumParameter<T extends Enum<T>> implements CParameter<T, Integer>
         return SynchedEntityData.defineId(type, EntityDataSerializers.INT);
     }
 }
-
