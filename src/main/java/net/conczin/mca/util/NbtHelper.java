@@ -21,7 +21,8 @@ public interface NbtHelper {
 
     @SuppressWarnings("unchecked")
     static <T extends Tag> T computeIfAbsent(CompoundTag nbt, String key, int type, Supplier<T> factory) {
-        if (!nbt.contains(key, type)) {
+        // In 1.21.11, contains(key, type) signature changed to contains(key) only
+        if (!nbt.contains(key)) {
             nbt.put(key, factory.get());
         }
         return (T) nbt.get(key);

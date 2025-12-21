@@ -21,16 +21,20 @@ public class CivilRegistryManager extends SavedData {
     }
 
     CivilRegistryManager(CompoundTag nbt, HolderLookup.Provider provider) {
-        entries.addAll(NbtHelper.toList(nbt.get("entries"), element -> Component.Serializer.fromJson(element.getAsString(), provider)));
+        // In 1.21.11, Tag.getAsString() doesn't exist - cast to StringTag first
+        entries.addAll(NbtHelper.toList(nbt.get("entries"),
+                element -> Component.Serializer.fromJson(((StringTag) element).getAsString(), provider)));
     }
 
     public static CivilRegistryManager get(ServerLevel world, Village village) {
-        return WorldUtils.loadData(world.getServer().overworld(), CivilRegistryManager::new, CivilRegistryManager::new, "mca_civil_registry_" + village.getId());
+        return WorldUtils.loadData(world.getServer().overworld(), CivilRegistryManager::new, CivilRegistryManager::new,
+                "mca_civil_registry_" + village.getId());
     }
 
     @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
-        ListTag elements = NbtHelper.fromList(entries, a -> StringTag.valueOf(Component.Serializer.toJson(a, provider)));
+        ListTag elements = NbtHelper.fromList(entries,
+                a -> StringTag.valueOf(Component.Serializer.toJson(a, provider)));
         nbt.put("entries", elements);
         return nbt;
     }
@@ -45,4 +49,3 @@ public class CivilRegistryManager extends SavedData {
         return to <= from ? List.of() : entries.subList(from, to);
     }
 }
-
