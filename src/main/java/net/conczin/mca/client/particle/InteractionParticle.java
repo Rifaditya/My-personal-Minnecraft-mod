@@ -4,7 +4,8 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 
-public class InteractionParticle extends TextureSheetParticle {
+// TextureSheetParticle renamed to SingleQuadParticle in 1.21.11
+public class InteractionParticle extends SingleQuadParticle {
     protected InteractionParticle(ClientLevel world, double x, double y, double z) {
         super(world, x, y, z);
         this.xd *= 0.01F;
@@ -32,7 +33,7 @@ public class InteractionParticle extends TextureSheetParticle {
         if (this.age++ >= this.lifetime) {
             this.remove();
         } else {
-            //this.move(this.xd, this.yd, this.zd);
+            // this.move(this.xd, this.yd, this.zd);
             if (this.y == this.yo) {
                 this.xd *= 1.1D;
                 this.zd *= 1.1D;
@@ -56,7 +57,8 @@ public class InteractionParticle extends TextureSheetParticle {
             this.sprite = sprite;
         }
 
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {
+        public Particle createParticle(SimpleParticleType particleType, ClientLevel world, double x, double y, double z,
+                double velocityX, double velocityY, double velocityZ) {
             InteractionParticle heartparticle = new InteractionParticle(world, x, y + 0.5D, z);
             heartparticle.pickSprite(this.sprite);
             heartparticle.setColor(1.0F, 1.0F, 1.0F);
@@ -64,4 +66,3 @@ public class InteractionParticle extends TextureSheetParticle {
         }
     }
 }
-
