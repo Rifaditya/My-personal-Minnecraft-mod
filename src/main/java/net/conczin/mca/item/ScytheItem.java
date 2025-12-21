@@ -26,8 +26,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 public class ScytheItem extends SwordItem {
+    // Tiers renamed to ToolMaterial in 1.21.11
     public ScytheItem(Properties settings) {
-        super(Tiers.GOLD, settings);
+        super(net.minecraft.world.item.ToolMaterial.GOLD, settings);
     }
 
     public static void setSoul(ItemStack stack, boolean soul) {
@@ -44,25 +45,28 @@ public class ScytheItem extends SwordItem {
         BlockState state = world.getBlockState(pos);
 
         if (state.is(TagsMCA.Blocks.TOMBSTONES)) {
-            return TombstoneBlock.Data.of(world.getBlockEntity(pos)).filter(TombstoneBlock.Data::hasEntity).map(data -> {
-                if (!context.getlevel().isClientSide()) {
-                    CriterionMCA.GENERIC_EVENT.trigger((ServerPlayer) context.getPlayer(), cure ? "staffOfLife" : "scytheRevive");
-                }
+            return TombstoneBlock.Data.of(world.getBlockEntity(pos)).filter(TombstoneBlock.Data::hasEntity)
+                    .map(data -> {
+                        if (!context.getLevel().isClientSide()) {
+                            CriterionMCA.GENERIC_EVENT.trigger((ServerPlayer) context.getPlayer(),
+                                    cure ? "staffOfLife" : "scytheRevive");
+                        }
 
-                if (!world.isClientSide() && !data.isResurrecting()) {
-                    data.startResurrecting(cure);
-                    return InteractionResult.SUCCESS;
-                }
+                        if (!world.isClientSide() && !data.isResurrecting()) {
+                            data.startResurrecting(cure);
+                            return InteractionResult.SUCCESS;
+                        }
 
-                return InteractionResult.PASS;
-            }).orElse(InteractionResult.FAIL);
+                        return InteractionResult.PASS;
+                    }).orElse(InteractionResult.FAIL);
         }
         return InteractionResult.PASS;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.addAll(FlowingText.wrap(Component.translatable(getDescriptionId(stack) + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
+        tooltip.addAll(FlowingText.wrap(
+                Component.translatable(getDescriptionId(stack) + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
     }
 
     @Override
@@ -91,13 +95,13 @@ public class ScytheItem extends SwordItem {
             float baseVolume = selected ? 0.75F : 0.25F;
             entity.level().playSound(null, entity.blockPosition(), SoundsMCA.REAPER_SCYTHE_OUT, entity.getSoundSource(),
                     baseVolume + r.nextFloat() / 2F,
-                    0.65F + r.nextFloat() / 10F
-            );
+                    0.65F + r.nextFloat() / 10F);
         }
 
         if (selected) {
             if (living.swingTime == -1) {
-                entity.level().playSound(null, entity.blockPosition(), SoundsMCA.REAPER_SCYTHE_SWING, entity.getSoundSource(), 0.25F, 1);
+                entity.level().playSound(null, entity.blockPosition(), SoundsMCA.REAPER_SCYTHE_SWING,
+                        entity.getSoundSource(), 0.25F, 1);
             }
         }
     }
@@ -136,7 +140,8 @@ public class ScytheItem extends SwordItem {
 
         SoundEvent sound = SoundsMCA.REAPER_SCYTHE_OUT;
 
-        if (!hasSoul(stack) && target.isDeadOrDying() && (target.getType() == EntitiesMCA.MALE_VILLAGER || target.getType() == EntitiesMCA.FEMALE_VILLAGER)) {
+        if (!hasSoul(stack) && target.isDeadOrDying()
+                && (target.getType() == EntitiesMCA.MALE_VILLAGER || target.getType() == EntitiesMCA.FEMALE_VILLAGER)) {
             setSoul(stack, true);
             sound = SoundEvents.BELL_RESONATE;
 
@@ -148,8 +153,7 @@ public class ScytheItem extends SwordItem {
         RandomSource r = attacker.level().random;
         attacker.level().playSound(null, attacker.blockPosition(), sound, attacker.getSoundSource(),
                 0.75F + r.nextFloat() / 2F,
-                0.75F + r.nextFloat() / 2F
-        );
+                0.75F + r.nextFloat() / 2F);
 
         return super.hurtEnemy(stack, target, attacker);
     }
@@ -159,4 +163,3 @@ public class ScytheItem extends SwordItem {
         return stack.getItem() == ingredient.getItem();
     }
 }
-
