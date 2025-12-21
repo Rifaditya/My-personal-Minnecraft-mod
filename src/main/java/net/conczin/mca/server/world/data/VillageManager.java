@@ -55,7 +55,8 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         this.world = world;
         lastBuildingId = nbt.getInt("lastBuildingId");
         lastVillageId = nbt.getInt("lastVillageId");
-        reapers = nbt.contains("reapers", Tag.TAG_COMPOUND) ? new ReaperSpawner(this, nbt.getCompound("reapers")) : new ReaperSpawner(this);
+        reapers = nbt.contains("reapers", Tag.TAG_COMPOUND) ? new ReaperSpawner(this, nbt.getCompound("reapers"))
+                : new ReaperSpawner(this);
 
         ListTag villageList = nbt.getList("villages", Tag.TAG_COMPOUND);
         for (int i = 0; i < villageList.size(); i++) {
@@ -70,7 +71,8 @@ public class VillageManager extends SavedData implements Iterable<Village> {
     }
 
     public static VillageManager get(ServerLevel world) {
-        return WorldUtils.loadData(world, (nbt, provider) -> new VillageManager(world, nbt), VillageManager::new, "mca_villages");
+        return WorldUtils.loadData(world, (nbt, provider) -> new VillageManager(world, nbt), VillageManager::new,
+                "mca_villages");
     }
 
     public ReaperSpawner getReaperSpawner() {
@@ -100,11 +102,13 @@ public class VillageManager extends SavedData implements Iterable<Village> {
 
     public Optional<Village> findNearestVillage(Entity entity) {
         BlockPos p = entity.blockPosition();
-        return findVillages(v -> v.isWithinBorder(entity)).min((a, b) -> (int) (a.getCenter().distSqr(p) - b.getCenter().distSqr(p)));
+        return findVillages(v -> v.isWithinBorder(entity))
+                .min((a, b) -> (int) (a.getCenter().distSqr(p) - b.getCenter().distSqr(p)));
     }
 
     public Optional<Village> findNearestVillage(BlockPos p, int margin) {
-        return findVillages(v -> v.isWithinBorder(p, margin)).min((a, b) -> (int) (a.getCenter().distSqr(p) - b.getCenter().distSqr(p)));
+        return findVillages(v -> v.isWithinBorder(p, margin))
+                .min((a, b) -> (int) (a.getCenter().distSqr(p) - b.getCenter().distSqr(p)));
     }
 
     public boolean isWithinHorizontalBoundaries(BlockPos p) {
@@ -124,17 +128,17 @@ public class VillageManager extends SavedData implements Iterable<Village> {
      * Updates all the villages in the world.
      */
     public void tick() {
-        //keep track of where player are currently
+        // keep track of where player are currently
         if (world.getDayTime() % 100 == 0) {
-            world.players().forEach(player ->
-                    PlayerSaveData.get(player).updateLastSeenVillage(this, player)
-            );
+            world.players().forEach(player -> PlayerSaveData.get(player).updateLastSeenVillage(this, player));
         }
 
-        //send bounty hunters
-        if (world.getDayTime() % (Config.getInstance().bountyHunterInterval / 10) == 0 && world.getDifficulty() != Difficulty.PEACEFUL) {
+        // send bounty hunters
+        if (world.getDayTime() % (Config.getInstance().bountyHunterInterval / 10) == 0
+                && world.getDifficulty() != Difficulty.PEACEFUL) {
             world.players().forEach(player -> {
-                if (world.random.nextInt(10) == 0 && !isWithinHorizontalBoundaries(player.blockPosition()) && !player.isCreative()) {
+                if (world.random.nextInt(10) == 0 && !isWithinHorizontalBoundaries(player.blockPosition())
+                        && !player.isCreative()) {
                     villages.values().stream()
                             .filter(v -> v.getPopulation() >= 3)
                             .filter(v -> v.getReputation(player) < Config.getInstance().bountyHunterHearts)
@@ -150,7 +154,7 @@ public class VillageManager extends SavedData implements Iterable<Village> {
             v.tick(world, time);
         }
 
-        //process a single building
+        // process a single building
         if (time % buildingCooldown == 0 && !buildingQueue.isEmpty()) {
             processBuilding(buildingQueue.removeFirst());
         }
@@ -164,19 +168,19 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         int count = Math.min(15, -sender.getReputation(player) / heartsPerHunter + 2);
 
         if (sender.getPopulation() == 0) {
-            //the village has been wiped out, lets send one last wave
+            // the village has been wiped out, lets send one last wave
             sender.cleanReputation();
 
             count *= 2;
         } else {
-            //slightly increase your reputation
+            // slightly increase your reputation
             sender.pushHearts(player, count * heartsPerHunter / 2);
         }
 
-        //trigger advancement
+        // trigger advancement
         CriterionMCA.GENERIC_EVENT.trigger(player, "bounty_hunter");
 
-        //spawn the bois
+        // spawn the bois
         for (int c = 0; c < count; c++) {
             if (world.random.nextBoolean()) {
                 spawnBountyHunter(EntityType.PILLAGER, player);
@@ -185,15 +189,20 @@ public class VillageManager extends SavedData implements Iterable<Village> {
             }
         }
 
-        //warn the player
-        player.displayClientMessage(Component.translatable(sender.getPopulation() == 0 ? "events.bountyHuntersFinal" : "events.bountyHunters", sender.getName()).withStyle(ChatFormatting.RED), false);
+        // warn the player
+        player.displayClientMessage(Component
+                .translatable(sender.getPopulation() == 0 ? "events.bountyHuntersFinal" : "events.bountyHunters",
+                        sender.getName())
+                .withStyle(ChatFormatting.RED), false);
 
-        //civil entry
-        sender.getCivilRegistry().ifPresent(r -> r.addText(Component.translatable("civil_registry.bounty_hunters", player.getName())));
+        // civil entry
+        sender.getCivilRegistry()
+                .ifPresent(r -> r.addText(Component.translatable("civil_registry.bounty_hunters", player.getName())));
     }
 
     private <T extends AbstractIllager> void spawnBountyHunter(EntityType<T> t, ServerPlayer player) {
-        AbstractIllager pillager = t.create(world);
+        // EntityType.create now requires EntitySpawnReason in 1.21.11
+        AbstractIllager pillager = t.create(world, EntitySpawnReason.EVENT);
         if (pillager != null) {
             for (int attempt = 0; attempt < 32; attempt++) {
                 float f = this.world.random.nextFloat() * 6.2831855F;
@@ -211,9 +220,9 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         }
     }
 
-    //adds a potential block to the processing queue
+    // adds a potential block to the processing queue
     public void reportBuilding(BlockPos pos) {
-        //mark in cache
+        // mark in cache
         cache.add(pos);
 
         buildingQueue.add(pos);
@@ -223,7 +232,8 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         return processBuilding(pos, false, true);
     }
 
-    //checks weather the given block contains a grouped building block, e.g., a town bell or gravestone
+    // checks weather the given block contains a grouped building block, e.g., a
+    // town bell or gravestone
     private BuildingType getGroupedBuildingType(BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
         for (BuildingType bt : BuildingTypes.getInstance()) {
@@ -234,7 +244,7 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         return null;
     }
 
-    //returns the scan-source blocks of all buildings, used to check for overlaps
+    // returns the scan-source blocks of all buildings, used to check for overlaps
     private Set<BlockPos> getBlockedSet(Village village) {
         return village.getBuildings().values().stream()
                 .filter(b -> !b.getBuildingType().grouped())
@@ -242,18 +252,18 @@ public class VillageManager extends SavedData implements Iterable<Village> {
                 .collect(Collectors.toSet());
     }
 
-    //processed a building at given position
+    // processed a building at given position
     public Building.validationResult processBuilding(BlockPos pos, boolean enforce, boolean strictScan) {
-        //find the closest village
+        // find the closest village
         Optional<Village> optionalVillage = findNearestVillage(pos, Village.MERGE_MARGIN);
 
-        //check if this might be a grouped building
+        // check if this might be a grouped building
         BuildingType groupedBuildingType = getGroupedBuildingType(pos);
 
-        //block existing buildings to prevent overlaps
+        // block existing buildings to prevent overlaps
         Set<BlockPos> blocked = new HashSet<>();
 
-        //look for existing building
+        // look for existing building
         boolean found = false;
         List<Integer> toRemove = new LinkedList<>();
         if (optionalVillage.isPresent()) {
@@ -264,7 +274,7 @@ public class VillageManager extends SavedData implements Iterable<Village> {
                 String name = groupedBuildingType.name();
                 double range = groupedBuildingType.mergeRange() * groupedBuildingType.mergeRange();
 
-                //add POI to the nearest one
+                // add POI to the nearest one
                 Optional<Building> building = village.getBuildings().values().stream()
                         .filter(b -> b.getType().equals(name))
                         .min((a, b) -> (int) (a.getCenter().distSqr(pos) - b.getCenter().distSqr(pos)))
@@ -276,26 +286,27 @@ public class VillageManager extends SavedData implements Iterable<Village> {
                     setDirty();
                 }
             } else {
-                //verify affected buildings
+                // verify affected buildings
                 for (Building b : village.getBuildings().values()) {
                     if (b.containsPos(pos)) {
                         if (!enforce) {
                             found = true;
                         }
-                        if ((enforce || world.getGameTime() - b.getLastScan() > Building.SCAN_COOLDOWN) && b.validateBuilding(world, blocked) != Building.validationResult.SUCCESS) {
+                        if ((enforce || world.getGameTime() - b.getLastScan() > Building.SCAN_COOLDOWN)
+                                && b.validateBuilding(world, blocked) != Building.validationResult.SUCCESS) {
                             toRemove.add(b.getId());
                         }
                     }
                 }
             }
 
-            //remove buildings, which became invalid for whatever reason
+            // remove buildings, which became invalid for whatever reason
             for (int id : toRemove) {
                 village.removeBuilding(id);
                 setDirty();
             }
 
-            //village is empty
+            // village is empty
             if (village.getBuildings().isEmpty()) {
                 villages.remove(village.getId());
                 optionalVillage = Optional.empty();
@@ -303,52 +314,53 @@ public class VillageManager extends SavedData implements Iterable<Village> {
             }
         }
 
-        //add a new building, if no overlap has been found or the player enforced a full add
+        // add a new building, if no overlap has been found or the player enforced a
+        // full add
         if (!found && !blocked.contains(pos)) {
-            //create new village
+            // create new village
             Village village = optionalVillage.orElse(new Village(lastVillageId++, world));
 
-            //create new building
+            // create new building
             Building building = new Building(pos, strictScan);
             if (groupedBuildingType != null) {
-                //add initial poi
+                // add initial poi
                 building.setType(groupedBuildingType.name());
                 building.addPOI(world, pos);
             } else {
-                //check its boundaries, count the blocks, etc
+                // check its boundaries, count the blocks, etc
                 Building.validationResult result = building.validateBuilding(world, blocked);
                 if (result == Building.validationResult.SUCCESS) {
-                    //the building is valid, but might be identical to an old one with an existing one
+                    // the building is valid, but might be identical to an old one with an existing
+                    // one
                     if (village.getBuildings().values().stream().anyMatch(b -> b.isIdentical(building))) {
                         return Building.validationResult.IDENTICAL;
                     }
                 } else {
-                    //not valid
+                    // not valid
                     return result;
                 }
             }
 
-            //add to building list
+            // add to building list
             villages.put(village.getId(), village);
             building.setId(lastBuildingId++);
             village.getBuildings().put(building.getId(), building);
             village.calculateDimensions();
 
-            //attempt to merge
+            // attempt to merge
             villages.values().stream()
                     .filter(v -> v != village)
                     .filter(v -> v.getBox().inflatedBy(Village.MERGE_MARGIN).intersects(village.getBox()))
                     .findAny()
                     .ifPresent(v -> {
-                                if (v.getPopulation() > village.getPopulation()) {
-                                    merge(v, village);
-                                    villages.remove(village.getId());
-                                } else {
-                                    merge(village, v);
-                                    villages.remove(v.getId());
-                                }
-                            }
-                    );
+                        if (v.getPopulation() > village.getPopulation()) {
+                            merge(v, village);
+                            villages.remove(village.getId());
+                        } else {
+                            merge(village, v);
+                            villages.remove(v.getId());
+                        }
+                    });
 
             setDirty();
         }
@@ -364,4 +376,3 @@ public class VillageManager extends SavedData implements Iterable<Village> {
         into.merge(from);
     }
 }
-
