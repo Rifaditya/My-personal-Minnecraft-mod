@@ -25,7 +25,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.entity.monster.AbstractIllager;
+// AbstractIllager may have been removed/reorganized in 1.21.11
+// Using Mob as the base type for bounty hunters
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -200,9 +202,10 @@ public class VillageManager extends SavedData implements Iterable<Village> {
                 .ifPresent(r -> r.addText(Component.translatable("civil_registry.bounty_hunters", player.getName())));
     }
 
-    private <T extends AbstractIllager> void spawnBountyHunter(EntityType<T> t, ServerPlayer player) {
+    // AbstractIllager class removed/reorganized in 1.21.11, using Mob as base type
+    private <T extends Mob> void spawnBountyHunter(EntityType<T> t, ServerPlayer player) {
         // EntityType.create now requires EntitySpawnReason in 1.21.11
-        AbstractIllager pillager = t.create(world, EntitySpawnReason.EVENT);
+        Mob pillager = t.create(world, EntitySpawnReason.EVENT);
         if (pillager != null) {
             for (int attempt = 0; attempt < 32; attempt++) {
                 float f = this.world.random.nextFloat() * 6.2831855F;
