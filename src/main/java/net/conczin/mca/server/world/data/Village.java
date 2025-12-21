@@ -69,16 +69,27 @@ public class Village implements Iterable<Building> {
         taxes = v.getFloat("taxesFloat").orElse(0f);
         beds = v.getInt("beds").orElse(0);
         // In 1.21.11, IntTag/LongTag may need to be cast to NumericTag for
-        // In 1.21.11, NumericTag.getAsInt/getAsLong return Optional, must use or
-        // primitive getters
+        // In 1.21.11, NBT value extraction uses different patterns
+        // For int values - use IntTag or just get the value as a Number via casting
         reputation = NbtHelper.toMap(v.getCompound("reputation").orElse(new CompoundTag()), UUID::fromString,
-                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString,
-                        i2 -> ((NumericTag) i2).getAsNumber().intValue()));
-        // In 1.21.11, StringTag.getAsString() -> asString() returns Optional
+                i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> {
+                    // Cast to IntTag and get value directly
+                    if (i2 instanceof net.minecraft.nbt.IntTag intTag) {
+                        return intTag.intValue();
+                    }
+                    return 0;
+                }));
+        // In 1.21.11, StringTag.asString() returns Optional
         residentNames = NbtHelper.toMap(v.getCompound("residentNames").orElse(new CompoundTag()), UUID::fromString,
                 i -> ((StringTag) i).asString().orElse(""));
         residentHomes = NbtHelper.toMap(v.getCompound("residentHomes").orElse(new CompoundTag()), UUID::fromString,
-                i -> ((NumericTag) i).getAsNumber().longValue());
+                i -> {
+                    // Cast to LongTag and get value directly
+                    if (i instanceof net.minecraft.nbt.LongTag longTag) {
+                        return longTag.longValue();
+                    }
+                    return 0L;
+                });
 
         if (v.contains("populationThresholdFloat")) {
             populationThreshold = v.getFloat("populationThresholdFloat").orElse(0.75f);
