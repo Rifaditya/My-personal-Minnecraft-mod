@@ -79,18 +79,16 @@ public class Residency {
                             // In 1.21.11, VillagerData getter/setter methods changed
                             // withProfession expects Holder<VillagerProfession>
                             int level = entity.getVillagerData().level();
-                            // Get holder for the profession from the registry
-                            BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(profession)
-                                    .ifPresent(professionHolder -> {
-                                        entity.setVillagerData(
-                                                entity.getVillagerData().withProfession(professionHolder).withLevel(1));
-                                        entity.setOffers(null);
-                                        entity.getOffers();
-                                        for (int l = 1; l < level; l++) {
-                                            entity.customLevelUp();
-                                        }
-                                        entity.refreshBrain((ServerLevel) player.level());
-                                    });
+                            // wrapAsHolder returns Holder directly, not Optional
+                            var professionHolder = BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(profession);
+                            entity.setVillagerData(
+                                    entity.getVillagerData().withProfession(professionHolder).withLevel(1));
+                            entity.setOffers(null);
+                            entity.getOffers();
+                            for (int l = 1; l < level; l++) {
+                                entity.customLevelUp();
+                            }
+                            entity.refreshBrain((ServerLevel) player.level());
                         });
 
                         // Success
