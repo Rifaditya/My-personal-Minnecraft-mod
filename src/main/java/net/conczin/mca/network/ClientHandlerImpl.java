@@ -50,7 +50,8 @@ public class ClientHandlerImpl implements ClientHandler {
             case INTERACT:
                 if (client.player != null) {
                     ItemStack item = client.player.getItemInHand(InteractionHand.MAIN_HAND);
-                    boolean isOnBlacklist = Config.getInstance().villagerInteractionItemBlacklist.contains(BuiltInRegistries.ITEM.getKey(item.getItem()).toString());
+                    boolean isOnBlacklist = Config.getInstance().villagerInteractionItemBlacklist
+                            .contains(BuiltInRegistries.ITEM.getKey(item.getItem()).toString());
                     if (!isOnBlacklist) {
                         VillagerLike<?> villager = (VillagerLike<?>) client.level.getEntity(message.villager());
                         client.setScreen(new InteractScreen(villager));
@@ -65,7 +66,8 @@ public class ClientHandlerImpl implements ClientHandler {
             case LIMITED_VILLAGER_EDITOR:
                 entity = client.level.getEntity(message.villager());
                 assert entity != null;
-                client.setScreen(new LimitedVillagerEditorScreen(entity.getUUID(), Minecraft.getInstance().player.getUUID()));
+                client.setScreen(
+                        new LimitedVillagerEditorScreen(entity.getUUID(), Minecraft.getInstance().player.getUUID()));
                 break;
             case NEEDLE_AND_THREAD:
                 entity = client.level.getEntity(message.villager());
@@ -127,7 +129,8 @@ public class ClientHandlerImpl implements ClientHandler {
 
             Village village = new Village(message.getData(), null);
             gui.setVillage(village);
-            gui.setVillageData(message.rank(), message.reputation(), message.isVillage(), message.ids(), message.tasks());
+            gui.setVillageData(message.rank(), message.reputation(), message.isVillage(), message.ids(),
+                    message.tasks());
         }
     }
 
@@ -194,7 +197,8 @@ public class ClientHandlerImpl implements ClientHandler {
 
     @Override
     public void handleToastMessage(ShowToastRequest message) {
-        SystemToast.add(client.getToasts(), SystemToast.SystemToastId.PERIODIC_NOTIFICATION, message.getTitle(), message.getMessage());
+        SystemToast.add(client.getToasts(), SystemToast.SystemToastId.PERIODIC_NOTIFICATION, message.getTitle(),
+                message.getMessage());
     }
 
     @Override
@@ -208,7 +212,9 @@ public class ClientHandlerImpl implements ClientHandler {
     @Override
     public void handlePlayerDataMessage(PlayerDataMessage response) {
         assert client.level != null;
-        VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(client.level);
+        // EntityType.create now requires EntitySpawnReason in 1.21.11
+        VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(client.level,
+                net.minecraft.world.entity.EntitySpawnReason.LOAD);
         assert villager != null;
         villager.readAdditionalSaveData(response.nbt());
         MCAClient.addPlayerData(response.uuid(), villager);
@@ -248,9 +254,9 @@ public class ClientHandlerImpl implements ClientHandler {
     @Override
     public void handleCivilRegistryResponse(CivilRegistryResponse response) {
         Screen screen = client.screen;
-        if (screen instanceof ExtendedBookScreen extendedBookScreen && (extendedBookScreen.getBook() instanceof CivilRegistryBook civilRegistryBook)) {
+        if (screen instanceof ExtendedBookScreen extendedBookScreen
+                && (extendedBookScreen.getBook() instanceof CivilRegistryBook civilRegistryBook)) {
             civilRegistryBook.receive(response.getIndex(), response.getLines());
         }
     }
 }
-
