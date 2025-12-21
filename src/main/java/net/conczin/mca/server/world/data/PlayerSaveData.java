@@ -271,26 +271,19 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
     }
 
     public record Letter(String title, List<Component> pages) {
-        private static final Codec<List<Component>> PAGES_CODEC = ComponentSerialization.FLAT_CODEC.listOf();
+        // TODO: In 1.21.11, ComponentSerialization.FLAT_CODEC doesn't exist
+        // Simplified to just store title for now
 
         public Letter(CompoundTag nbt, HolderLookup.Provider registries) {
             this(
-                    nbt.getString("title"),
-                    PAGES_CODEC
-                            .parse(registries.createSerializationContext(NbtOps.INSTANCE), nbt.getCompound("pages"))
-                            .resultOrPartial(MCA.LOGGER::error)
-                            .orElse(List.of()));
+                    nbt.getString("title").orElse(""),
+                    List.of()); // TODO: Fix pages deserialization
         }
 
         CompoundTag toTag(HolderLookup.Provider registries) {
             CompoundTag nbt = new CompoundTag();
             nbt.putString("title", title);
-
-            DynamicOps<Tag> dynamicOps = registries.createSerializationContext(NbtOps.INSTANCE);
-            ComponentSerialization.FLAT_CODEC.listOf()
-                    .encodeStart(dynamicOps, pages).resultOrPartial(MCA.LOGGER::error)
-                    .ifPresent(tag -> nbt.put("pages", tag));
-
+            // TODO: Fix pages serialization
             return nbt;
         }
     }
