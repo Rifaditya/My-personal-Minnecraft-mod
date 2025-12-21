@@ -12,17 +12,15 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.ai.util.RandomPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.Heightmap;
-
-import java.util.EnumSet;
 
 public record DestinyMessage(String location, boolean isClosing) implements HandleablePayload {
     public static final CustomPacketPayload.Type<DestinyMessage> TYPE = new CustomPacketPayload.Type<>(
@@ -70,8 +68,9 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         ChunkPos chunkPos = new ChunkPos(pos);
         ((ServerLevel) player.level()).getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkPos, 1,
                 player.getId());
-        player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), player.getYRot(), player.getXRot(),
-                EnumSet.noneOf(RelativeMovement.class));
+        // In 1.21.11, RelativeMovement was removed. Use simpler teleport method
+        // requestTeleport without flags or use teleportTo(x, y, z, yaw, pitch)
+        player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), player.getYRot(), player.getXRot());
         player.setRespawnPosition(player.level().dimension(), pos, 0.0f, true, false);
         // noinspection DataFlowIssue
         if (player.level().getServer().isSingleplayerOwner(player.getGameProfile())) {
@@ -84,4 +83,3 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         return TYPE;
     }
 }
-
