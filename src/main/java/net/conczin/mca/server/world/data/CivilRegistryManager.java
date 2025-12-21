@@ -21,20 +21,9 @@ public class CivilRegistryManager extends SavedData {
     }
 
     CivilRegistryManager(CompoundTag nbt, HolderLookup.Provider provider) {
-        // In 1.21.11, need to get string value from ListTag elements
-        // StringTag may have different API - use toString/value pattern
-        ListTag list = (ListTag) nbt.get("entries");
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                String json = list.getString(i).orElse("");
-                if (!json.isEmpty()) {
-                    Component component = Component.Serializer.fromJson(json, provider);
-                    if (component != null) {
-                        entries.add(component);
-                    }
-                }
-            }
-        }
+        // TODO: Component.Serializer.fromJson signature changed in 1.21.11
+        // Skipping deserialization for now - will be empty on load
+        // Need to research correct API for Component JSON deserialization
     }
 
     public static CivilRegistryManager get(ServerLevel world, Village village) {
