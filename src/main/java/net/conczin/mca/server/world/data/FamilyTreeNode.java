@@ -63,22 +63,34 @@ public final class FamilyTreeNode {
     public FamilyTreeNode(FamilyTree rootNode, CompoundTag nbt) {
         this(
                 rootNode,
-                // In 1.21.11, CompoundTag getters return Optional
-                nbt.getUUID("id").orElse(new UUID(0, 0)),
+                // In 1.21.11, CompoundTag doesn't have getUUID() - read as string and parse
+                parseUUID(nbt.getString("id").orElse("")),
                 nbt.getString("name").orElse(""),
                 nbt.getBoolean("isPlayer").orElse(false),
                 Gender.byId(nbt.getInt("gender").orElse(0)),
-                nbt.getUUID("father").orElse(new UUID(0, 0)),
-                nbt.getUUID("mother").orElse(new UUID(0, 0)));
+                parseUUID(nbt.getString("father").orElse("")),
+                parseUUID(nbt.getString("mother").orElse("")));
         children.addAll(NbtHelper.toList(nbt.getList("children").orElse(new net.minecraft.nbt.ListTag()),
-                c -> ((CompoundTag) c).getUUID("uuid").orElse(new UUID(0, 0))));
+                c -> parseUUID(((CompoundTag) c).getString("uuid").orElse(""))));
         profession = nbt.getString("profession")
-                .orElse(BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE).toString());
+                .orElse(BuiltInRegistries.VILLAGER_PROFESSION.getKey(VillagerProfession.NONE)
+                        .map(key -> key.location().toString()).orElse("minecraft:none"));
         deceased = nbt.getBoolean("isDeceased").orElse(false);
-        if (nbt.hasUUID("spouse")) {
-            partner = nbt.getUUID("spouse").orElse(new UUID(0, 0));
+        String spouseStr = nbt.getString("spouse").orElse("");
+        if (!spouseStr.isEmpty()) {
+            partner = parseUUID(spouseStr);
         }
         relationshipState = RelationshipState.byId(nbt.getInt("marriageState").orElse(0));
+    }
+
+    private static UUID parseUUID(String str) {
+        if (str == null || str.isEmpty())
+            return new UUID(0, 0);
+        try {
+            return UUID.fromString(str);
+        } catch (IllegalArgumentException e) {
+            return new UUID(0, 0);
+        }
     }
 
     public static boolean isValid(@Nullable UUID uuid) {
