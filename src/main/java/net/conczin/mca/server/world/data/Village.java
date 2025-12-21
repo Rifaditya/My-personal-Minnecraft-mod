@@ -70,8 +70,9 @@ public class Village implements Iterable<Building> {
         beds = v.getInt("beds").orElse(0);
         reputation = NbtHelper.toMap(v.getCompound("reputation").orElse(new CompoundTag()), UUID::fromString,
                 i -> NbtHelper.toMap((CompoundTag) i, UUID::fromString, i2 -> ((IntTag) i2).getAsInt()));
+        // In 1.21.11, Tag::getAsString is not valid - use lambda with cast to StringTag
         residentNames = NbtHelper.toMap(v.getCompound("residentNames").orElse(new CompoundTag()), UUID::fromString,
-                Tag::getAsString);
+                i -> ((net.minecraft.nbt.StringTag) i).getAsString());
         residentHomes = NbtHelper.toMap(v.getCompound("residentHomes").orElse(new CompoundTag()), UUID::fromString,
                 i -> ((LongTag) i).getAsLong());
 

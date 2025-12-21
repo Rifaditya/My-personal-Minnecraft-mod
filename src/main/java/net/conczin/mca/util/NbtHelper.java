@@ -28,7 +28,8 @@ public interface NbtHelper {
     }
 
     static CompoundTag copyTo(CompoundTag from, CompoundTag to) {
-        from.getAllKeys().forEach(key -> to.put(key, from.get(key)));
+        // In 1.21.11, getAllKeys() -> keySet()
+        from.keySet().forEach(key -> to.put(key, from.get(key)));
         return to;
     }
 
@@ -45,17 +46,19 @@ public interface NbtHelper {
     }
 
     static <K, V> Map<K, V> toMap(CompoundTag nbt, Function<String, K> keyMapper, BiFunction<K, Tag, V> valueMapper) {
-        return nbt.getAllKeys().stream()
+        // In 1.21.11, getAllKeys() -> keySet()
+        return nbt.keySet().stream()
                 .map(e -> {
                     K k = keyMapper.apply(e);
-                    if (k == null) return null;
+                    if (k == null)
+                        return null;
                     V v = valueMapper.apply(k, nbt.get(e));
-                    if (v == null) return null;
+                    if (v == null)
+                        return null;
                     return k == null ? null : new Pair<>(k, v);
                 })
                 .filter(Objects::nonNull)
-                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)
-                );
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
 
     static <V> ListTag fromList(Iterable<V> list, Function<V, Tag> valueMapper) {
@@ -66,7 +69,8 @@ public interface NbtHelper {
         return output;
     }
 
-    static <K, V> CompoundTag fromMap(CompoundTag output, Map<K, V> map, Function<K, String> keyMapper, Function<V, Tag> valueMapper) {
+    static <K, V> CompoundTag fromMap(CompoundTag output, Map<K, V> map, Function<K, String> keyMapper,
+            Function<V, Tag> valueMapper) {
         map.forEach((key, value) -> output.put(keyMapper.apply(key), valueMapper.apply(value)));
         return output;
     }
@@ -79,4 +83,3 @@ public interface NbtHelper {
         return GlobalPos.CODEC.parse(NbtOps.INSTANCE, element).resultOrPartial(MCA.LOGGER::error).orElse(null);
     }
 }
-

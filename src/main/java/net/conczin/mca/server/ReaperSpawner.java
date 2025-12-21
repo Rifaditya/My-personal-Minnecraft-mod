@@ -170,8 +170,11 @@ public class ReaperSpawner {
         public SummonPosition(CompoundTag tag) {
             spawnPosition = NbtUtils.readBlockPos(tag, "spawnPosition").orElse(BlockPos.ZERO);
             fire = NbtUtils.readBlockPos(tag, "fire").orElse(BlockPos.ZERO);
+            // In 1.21.11, getCompound returns Optional - need to handle the ListTag
+            // differently
             totems = new HashSet<>(
-                    NbtHelper.toList(tag.getCompound("totems"), v -> readBlockPos(((IntArrayTag) v).getAsIntArray())));
+                    NbtHelper.toList(tag.getList("totems").orElse(new net.minecraft.nbt.ListTag()),
+                            v -> readBlockPos(((IntArrayTag) v).getAsIntArray())));
         }
 
         public SummonPosition(BlockPos fire, Set<BlockPos> totems) {
@@ -210,8 +213,9 @@ public class ReaperSpawner {
         }
 
         ActiveSummon(CompoundTag nbt) {
-            ticks = nbt.getInt("ticks");
-            position = new SummonPosition(nbt.getCompound("position"));
+            // In 1.21.11, getInt/getCompound return Optional
+            ticks = nbt.getInt("ticks").orElse(0);
+            position = new SummonPosition(nbt.getCompound("position").orElse(new CompoundTag()));
         }
 
         public void start(SummonPosition pos) {
