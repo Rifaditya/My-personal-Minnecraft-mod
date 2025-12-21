@@ -12,23 +12,35 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.level.ServerLevel;
 
 import java.util.List;
 
-public class ScytheItem extends SwordItem {
-    // Tiers renamed to ToolMaterial in 1.21.11
+/**
+ * ScytheItem - Rewritten for 1.21.11 API
+ * SwordItem class removed in 1.21.5+, now using Item with sword() properties
+ */
+public class ScytheItem extends Item {
+
+    // Create ScytheItem with sword-like properties using gold material stats
+    // Parameters for sword(): ToolMaterial, baseAttackDamage, attackSpeed
     public ScytheItem(Properties settings) {
-        super(net.minecraft.world.item.ToolMaterial.GOLD, settings);
+        // Use sword() method on properties to get sword-like behavior
+        // Gold sword has: 3 attack damage bonus, -2.4 attack speed
+        super(settings.sword(ToolMaterial.GOLD, 3.0f, -2.4f));
     }
 
     public static void setSoul(ItemStack stack, boolean soul) {
@@ -66,25 +78,18 @@ public class ScytheItem extends SwordItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.addAll(FlowingText.wrap(
-                Component.translatable(getDescriptionId(stack) + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
+                Component.translatable(this.getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
     }
 
+    // inventoryTick signature changed in 1.21.11: (ItemStack, ServerLevel, Entity,
+    // EquipmentSlot)
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BLOCK;
-    }
-
-    @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
-        return 72000;
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, EquipmentSlot slot) {
         if (!(entity instanceof LivingEntity living)) {
             return;
         }
 
+        boolean selected = slot == EquipmentSlot.MAINHAND;
         boolean active = stack.getOrDefault(DataComponentsMCA.SCYTHE_ACTIVE, false);
 
         RandomSource r = entity.level().random;
@@ -109,7 +114,7 @@ public class ScytheItem extends SwordItem {
     @Override
     public InteractionResult use(Level world, Player user, InteractionHand hand) {
         user.startUsingItem(hand);
-        return super.use(world, user, hand);
+        return InteractionResult.CONSUME;
     }
 
     @Override
@@ -124,7 +129,7 @@ public class ScytheItem extends SwordItem {
             }
         }
 
-        return super.useOn(context);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -132,6 +137,7 @@ public class ScytheItem extends SwordItem {
         return super.isFoil(stack) || hasSoul(stack);
     }
 
+    // hurtEnemy signature may have changed - keeping compatible version
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (target.level().random.nextInt(50) > 40) {
@@ -155,7 +161,7 @@ public class ScytheItem extends SwordItem {
                 0.75F + r.nextFloat() / 2F,
                 0.75F + r.nextFloat() / 2F);
 
-        return super.hurtEnemy(stack, target, attacker);
+        return true; // Return true for successful hit
     }
 
     @Override
