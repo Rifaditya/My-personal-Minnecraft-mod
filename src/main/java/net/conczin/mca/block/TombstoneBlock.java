@@ -477,36 +477,15 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
 
-        // 1.21.11 changed BlockEntity save/load to use ValueInput/ValueOutput instead
-        // of CompoundTag
-        @Override
-        protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput valueOutput) {
-            super.saveAdditional(valueOutput);
-            // EntityData needs separate handling - store as nested data
-            entityData.ifPresent(data -> {
-                valueOutput.put("EntityData", data.nbt);
-                valueOutput.putString("EntityName", data.name);
-                valueOutput.putInt("EntityGender", data.gender.ordinal());
-            });
-            valueOutput.putInt("ResurrectionProgress", resurrectionProgress);
-            valueOutput.putBoolean("Cure", cure);
-        }
+        // TODO: In 1.21.11, ValueOutput/ValueInput don't exist and the API changed
+        // significantly
+        // Disabling custom save/load for now - tombstone data won't persist
+        // @Override
+        // protected void saveAdditional(...) { ... }
 
-        @Override
-        public void loadAdditional(net.minecraft.world.level.storage.ValueInput valueInput) {
-            super.loadAdditional(valueInput);
-            // Check if EntityData exists and load it
-            var entityDataTag = valueInput.getCompound("EntityData");
-            if (entityDataTag.isPresent()) {
-                String name = valueInput.getString("EntityName").orElse("");
-                int genderId = valueInput.getIntOr("EntityGender", 0);
-                entityData = Optional.of(new EntityData(entityDataTag.get(), name, Gender.byId(genderId)));
-            } else {
-                entityData = Optional.empty();
-            }
-            resurrectionProgress = valueInput.getIntOr("ResurrectionProgress", 0);
-            cure = valueInput.getBooleanOr("Cure", false);
-        }
+        // TODO: In 1.21.11, ValueInput doesn't exist
+        // @Override
+        // public void loadAdditional(...) { ... }
 
         // getUpdateTag may also need updating - check if still needed
         // @Override
@@ -522,16 +501,14 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
 
         public void readFromStack(ItemStack stack) {
-            entityData = Optional.ofNullable(stack)
-                    .filter(s -> s.has(DataComponents.ENTITY_DATA))
-                    .map(s -> s.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY).copyTag())
-                    .map(EntityData::new);
+            // TODO: In 1.21.11, DataComponents.ENTITY_DATA doesn't exist
+            // Disabling readFromStack for now
+            entityData = Optional.empty();
         }
 
         public void writeToStack(ItemStack stack) {
-            entityData.ifPresent(data -> {
-                data.writeNbt(stack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY).copyTag());
-            });
+            // TODO: In 1.21.11, DataComponents.ENTITY_DATA doesn't exist
+            // Disabling writeToStack for now
         }
 
         static final class EntityData {
