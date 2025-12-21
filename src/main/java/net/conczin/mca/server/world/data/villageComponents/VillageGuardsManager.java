@@ -19,7 +19,8 @@ public class VillageGuardsManager {
         this.village = village;
     }
 
-    public static EquipmentSet getEquipmentFor(InteractionHand dominantHand, EquipmentSet rightSet, EquipmentSet leftSet) {
+    public static EquipmentSet getEquipmentFor(InteractionHand dominantHand, EquipmentSet rightSet,
+            EquipmentSet leftSet) {
         return dominantHand == InteractionHand.OFF_HAND && leftSet != null ? leftSet : rightSet;
     }
 
@@ -35,7 +36,9 @@ public class VillageGuardsManager {
             if (villager.isGuard()) {
                 guards++;
             } else {
-                if (!villager.isBaby() && !villager.isProfessionImportant() && villager.getVillagerXp() == 0 && villager.getVillagerData().getLevel() <= 1) {
+                // In 1.21.11, getLevel() -> level()
+                if (!villager.isBaby() && !villager.isProfessionImportant() && villager.getVillagerXp() == 0
+                        && villager.getVillagerData().level() <= 1) {
                     nonGuards.add(villager);
                 }
                 citizen++;
@@ -44,7 +47,8 @@ public class VillageGuardsManager {
 
         // Count all unloaded villagers against the guard limit
         // This is statistical and may not be accurate, but it's better than nothing
-        guards += (int) Math.ceil((village.getPopulation() - guards - citizen) * Config.getInstance().guardSpawnFraction);
+        guards += (int) Math
+                .ceil((village.getPopulation() - guards - citizen) * Config.getInstance().guardSpawnFraction);
 
         // Spawn a new guard if we don't have enough
         if (!nonGuards.isEmpty() && guards < guardCapacity) {
@@ -77,4 +81,3 @@ public class VillageGuardsManager {
         }
     }
 }
-

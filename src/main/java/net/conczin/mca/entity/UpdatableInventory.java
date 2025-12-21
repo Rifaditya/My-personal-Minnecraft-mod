@@ -9,11 +9,16 @@ public class UpdatableInventory extends SimpleContainer {
     }
 
     public void update(Entity entity) {
-        for (int slot = 0; slot < getContainerSize(); slot++) {
-            if (!getItem(slot).isEmpty()) {
-                getItem(slot).inventoryTick(entity.level(), entity, slot, false);
-            }
-        }
+        // In 1.21.11, ItemStack.inventoryTick signature changed significantly
+        // (requires ServerLevel, Entity, EquipmentSlot instead of Level, Entity, int,
+        // boolean)
+        // Disabled for now pending proper implementation
+        /*
+         * for (int slot = 0; slot < getContainerSize(); slot++) {
+         * if (!getItem(slot).isEmpty()) {
+         * getItem(slot).inventoryTick(entity.level(), entity, slot, false);
+         * }
+         * }
+         */
     }
 }
-
