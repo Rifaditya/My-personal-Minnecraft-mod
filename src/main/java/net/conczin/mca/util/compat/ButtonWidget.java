@@ -1,5 +1,6 @@
 package net.conczin.mca.util.compat;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
@@ -17,5 +18,11 @@ public class ButtonWidget extends net.minecraft.client.gui.components.Button {
         this(x, y, width, height, message, onPress);
         setTooltip(Tooltip.create(tooltip));
     }
-}
 
+    // In 1.21.11, AbstractButton requires this method to be implemented
+    @Override
+    protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        // Default behavior - render message text centered
+        this.renderString(graphics, net.minecraft.client.Minecraft.getInstance().font, getFGColor());
+    }
+}

@@ -89,27 +89,28 @@ public abstract class AbstractDynamicScreen extends Screen {
     }
 
     protected void drawIcon(GuiGraphics context, Identifier texture, String key) {
-        Icon icon = MCAScreens.getInstance().getIcon(key);
-        context.blit(texture, (int) (icon.x() / iconScale), (int) (icon.y() / iconScale), icon.u(), icon.v(), 16, 16);
+        // TODO: In 1.21.11, blit signature changed significantly
+        // Need to research proper RenderType pattern
+        // Icon icon = MCAScreens.getInstance().getIcon(key);
     }
 
     protected void drawHoveringIconText(GuiGraphics context, Component text, String key) {
-        Icon icon = MCAScreens.getInstance().getIcon(key);
-        context.renderTooltip(font, text, icon.x() + 16, icon.y() + 20);
+        // TODO: In 1.21.11, renderTooltip signature changed
+        // Icon icon = MCAScreens.getInstance().getIcon(key);
     }
 
     protected void drawHoveringIconText(GuiGraphics context, List<Component> text, String key) {
-        Icon icon = MCAScreens.getInstance().getIcon(key);
-        context.renderComponentTooltip(font, text, icon.x() + 16, icon.y() + 20);
+        // TODO: In 1.21.11, renderComponentTooltip removed
+        // Icon icon = MCAScreens.getInstance().getIcon(key);
     }
 
-    //checks if the mouse hovers over a specified button
+    // checks if the mouse hovers over a specified button
     protected boolean hoveringOverIcon(String key) {
         Icon icon = MCAScreens.getInstance().getIcon(key);
         return hoveringOver(icon.x(), icon.y(), (int) (16 * iconScale), (int) (16 * iconScale));
     }
 
-    //checks if the mouse hovers over a rectangle
+    // checks if the mouse hovers over a rectangle
     protected boolean hoveringOver(int x, int y, int w, int h) {
         return mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h;
     }
@@ -155,7 +156,8 @@ public abstract class AbstractDynamicScreen extends Screen {
                     DEFAULT_NARRATION);
             this.apiButton = apiButton;
 
-            // Remove the button if we specify it should not be present on constraint failure
+            // Remove the button if we specify it should not be present on constraint
+            // failure
             // Otherwise we just mark the button as disabled.
             if (!apiButton.isValidForConstraint(screen.getConstraints())) {
                 if (apiButton.hideOnFail()) {
@@ -168,6 +170,11 @@ public abstract class AbstractDynamicScreen extends Screen {
         public MCAButton getApiButton() {
             return apiButton;
         }
+
+        // In 1.21.11, AbstractButton requires this method to be implemented
+        @Override
+        protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+            this.renderString(graphics, net.minecraft.client.Minecraft.getInstance().font, getFGColor());
+        }
     }
 }
-
