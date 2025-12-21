@@ -1,4 +1,5 @@
 package net.conczin.mca.entity;
+
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 
@@ -145,22 +146,28 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         if (isVehicle() && getFirstPassenger() instanceof VillagerEntityMCA && infant == null)
             setEntityOccupant((VillagerEntityMCA) getFirstPassenger());
 
-        // Removing occupant is first priority over adding occupant, so that multiple occupants dont exist.
+        // Removing occupant is first priority over adding occupant, so that multiple
+        // occupants dont exist.
         if (infant != null && infant.getVehicle() == this) {
-            infant.startRiding(player, true);
+            // startRiding in 1.21.11 takes 3 params
+            infant.startRiding(player, true, false);
             unsetEntityOccupant();
         } else if (!getTrackedValue(BABY).equals(ItemStack.EMPTY)) {
             player.getInventory().add(getTrackedValue(BABY));
             setTrackedValue(BABY, ItemStack.EMPTY);
-        } else if (player.getInventory().getSelected() != ItemStack.EMPTY && player.getInventory().getSelected().getItem() instanceof BabyItem) {
+        } else if (player.getInventory().getSelected() != ItemStack.EMPTY
+                && player.getInventory().getSelected().getItem() instanceof BabyItem) {
             setTrackedValue(BABY, player.getInventory().getSelected());
             player.getInventory().removeItem(getTrackedValue(BABY));
-        } else if (player.getFirstPassenger() != null && player.getFirstPassenger() instanceof VillagerEntityMCA rider) {
+        } else if (player.getFirstPassenger() != null
+                && player.getFirstPassenger() instanceof VillagerEntityMCA rider) {
             if (rider.getAgeState() == AgeState.BABY) {
                 setEntityOccupant(rider);
-                infant.startRiding(this, true);
+                // startRiding in 1.21.11 takes 3 params
+                infant.startRiding(this, true, false);
             }
-        } else return InteractionResult.PASS;
+        } else
+            return InteractionResult.PASS;
 
         return InteractionResult.SUCCESS;
     }
@@ -198,7 +205,8 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
             return false;
         }
 
-        if (isOccupied()) return false;
+        if (isOccupied())
+            return false;
 
         if (this.isInvulnerableTo(source)) {
             return false;
@@ -227,7 +235,9 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
             this.kill();
             return bl2;
         } else {
-            CribItem matchingType = ItemsMCA.CRIBS.stream().filter(c -> c.getColor() == getTrackedValue(COLOR) && c.getWood() == getTrackedValue(WOOD)).findFirst().get();
+            CribItem matchingType = ItemsMCA.CRIBS.stream()
+                    .filter(c -> c.getColor() == getTrackedValue(COLOR) && c.getWood() == getTrackedValue(WOOD))
+                    .findFirst().get();
             Block.popResource(this.level(), this.blockPosition(), new ItemStack(matchingType));
             this.spawnBreakParticles();
             this.kill();
@@ -238,13 +248,16 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
 
     private void spawnBreakParticles() {
         if (this.level() instanceof ServerLevel) {
-            ((ServerLevel) this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_PLANKS.defaultBlockState()),
-                    this.getX(), this.getY(0.6666666666666666), this.getZ(), 10, this.getBbWidth() / 4.0f, this.getBbHeight() / 4.0f, this.getBbWidth() / 4.0f, 0.05);
+            ((ServerLevel) this.level()).sendParticles(
+                    new BlockParticleOption(ParticleTypes.BLOCK, Blocks.OAK_PLANKS.defaultBlockState()),
+                    this.getX(), this.getY(0.6666666666666666), this.getZ(), 10, this.getBbWidth() / 4.0f,
+                    this.getBbHeight() / 4.0f, this.getBbWidth() / 4.0f, 0.05);
         }
     }
 
     private void playBreakSound() {
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ARMOR_STAND_BREAK, this.getSoundSource(), 1.0f, 1.0f);
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ARMOR_STAND_BREAK,
+                this.getSoundSource(), 1.0f, 1.0f);
     }
 
     @Override
@@ -252,4 +265,3 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         return DATA;
     }
 }
-

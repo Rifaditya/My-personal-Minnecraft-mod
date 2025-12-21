@@ -107,18 +107,17 @@ public class VillagerFactory {
         VillagerEntityMCA villager = gender.getVillagerType().create(world);
         assert villager != null;
         villager.getGenetics().setGender(gender);
-        villager.setAge(age.orElseGet(() -> villager.getRandom().nextInt(AgeState.getMaxAge() * 3) - AgeState.getMaxAge()));
-        position.ifPresent(pos -> villager.absMoveTo(pos.x(), pos.y(), pos.z()));
+        villager.setAge(
+                age.orElseGet(() -> villager.getRandom().nextInt(AgeState.getMaxAge() * 3) - AgeState.getMaxAge()));
+        // absMoveTo replaced with moveTo in 1.21.11\n position.ifPresent(pos ->
+        // villager.moveTo(pos.x(), pos.y(), pos.z()));
         villager.setCustomName(Component.literal(name.orElseGet(() -> Names.pickCitizenName(gender, villager))));
         VillagerData data = villager.getVillagerData();
         villager.setVillagerData(new VillagerData(
-                        type.orElseGet(data::getType),
-                        profession.orElse(VillagerProfession.NONE),
-                        level.orElseGet(data::getLevel)
-                )
-        );
+                type.orElseGet(data::getType),
+                profession.orElse(VillagerProfession.NONE),
+                level.orElseGet(data::getLevel)));
         offers.ifPresent(villager::setOffers);
         return villager;
     }
 }
-

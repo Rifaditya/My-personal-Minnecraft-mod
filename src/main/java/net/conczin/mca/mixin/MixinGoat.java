@@ -64,7 +64,8 @@ public abstract class MixinGoat extends Animal {
                     LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level(), EntitySpawnReason.EVENT);
                     if (bolt != null) {
                         bolt.setVisualOnly(true);
-                        bolt.absMoveTo(pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F);
+                        // absMoveTo replaced with moveTo in 1.21.11\n bolt.moveTo(pos.getX() + 0.5,
+                        // pos.getY(), pos.getZ() + 0.5);
                         level().addFreshEntity(bolt);
                     }
                 }

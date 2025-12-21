@@ -91,15 +91,13 @@ public class ZombieVillagerFactory {
         assert zombie != null;
         zombie.getGenetics().setGender(gender);
         zombie.setCustomName(Component.literal(name.orElseGet(() -> Names.pickCitizenName(gender, zombie))));
-        position.ifPresent(pos -> zombie.absMoveTo(pos.x(), pos.y(), pos.z()));
+        // absMoveTo replaced with moveTo in 1.21.11\n position.ifPresent(pos ->
+        // zombie.moveTo(pos.x(), pos.y(), pos.z()));
         VillagerData data = zombie.getVillagerData();
         zombie.setVillagerData(new VillagerData(
-                        type.orElseGet(data::getType),
-                        profession.orElse(VillagerProfession.NONE),
-                        level.orElseGet(data::getLevel)
-                )
-        );
+                type.orElseGet(data::getType),
+                profession.orElse(VillagerProfession.NONE),
+                level.orElseGet(data::getLevel)));
         return zombie;
     }
 }
-

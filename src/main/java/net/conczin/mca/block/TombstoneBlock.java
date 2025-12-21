@@ -403,7 +403,8 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
             level.setSkyFlashTime(10);
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.EVENT);
             bolt.setVisualOnly(true);
-            bolt.absMoveTo(worldPosition.getX() + 0.5F, worldPosition.getY(), worldPosition.getZ() + 0.5F);
+            // absMoveTo replaced with moveTo in 1.21.11\n bolt.moveTo(worldPosition.getX()
+            // + 0.5, worldPosition.getY(), worldPosition.getZ() + 0.5);
             level.addFreshEntity(bolt);
         }
 
