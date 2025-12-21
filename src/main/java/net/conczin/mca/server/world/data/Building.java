@@ -66,18 +66,19 @@ public class Building {
     }
 
     public Building(CompoundTag v) {
-        id = v.getInt("id");
-        size = v.getInt("size");
-        pos0X = v.getInt("pos0X");
-        pos0Y = v.getInt("pos0Y");
-        pos0Z = v.getInt("pos0Z");
-        pos1X = v.getInt("pos1X");
-        pos1Y = v.getInt("pos1Y");
-        pos1Z = v.getInt("pos1Z");
+        // In 1.21.11, CompoundTag getters return Optional
+        id = v.getInt("id").orElse(0);
+        size = v.getInt("size").orElse(0);
+        pos0X = v.getInt("pos0X").orElse(0);
+        pos0Y = v.getInt("pos0Y").orElse(0);
+        pos0Z = v.getInt("pos0Z").orElse(0);
+        pos1X = v.getInt("pos1X").orElse(0);
+        pos1Y = v.getInt("pos1Y").orElse(0);
+        pos1Z = v.getInt("pos1Z").orElse(0);
         if (v.contains("posX")) {
-            posX = v.getInt("posX");
-            posY = v.getInt("posY");
-            posZ = v.getInt("posZ");
+            posX = v.getInt("posX").orElse(0);
+            posY = v.getInt("posY").orElse(0);
+            posZ = v.getInt("posZ").orElse(0);
         } else {
             BlockPos center = getCenter();
             posX = center.getX();
@@ -85,16 +86,16 @@ public class Building {
             posZ = center.getZ();
         }
 
-        isTypeForced = v.getBoolean("isTypeForced");
-        type = v.getString("type");
+        isTypeForced = v.getBoolean("isTypeForced").orElse(false);
+        type = v.getString("type").orElse("building");
 
-        strictScan = v.getBoolean("strictScan");
+        strictScan = v.getBoolean("strictScan").orElse(false);
 
-        blocks.putAll(NbtHelper.toMap(v.getCompound("blocks2"),
+        blocks.putAll(NbtHelper.toMap(v.getCompound("blocks2").orElse(new CompoundTag()),
                 Identifier::parse,
                 l -> NbtHelper.toList(l, e -> {
                     CompoundTag c = (CompoundTag) e;
-                    return new BlockPos(c.getInt("x"), c.getInt("y"), c.getInt("z"));
+                    return new BlockPos(c.getInt("x").orElse(0), c.getInt("y").orElse(0), c.getInt("z").orElse(0));
                 })));
     }
 
@@ -126,8 +127,7 @@ public class Building {
                     entry.putInt("y", p.getY());
                     entry.putInt("z", p.getZ());
                     return entry;
-                })
-        );
+                }));
         v.put("blocks2", b);
 
         return v;
@@ -147,8 +147,7 @@ public class Building {
         return new BlockPos(
                 (pos0X + pos1X) / 2,
                 (pos0Y + pos1Y) / 2,
-                (pos0Z + pos1Z) / 2
-        );
+                (pos0Z + pos1Z) / 2);
     }
 
     public BlockPos getSourceBlock() {
@@ -158,10 +157,11 @@ public class Building {
     public void validateBlocks(Level world) {
         setLastScan(world.getGameTime());
 
-        //remove all invalid blocks
+        // remove all invalid blocks
         for (Map.Entry<Identifier, List<BlockPos>> positions : blocks.entrySet()) {
             List<BlockPos> mask = positions.getValue().stream()
-                    .filter(p -> !BuiltInRegistries.BLOCK.getKey(world.getBlockState(p).getBlock()).equals(positions.getKey()))
+                    .filter(p -> !BuiltInRegistries.BLOCK.getKey(world.getBlockState(p).getBlock())
+                            .equals(positions.getKey()))
                     .toList();
             positions.getValue().removeAll(mask);
         }
@@ -176,10 +176,10 @@ public class Building {
         removeBlock(block, pos);
         addBlock(block, pos);
 
-        //validate grouped buildings
+        // validate grouped buildings
         validateBlocks(world);
 
-        //mean center
+        // mean center
         int n = (int) getBlockPosStream().count();
         if (n > 0) {
             BlockPos center = getBlockPosStream().reduce(BlockPos.ZERO, BlockPos::offset);
@@ -193,33 +193,33 @@ public class Building {
     }
 
     public validationResult validateBuilding(Level world, Set<BlockPos> blocked) {
-        //validate grouped buildings differently
+        // validate grouped buildings differently
         if (getBuildingType().grouped()) {
             validateBlocks(world);
             return getBlockPosStream().findAny().isEmpty() ? validationResult.TOO_SMALL : validationResult.SUCCESS;
         }
 
-        //clear old building
+        // clear old building
         blocks.clear();
         size = 0;
 
         setLastScan(world.getGameTime());
 
-        //temp data for flood fill
+        // temp data for flood fill
         Set<BlockPos> done = new HashSet<>();
         LinkedList<BlockPos> queue = new LinkedList<>();
 
-        //start point
+        // start point
         BlockPos center = getSourceBlock();
         queue.add(center);
         done.add(center);
 
-        //const
+        // const
         final int minSize = Config.getInstance().minBuildingSize;
         final int maxSize = Config.getInstance().maxBuildingSize;
         final int maxRadius = Config.getInstance().maxBuildingRadius;
 
-        //fill the building
+        // fill the building
         int scanSize = 0;
         int interiorSize = 0;
         boolean hasDoor = false;
@@ -227,24 +227,24 @@ public class Building {
         while (!queue.isEmpty() && scanSize < maxSize) {
             BlockPos p = queue.removeLast();
 
-            //this block is marked as blocked, indicating an overlap
+            // this block is marked as blocked, indicating an overlap
             if (blocked.contains(p) && scanSize > 0) {
                 return validationResult.OVERLAP;
             }
 
-            //as long the max radius is not reached
+            // as long the max radius is not reached
             if (p.distManhattan(center) < maxRadius) {
                 for (Direction d : directions) {
                     BlockPos n = p.relative(d);
 
-                    //and the block is not already checked
+                    // and the block is not already checked
                     if (!done.contains(n)) {
                         BlockState state = world.getBlockState(n);
 
-                        //mark it
+                        // mark it
                         done.add(n);
 
-                        //if not solid, continue
+                        // if not solid, continue
                         if (state.isAir()) {
                             if (!roofCache.containsKey(n)) {
                                 BlockPos n2 = n;
@@ -253,10 +253,11 @@ public class Building {
                                     roofCache.put(n2, false);
                                     n2 = n2.above();
 
-                                    //found valid block
+                                    // found valid block
                                     BlockState block = world.getBlockState(n2);
                                     if (!block.isAir() || roofCache.containsKey(n2)) {
-                                        if (!(roofCache.containsKey(n2) && !roofCache.get(n2)) && !block.is(BlockTags.LEAVES)) {
+                                        if (!(roofCache.containsKey(n2) && !roofCache.get(n2))
+                                                && !block.is(BlockTags.LEAVES)) {
                                             for (int i2 = i; i2 >= 0; i2--) {
                                                 n2 = n2.below();
                                                 roofCache.put(n2, true);
@@ -271,7 +272,7 @@ public class Building {
                                 queue.add(n);
                             }
                         } else if (state.getBlock() instanceof DoorBlock) {
-                            //skip door and start a new room
+                            // skip door and start a new room
                             if (!strictScan) {
                                 queue.add(n);
                             }
@@ -286,7 +287,8 @@ public class Building {
             scanSize++;
         }
 
-        // min size is 32 by default, which equals an 8 block big cube with 6 times 4 sides
+        // min size is 32 by default, which equals an 8 block big cube with 6 times 4
+        // sides
         if (!queue.isEmpty()) {
             return validationResult.BLOCK_LIMIT;
         } else if (done.size() <= minSize) {
@@ -294,13 +296,13 @@ public class Building {
         } else if (!hasDoor) {
             return validationResult.NO_DOOR;
         } else {
-            //fetch all interesting block types
+            // fetch all interesting block types
             Set<Identifier> blockTypes = new HashSet<>();
             for (BuildingType bt : BuildingTypes.getInstance()) {
                 blockTypes.addAll(bt.getBlockToGroup().keySet());
             }
 
-            //dimensions
+            // dimensions
             int sx = center.getX();
             int sy = center.getY();
             int sz = center.getZ();
@@ -316,7 +318,7 @@ public class Building {
                 ey = Math.max(ey, p.getY());
                 ez = Math.max(ez, p.getZ());
 
-                //count blocks types
+                // count blocks types
                 BlockState blockState = world.getBlockState(p);
                 Block block = blockState.getBlock();
                 if (blockTypes.contains(BuiltInRegistries.BLOCK.getKey(block))) {
@@ -331,7 +333,7 @@ public class Building {
                 }
             }
 
-            //adjust building dimensions
+            // adjust building dimensions
             pos0X = sx;
             pos0Y = sy;
             pos0Z = sz;
@@ -342,7 +344,7 @@ public class Building {
 
             size = interiorSize;
 
-            //determine type
+            // determine type
             return isTypeForced() || determineType() ? validationResult.SUCCESS : validationResult.INVALID_TYPE;
         }
     }
@@ -353,9 +355,10 @@ public class Building {
 
         for (BuildingType bt : BuildingTypes.getInstance()) {
             if (bt.priority() > bestPriority) {
-                //get an overview of the satisfied blocks
+                // get an overview of the satisfied blocks
                 Map<Identifier, List<BlockPos>> available = bt.getGroups(blocks);
-                boolean valid = bt.getGroups().entrySet().stream().noneMatch(e -> !available.containsKey(e.getKey()) || available.get(e.getKey()).size() < e.getValue());
+                boolean valid = bt.getGroups().entrySet().stream().noneMatch(
+                        e -> !available.containsKey(e.getKey()) || available.get(e.getKey()).size() < e.getValue());
                 if (valid) {
                     bestPriority = bt.priority();
                     type = bt.name();
@@ -416,7 +419,8 @@ public class Building {
     }
 
     public boolean overlaps(Building b) {
-        return pos1X > b.pos0X && pos0X < b.pos1X && pos1Y > b.pos0Y && pos0Y < b.pos1Y && pos1Z > b.pos0Z && pos0Z < b.pos1Z;
+        return pos1X > b.pos0X && pos0X < b.pos1X && pos1Y > b.pos0Y && pos0Y < b.pos1Y && pos1Z > b.pos0Z
+                && pos0Z < b.pos1Z;
     }
 
     public boolean containsPos(Vec3i pos) {
@@ -424,12 +428,13 @@ public class Building {
             return pos.closerThan(getCenter(), getBuildingType().getMargin());
         }
         return pos.getX() >= pos0X && pos.getX() <= pos1X
-               && pos.getY() >= pos0Y && pos.getY() <= pos1Y
-               && pos.getZ() >= pos0Z && pos.getZ() <= pos1Z;
+                && pos.getY() >= pos0Y && pos.getY() <= pos1Y
+                && pos.getZ() >= pos0Z && pos.getZ() <= pos1Z;
     }
 
     public boolean isIdentical(Building b) {
-        return pos0X == b.pos0X && pos1X == b.pos1X && pos0Y == b.pos0Y && pos1Y == b.pos1Y && pos0Z == b.pos0Z && pos1Z == b.pos1Z;
+        return pos0X == b.pos0X && pos1X == b.pos1X && pos0Y == b.pos0Y && pos1Y == b.pos1Y && pos0Z == b.pos0Z
+                && pos1Z == b.pos1Z;
     }
 
     public int getSize() {
@@ -449,7 +454,8 @@ public class Building {
     }
 
     /**
-     * @return true if the group is large enough to be considered complete (e.g., Graveyard appears on map)
+     * @return true if the group is large enough to be considered complete (e.g.,
+     *         Graveyard appears on map)
      */
     public boolean isComplete() {
         BuildingType bt = getBuildingType();
@@ -468,4 +474,3 @@ public class Building {
         INVALID_TYPE
     }
 }
-
