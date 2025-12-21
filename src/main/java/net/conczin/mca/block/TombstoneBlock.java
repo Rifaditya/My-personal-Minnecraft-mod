@@ -25,6 +25,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.entity.monster.zombie.ZombieVillager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -165,14 +166,11 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
     }
 
-    @Deprecated
+    // onRemove renamed to affectNeighborsAfterRemoval in 1.21.11
     @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onRemove(state, world, pos, newState, moved);
-        if (!world.isClientSide() && !state.is(newState.getBlock())) {
-            updateNeighbors(state, world, pos);
-            GraveyardManager.get((ServerLevel) world).removeTombstoneState(pos);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        updateNeighbors(state, world, pos);
+        GraveyardManager.get(world).removeTombstoneState(pos);
     }
 
     @Override
@@ -195,19 +193,19 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         builder.add(BlockStateProperties.WATERLOGGED).add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
-    @Deprecated
+    // updateShape signature changed in 1.21.11
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world,
-            BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess scheduledTickAccess,
+            BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         if (state.getValue(BlockStateProperties.WATERLOGGED)) {
-            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+            scheduledTickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         }
 
         if (direction == Direction.DOWN && !canSurvive(state, world, pos)) {
             return Blocks.AIR.defaultBlockState();
         }
 
-        return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
+        return super.updateShape(state, world, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
