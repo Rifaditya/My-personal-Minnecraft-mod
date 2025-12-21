@@ -2,12 +2,22 @@ package net.conczin.mca.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
-// TextureSheetParticle renamed to SingleQuadParticle in 1.21.11
+/**
+ * Interaction particle for MCA.
+ * Updated for 1.21.11:
+ * - TextureSheetParticle renamed to SingleQuadParticle
+ * - Constructor now takes TextureAtlasSprite
+ * - getRenderType() replaced with getLayer()
+ * - ParticleProvider.createParticle now takes RandomSource
+ */
 public class InteractionParticle extends SingleQuadParticle {
-    protected InteractionParticle(ClientLevel world, double x, double y, double z) {
-        super(world, x, y, z);
+    // Constructor now takes sprite parameter in 1.21.11
+    protected InteractionParticle(ClientLevel world, double x, double y, double z, TextureAtlasSprite sprite) {
+        super(world, x, y, z, sprite);
         this.xd *= 0.01F;
         this.yd *= 0.01F;
         this.zd *= 0.01F;
@@ -17,15 +27,18 @@ public class InteractionParticle extends SingleQuadParticle {
         this.hasPhysics = false;
     }
 
+    // getRenderType() replaced with getLayer() in 1.21.11
     @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected Layer getLayer() {
+        return Layer.OPAQUE;
     }
 
+    @Override
     public float getQuadSize(float tickDelta) {
         return 0.3F;
     }
 
+    @Override
     public void tick() {
         this.xo = this.x;
         this.yo = this.y;
@@ -33,7 +46,6 @@ public class InteractionParticle extends SingleQuadParticle {
         if (this.age++ >= this.lifetime) {
             this.remove();
         } else {
-            // this.move(this.xd, this.yd, this.zd);
             if (this.y == this.yo) {
                 this.xd *= 1.1D;
                 this.zd *= 1.1D;
@@ -46,23 +58,22 @@ public class InteractionParticle extends SingleQuadParticle {
                 this.xd *= 0.7F;
                 this.zd *= 0.7F;
             }
-
         }
     }
 
-    public static class Factory implements ParticleProvider<SimpleParticleType> {
-        private final SpriteSet sprite;
-
-        public Factory(SpriteSet sprite) {
-            this.sprite = sprite;
-        }
-
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel world, double x, double y, double z,
-                double velocityX, double velocityY, double velocityZ) {
-            InteractionParticle heartparticle = new InteractionParticle(world, x, y + 0.5D, z);
-            heartparticle.pickSprite(this.sprite);
-            heartparticle.setColor(1.0F, 1.0F, 1.0F);
-            return heartparticle;
+    // Updated for 1.21.11: createParticle now takes RandomSource as last parameter
+    public record Factory(SpriteSet spriteSet) implements ParticleProvider<SimpleParticleType> {
+        @Override
+        public Particle createParticle(
+                SimpleParticleType options,
+                ClientLevel level,
+                double x, double y, double z,
+                double xd, double yd, double zd,
+                RandomSource random) {
+            // Use spriteSet.get(random) instead of pickSprite()
+            InteractionParticle particle = new InteractionParticle(level, x, y + 0.5D, z, this.spriteSet.get(random));
+            particle.setColor(1.0F, 1.0F, 1.0F);
+            return particle;
         }
     }
 }
