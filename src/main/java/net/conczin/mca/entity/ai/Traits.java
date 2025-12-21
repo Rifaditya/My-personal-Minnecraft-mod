@@ -62,11 +62,14 @@ public class Traits {
     }
 
     public Set<Trait> getTraits() {
-        return entity.getTrackedValue(TRAITS).getAllKeys().stream().map(Trait::valueOf).collect(Collectors.toSet());
+        // In 1.21.11, getAllKeys() replaced with keySet()
+        return entity.getTrackedValue(TRAITS).keySet().stream().map(Trait::valueOf).collect(Collectors.toSet());
     }
 
     public Set<Trait> getInheritedTraits() {
-        return getTraits().stream().filter(t -> random.nextFloat() < t.inherit * Config.getInstance().traitInheritChance).collect(Collectors.toSet());
+        return getTraits().stream()
+                .filter(t -> random.nextFloat() < t.inherit * Config.getInstance().traitInheritChance)
+                .collect(Collectors.toSet());
     }
 
     public boolean hasTrait(VillagerLike<?> target, Trait trait) {
@@ -104,7 +107,7 @@ public class Traits {
         entity.setTrackedValue(TRAITS, traits);
     }
 
-    //initializes the genes with random numbers
+    // initializes the genes with random numbers
     public void randomize() {
         float total = (float) Trait.values().stream().mapToDouble(tr -> tr.chance).sum();
         for (Trait t : Trait.values()) {
@@ -133,7 +136,8 @@ public class Traits {
     }
 
     public float getHorizontalScaleFactor() {
-        return (hasTrait(Traits.DWARFISM) ? 0.85f : 1.0f) * (hasTrait(Traits.TOUGH) ? 1.2f : 1.0f) * (hasTrait(Traits.WEAK) ? 0.85f : 1.0f);
+        return (hasTrait(Traits.DWARFISM) ? 0.85f : 1.0f) * (hasTrait(Traits.TOUGH) ? 1.2f : 1.0f)
+                * (hasTrait(Traits.WEAK) ? 0.85f : 1.0f);
     }
 
     public static class Trait {
@@ -178,4 +182,3 @@ public class Traits {
         }
     }
 }
-

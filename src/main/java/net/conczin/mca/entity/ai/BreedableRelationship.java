@@ -110,46 +110,37 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
         }
     }
 
-    //returns estimated values for common item types, which the villager could use
+    // returns estimated values for common item types, which the villager could use
     private Optional<GiftType> handleDynamicGift(ItemStack stack) {
-        switch (stack.getItem()) {
-            case SwordItem ignored -> {
-                //swords
-                double satisfaction = InventoryUtils.approximateDamage(stack, entity);
-                satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
-                return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate("swords")));
-            }
-            case ProjectileWeaponItem ranged -> {
-                //ranged weapons
-                float satisfaction = ranged.getDefaultProjectileRange();
-                satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
-                return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate("archery")));
-            }
-            case TieredItem tool -> {
-                //tools
-                float satisfaction = tool.getTier().getSpeed();
-                satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
-                return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate(
-                        stack.getItem() instanceof AxeItem ? "swords" :
-                                stack.getItem() instanceof HoeItem ? "hoes" :
-                                        stack.getItem() instanceof ShovelItem ? "shovels" :
-                                                "pickaxes"
-                )));
-            }
-            case ArmorItem armor -> {
-                //armor
-                int satisfaction = (int) (Math.pow(armor.getDefense(), 1.25) * 1.5 + armor.getToughness() * 5);
-                return Optional.of(new GiftType(stack.getItem(), satisfaction, MCA.locate("armor")));
-            }
-            default -> {
-                //food
-                FoodProperties component = stack.get(DataComponents.FOOD);
-                if (component != null) {
-                    int satisfaction = (int) (component.nutrition() + component.saturation() * 3);
-                    return Optional.of(new GiftType(stack.getItem(), satisfaction, MCA.locate("food")));
-                }
-            }
+        Item item = stack.getItem();
+
+        // In 1.21.11, SwordItem, TieredItem, ArmorItem classes removed
+        // Check for weapon/tool/armor using other methods
+
+        // Check for projectile weapons first
+        if (item instanceof ProjectileWeaponItem ranged) {
+            // ranged weapons
+            float satisfaction = ranged.getDefaultProjectileRange();
+            satisfaction = (float) (Math.pow(satisfaction, 1.25) * 2);
+            return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate("archery")));
         }
+
+        // Check for melee weapon (has attack damage attribute)
+        double attackDamage = InventoryUtils.approximateDamage(stack, entity);
+        if (attackDamage > 1.0) {
+            // This is likely a weapon or tool with attack damage
+            double satisfaction = (Math.pow(attackDamage, 1.25) * 2);
+            return Optional.of(new GiftType(stack.getItem(), (int) satisfaction, MCA.locate("swords")));
+        }
+
+        // Check for armor using ArmorMaterial or defensive attributes
+        // For now, just check food components
+        FoodProperties component = stack.get(DataComponents.FOOD);
+        if (component != null) {
+            int satisfaction = (int) (component.nutrition() + component.saturation() * 3);
+            return Optional.of(new GiftType(stack.getItem(), satisfaction, MCA.locate("food")));
+        }
+
         return Optional.empty();
     }
 
@@ -166,7 +157,8 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
 
         // desaturation
         int occurrences = getGiftSaturation().get(stack);
-        int penalty = (int) (occurrences * Config.getInstance().giftDesaturationFactor * Math.pow(Math.max(satisfaction, 0.0), Config.getInstance().giftDesaturationExponent));
+        int penalty = (int) (occurrences * Config.getInstance().giftDesaturationFactor
+                * Math.pow(Math.max(satisfaction, 0.0), Config.getInstance().giftDesaturationExponent));
         if (penalty != 0) {
             analysis.add("desaturation", -penalty);
         }
@@ -188,14 +180,15 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
                 entity.playSurprisedSound();
             }
 
-            //take the gift
+            // take the gift
             getGiftSaturation().add(stack);
             entity.level().broadcastEntityEvent(entity, Status.MCA_VILLAGER_POS_INTERACTION);
             entity.getInventory().addItem(stack.split(1));
         }
 
-        //modify mood and hearts
-        entity.getVillagerBrain().modifyMoodValue((int) (desaturatedSatisfaction * Config.getInstance().giftMoodEffect + Config.getInstance().baseGiftMoodEffect * Mth.sign(desaturatedSatisfaction)));
+        // modify mood and hearts
+        entity.getVillagerBrain().modifyMoodValue((int) (desaturatedSatisfaction * Config.getInstance().giftMoodEffect
+                + Config.getInstance().baseGiftMoodEffect * Mth.sign(desaturatedSatisfaction)));
         CriterionMCA.HEARTS.trigger(player, memory.getHearts(), desaturatedSatisfaction, "gift");
         memory.modHearts(desaturatedSatisfaction);
     }
@@ -256,4 +249,3 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
         return false;
     }
 }
-
