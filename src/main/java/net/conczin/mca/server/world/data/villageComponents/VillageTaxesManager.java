@@ -36,10 +36,11 @@ public class VillageTaxesManager {
     }
 
     public void taxes(ServerLevel world) {
-        double taxes = Config.getInstance().taxesFactor * village.getPopulation() * village.getTaxes() + world.random.nextDouble();
+        double taxes = Config.getInstance().taxesFactor * village.getPopulation() * village.getTaxes()
+                + world.random.nextDouble();
         int moodImpact = 0;
 
-        //response
+        // response
         Component msg;
         float r = village.getTaxes() + (world.random.nextFloat() - 0.5f) * world.random.nextFloat();
         if (village.getTaxes() == 0.0f) {
@@ -50,7 +51,8 @@ public class VillageTaxesManager {
             msg = Component.translatable("gui.village.taxes.more", village.getName()).withStyle(ChatFormatting.GREEN);
             taxes += village.getPopulation() * 0.25;
         } else if (r < 0.3) {
-            msg = Component.translatable("gui.village.taxes.happy", village.getName()).withStyle(ChatFormatting.DARK_GREEN);
+            msg = Component.translatable("gui.village.taxes.happy", village.getName())
+                    .withStyle(ChatFormatting.DARK_GREEN);
             moodImpact = 5;
         } else if (r < 0.7) {
             msg = Component.translatable("gui.village.taxes", village.getName());
@@ -61,21 +63,22 @@ public class VillageTaxesManager {
             msg = Component.translatable("gui.village.taxes.angry", village.getName()).withStyle(ChatFormatting.RED);
             moodImpact = -10;
         } else {
-            msg = Component.translatable("gui.village.taxes.riot", village.getName()).withStyle(ChatFormatting.DARK_RED);
+            msg = Component.translatable("gui.village.taxes.riot", village.getName())
+                    .withStyle(ChatFormatting.DARK_RED);
             taxes = 0;
         }
 
-        //send all player with rank merchant a notification
+        // send all player with rank merchant a notification
         world.players().stream()
                 .filter(v -> Tasks.getRank(village, v).isAtLeast(Rank.MERCHANT))
                 .forEach(player -> player.displayClientMessage(msg, true));
 
-        //upgrades
+        // upgrades
         if (village.hasBuilding("library")) {
             taxes *= 1.5;
         }
 
-        //choose as many items as possible
+        // choose as many items as possible
         while (taxes > 0.0) {
             double finalTaxes = taxes;
 
@@ -91,7 +94,9 @@ public class VillageTaxesManager {
 
             // pick a random item
             String itemName = valids.get(world.random.nextInt(valids.size()));
-            Item item = BuiltInRegistries.ITEM.get(Identifier.parse(itemName));
+            // In 1.21.11, registry.get() returns Optional<Reference<Item>>
+            Item item = BuiltInRegistries.ITEM.getOptional(Identifier.parse(itemName))
+                    .orElse(Items.AIR);
 
             if (item == Items.AIR) {
                 throw new RuntimeException("The taxes map contains an invalid item %s!".formatted(itemName));
@@ -101,7 +106,8 @@ public class VillageTaxesManager {
             taxes -= Config.getInstance().taxesMap.get(itemName);
 
             // stack it or create a new item
-            Optional<ItemStack> stack = village.storageBuffer.stream().filter(i -> i.is(item) && i.getCount() < i.getMaxStackSize()).findAny();
+            Optional<ItemStack> stack = village.storageBuffer.stream()
+                    .filter(i -> i.is(item) && i.getCount() < i.getMaxStackSize()).findAny();
             if (stack.isPresent()) {
                 stack.get().grow(1);
             } else if (village.storageBuffer.size() < MAX_STORAGE_SIZE) {
@@ -175,4 +181,3 @@ public class VillageTaxesManager {
         }
     }
 }
-
