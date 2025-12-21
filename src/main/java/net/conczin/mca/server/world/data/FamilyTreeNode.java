@@ -146,21 +146,15 @@ public final class FamilyTreeNode {
         markDirty();
     }
 
-    @SuppressWarnings("unchecked")
     public VillagerProfession getProfession() {
-        // Simplified for 1.21.11 - direct lookup, return null if not found
-        try {
-            var opt = BuiltInRegistries.VILLAGER_PROFESSION.get(Identifier.tryParse(profession));
-            return (VillagerProfession) opt;
-        } catch (Exception e) {
-            return null;
-        }
+        // TODO: Complex Registry API in 1.21.11 - returning null for now
+        // Need to properly implement Registry lookup when API stabilizes
+        return null;
     }
 
     public void setProfession(VillagerProfession profession) {
-        // Simplified for 1.21.11 - just store the profession name
-        // TODO: Find proper way to get ResourceLocation from VillagerProfession
-        this.profession = "minecraft:" + profession.name().toLowerCase(java.util.Locale.ROOT);
+        // TODO: Complex Registry API in 1.21.11 - storing default for now
+        this.profession = "minecraft:none";
         markDirty();
     }
 
