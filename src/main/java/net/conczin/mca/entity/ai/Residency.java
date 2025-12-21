@@ -48,9 +48,13 @@ public class Residency {
 
     public void setWorkplace(ServerPlayer player) {
         PoiManager pointOfInterestStorage = ((ServerLevel) player.level()).getPoiManager();
-        pointOfInterestStorage.findClosest(VillagerProfession.NONE.acquirableJobSite(), a -> true, entity.blockPosition(), 8, PoiManager.Occupancy.HAS_SPACE).ifPresentOrElse(blockPos -> {
+        // In 1.21.11, VillagerProfession.NONE is ResourceKey, need to get from registry
+        // acquirableJobSite() was removed - use heldJobSite() instead
+        VillagerProfession noneProfession = BuiltInRegistries.VILLAGER_PROFESSION.getValue(VillagerProfession.NONE);
+        pointOfInterestStorage.findClosest(noneProfession.heldJobSite(), a -> true, entity.blockPosition(), 8,
+                PoiManager.Occupancy.HAS_SPACE).ifPresentOrElse(blockPos -> {
                     pointOfInterestStorage.getType(blockPos).ifPresent(pointOfInterestType -> {
-                        pointOfInterestStorage.take(VillagerProfession.NONE.acquirableJobSite(), (registryEntry, blockPos2) -> {
+                        pointOfInterestStorage.take(noneProfession.heldJobSite(), (registryEntry, blockPos2) -> {
                             return blockPos2.equals(blockPos);
                         }, blockPos, 1);
 
@@ -72,23 +76,30 @@ public class Residency {
                                 return profession.heldJobSite().test(registryEntry);
                             }).findFirst();
                         }).ifPresent(profession -> {
-                            int level = entity.getVillagerData().getLevel();
-                            entity.setVillagerData(entity.getVillagerData().setProfession(profession).setLevel(1));
-                            entity.setOffers(null);
-                            entity.getOffers();
-                            for (int l = 1; l < level; l++) {
-                                entity.customLevelUp();
-                            }
-                            entity.refreshBrain((ServerLevel) player.level());
+                            // In 1.21.11, VillagerData getter/setter methods changed
+                            // withProfession expects Holder<VillagerProfession>
+                            int level = entity.getVillagerData().level();
+                            // Get holder for the profession from the registry
+                            BuiltInRegistries.VILLAGER_PROFESSION.wrapAsHolder(profession)
+                                    .ifPresent(professionHolder -> {
+                                        entity.setVillagerData(
+                                                entity.getVillagerData().withProfession(professionHolder).withLevel(1));
+                                        entity.setOffers(null);
+                                        entity.getOffers();
+                                        for (int l = 1; l < level; l++) {
+                                            entity.customLevelUp();
+                                        }
+                                        entity.refreshBrain((ServerLevel) player.level());
+                                    });
                         });
 
                         // Success
                         entity.sendChatMessage(player, "interaction.setworkplace.success");
                     });
                 },
-                () -> {
-                    entity.sendChatMessage(player, "interaction.setworkplace.failed");
-                });
+                        () -> {
+                            entity.sendChatMessage(player, "interaction.setworkplace.failed");
+                        });
     }
 
     public Optional<Village> getHomeVillage() {
@@ -119,25 +130,27 @@ public class Residency {
     }
 
     public void tick() {
-        //report buildings close by
+        // report buildings close by
         if (entity.tickCount % 600 == 0 && entity.requiresHome()) {
             Optional<Village> village = getHomeVillage();
-            if (village.isEmpty() && Config.getInstance().enableAutoScanByDefault || village.filter(Village::isAutoScan).isPresent()) {
+            if (village.isEmpty() && Config.getInstance().enableAutoScanByDefault
+                    || village.filter(Village::isAutoScan).isPresent()) {
                 reportBuildings();
             }
 
-            //seek a home
+            // seek a home
             if (village.isEmpty()) {
                 seekHome();
             }
         }
 
-        //slowly inject village boni
+        // slowly inject village boni
         if (entity.tickCount % 1200 == 0) {
             getHomeVillage().ifPresentOrElse(village -> {
-                //update the reputation
+                // update the reputation
                 entity.level().players().forEach(player -> {
-                    //currently, only hearts are considered, maybe additional factors can affect that too
+                    // currently, only hearts are considered, maybe additional factors can affect
+                    // that too
                     int hearts = entity.getVillagerBrain().getMemoriesForPlayer(player).getHearts();
                     village.setReputation(player, entity, hearts);
                 });
@@ -145,11 +158,11 @@ public class Residency {
         }
     }
 
-    //report potential buildings within this villagers reach
+    // report potential buildings within this villagers reach
     private void reportBuildings() {
         VillageManager manager = VillageManager.get((ServerLevel) entity.level());
 
-        //fetch all near POIs
+        // fetch all near POIs
         Stream<BlockPos> stream = ((ServerLevel) entity.level()).getPoiManager().findAll(
                 type -> true,
                 p -> !manager.cache.contains(p),
@@ -157,7 +170,7 @@ public class Residency {
                 48,
                 PoiManager.Occupancy.ANY);
 
-        //check if it is a building
+        // check if it is a building
         stream.forEach(manager::reportBuilding);
 
         // also add tombstones
@@ -180,9 +193,10 @@ public class Residency {
 
         seekHome();
 
-        //check if a bed can be found
+        // check if a bed can be found
         PoiManager pointOfInterestStorage = ((ServerLevel) player.level()).getPoiManager();
-        Optional<BlockPos> position = pointOfInterestStorage.findAll(registryEntry -> registryEntry.is(PoiTypes.HOME), p -> true, player.blockPosition(), 8, PoiManager.Occupancy.HAS_SPACE).findAny();
+        Optional<BlockPos> position = pointOfInterestStorage.findAll(registryEntry -> registryEntry.is(PoiTypes.HOME),
+                p -> true, player.blockPosition(), 8, PoiManager.Occupancy.HAS_SPACE).findAny();
         if (position.isPresent()) {
             entity.sendChatMessage(player, "interaction.sethome.success");
 
@@ -193,19 +207,23 @@ public class Residency {
             });
 
             // Remember the new one
-            pointOfInterestStorage.take(registryEntry -> registryEntry.is(PoiTypes.HOME), (p, q) -> true, position.get(), 1);
-            entity.getBrain().setMemory(MemoryModuleType.HOME, GlobalPos.of(entity.level().dimension(), position.get()));
+            pointOfInterestStorage.take(registryEntry -> registryEntry.is(PoiTypes.HOME), (p, q) -> true,
+                    position.get(), 1);
+            entity.getBrain().setMemory(MemoryModuleType.HOME,
+                    GlobalPos.of(entity.level().dimension(), position.get()));
             entity.getBrain().setMemory(MemoryModuleTypeMCA.FORCED_HOME, true);
 
             seekHome();
         } else {
             entity.getBrain().eraseMemory(MemoryModuleTypeMCA.FORCED_HOME);
 
-            getHomeVillage().map(v -> v.getBuildingAt(entity.blockPosition())).filter(Optional::isPresent).map(Optional::get).filter(b -> b.getBuildingType().noBeds()).ifPresentOrElse(building -> {
-                entity.sendChatMessage(player, "interaction.sethome.bedfail." + building.getBuildingType().name());
-            }, () -> {
-                entity.sendChatMessage(player, "interaction.sethome.bedfail");
-            });
+            getHomeVillage().map(v -> v.getBuildingAt(entity.blockPosition())).filter(Optional::isPresent)
+                    .map(Optional::get).filter(b -> b.getBuildingType().noBeds()).ifPresentOrElse(building -> {
+                        entity.sendChatMessage(player,
+                                "interaction.sethome.bedfail." + building.getBuildingType().name());
+                    }, () -> {
+                        entity.sendChatMessage(player, "interaction.sethome.bedfail");
+                    });
         }
     }
 
@@ -218,4 +236,3 @@ public class Residency {
         }, () -> entity.sendChatMessage(player, "interaction.gohome.fail.nohome"));
     }
 }
-
