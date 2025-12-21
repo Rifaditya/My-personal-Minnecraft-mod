@@ -66,7 +66,7 @@ public interface Messenger extends EntityWrapper {
         if (target instanceof ServerPlayer serverPlayer) {
             targetName = getName(serverPlayer);
 
-            //player gender
+            // player gender
             genderString = "#G" + PlayerSaveData.get(serverPlayer).getGender().name().toLowerCase(Locale.ROOT) + ".";
         } else {
             targetName = target.getName().getString();
@@ -75,32 +75,40 @@ public interface Messenger extends EntityWrapper {
         System.arraycopy(params, 0, newParams, 1, params.length);
         newParams[0] = targetName;
 
-        //also pass profession
+        // also pass profession
         String professionString = "";
         if (!asEntity().isBaby() && asEntity() instanceof VillagerEntityMCA v) {
             professionString = "#P" + BuiltInRegistries.VILLAGER_PROFESSION.getKey(v.getProfession()).getPath() + ".";
         }
 
-        //and personality
+        // and personality
         String personalityString = "";
         if (asEntity() instanceof VillagerEntityMCA v) {
             personalityString = "#E" + v.getVillagerBrain().getPersonality().name() + ".";
         }
 
-        return Component.translatable(genderString + personalityString + professionString + "#T" + getDialogueType(target).name() + "." + phraseId, newParams);
+        return Component.translatable(genderString + personalityString + professionString + "#T"
+                + getDialogueType(target).name() + "." + phraseId, newParams);
     }
 
     default void sendChatToAllAround(MutableComponent phrase) {
-        for (Player player : asEntity().level().getNearbyPlayers(CAN_RECEIVE, asEntity(), asEntity().getBoundingBox().inflate(20))) {
+        // In 1.21.11, getNearbyPlayers signature changed. Use getEntitiesOfClass
+        // instead.
+        for (Player player : asEntity().level().getEntitiesOfClass(Player.class,
+                asEntity().getBoundingBox().inflate(20))) {
             float dist = player.distanceTo(asEntity());
             sendChatMessage(phrase.withStyle(dist < 10 ? ChatFormatting.WHITE : ChatFormatting.GRAY), player);
         }
     }
 
     default void sendChatToAllAround(String phrase, Object... params) {
-        for (Player player : asEntity().level().getNearbyPlayers(CAN_RECEIVE, asEntity(), asEntity().getBoundingBox().inflate(20))) {
+        // In 1.21.11, getNearbyPlayers signature changed. Use getEntitiesOfClass
+        // instead.
+        for (Player player : asEntity().level().getEntitiesOfClass(Player.class,
+                asEntity().getBoundingBox().inflate(20))) {
             float dist = player.distanceTo(asEntity());
-            sendChatMessage(getTranslatable(player, phrase, params).withStyle(dist < 10 ? ChatFormatting.WHITE : ChatFormatting.GRAY), player);
+            sendChatMessage(getTranslatable(player, phrase, params)
+                    .withStyle(dist < 10 ? ChatFormatting.WHITE : ChatFormatting.GRAY), player);
         }
     }
 
@@ -124,7 +132,8 @@ public interface Messenger extends EntityWrapper {
                 .append(asEntity().getDisplayName())
                 .append(": ");
 
-        //use custom packet to have access to sender UUID, and maybe future extra information
+        // use custom packet to have access to sender UUID, and maybe future extra
+        // information
         VillagerMessage msg = new VillagerMessage(prefix, message, asEntity().getUUID());
         if (receiver instanceof ServerPlayer serverPlayer) {
             Network.sendToPlayer(msg, serverPlayer);
@@ -148,4 +157,3 @@ public interface Messenger extends EntityWrapper {
         sendEventMessage(((Entity) this).level(), message);
     }
 }
-

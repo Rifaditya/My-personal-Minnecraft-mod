@@ -222,7 +222,8 @@ public class BreedableRelationship extends Relationship<VillagerEntityMCA> {
 
         if (item == Items.GOLDEN_APPLE && entity.isInfected()) {
             entity.setInfected(false);
-            entity.eat(entity.level(), stack);
+            // In 1.21.11, eat() method was removed. Just shrink the stack for the effect.
+            // The golden apple effect is already applied by setInfected(false)
             stack.shrink(1);
             return true;
         }
