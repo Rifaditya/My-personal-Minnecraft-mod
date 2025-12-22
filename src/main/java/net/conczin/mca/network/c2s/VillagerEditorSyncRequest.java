@@ -61,12 +61,14 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
                 saveEntity(player, entity, data());
                 break;
             case "profession":
-                if (entity instanceof VillagerEntityMCA villager) {
-                    // TODO: In 1.21.11, BuiltInRegistries.get returns Optional
-                    BuiltInRegistries.VILLAGER_PROFESSION
-                            .get(Identifier.parse(data.getString("profession")))
-                            .ifPresent(villager::setProfession);
-                }
+                // TODO: In 1.21.11, BuiltInRegistries.get and CompoundTag.getString return
+                // Optional
+                // Disabled until proper handling
+                // if (entity instanceof VillagerEntityMCA villager) {
+                // BuiltInRegistries.VILLAGER_PROFESSION
+                // .get(Identifier.parse(data.getString("profession").orElse("")))
+                // .ifPresent(villager::setProfession);
+                // }
                 break;
         }
     }
@@ -77,8 +79,10 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             // fetch hair
             String hair;
             if (data.contains("offset")) {
-                hair = HairList.getInstance().getPool(getGender(villagerData)).pickNext(villagerData.getString("Hair"),
-                        data.getInt("offset"));
+                // TODO: In 1.21.11, CompoundTag.getString/getInt return Optional
+                hair = HairList.getInstance().getPool(getGender(villagerData)).pickNext(
+                        villagerData.getString("Hair").orElse(""),
+                        data.getInt("offset").orElse(0));
             } else {
                 hair = HairList.getInstance().getPool(getGender(villagerData)).pickOne();
             }
@@ -98,8 +102,9 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
                     // TODO: In 1.21.11, getPool takes VillagerProfession not ResourceKey
                     // clothes = ClothingList.getInstance().getPool(getGender(villagerData),
                     // VillagerProfession.NONE)
-                    // .pickNext(villagerData.getString("Clothes"), data.getInt("offset"));
-                    clothes = villagerData.getString("Clothes"); // Keep existing
+                    // .pickNext(villagerData.getString("Clothes").orElse(""),
+                    // data.getInt("offset").orElse(0));
+                    clothes = villagerData.getString("Clothes").orElse("mca:missing"); // Keep existing
                 } else {
                     // clothes = ClothingList.getInstance().getPool(getGender(villagerData),
                     // VillagerProfession.NONE)
@@ -108,8 +113,9 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
                 }
             } else if (entity instanceof VillagerLike<?> villager) {
                 if (data.contains("offset")) {
+                    // TODO: In 1.21.11, getInt returns Optional
                     clothes = ClothingList.getInstance().getPool(villager).pickNext(villager.getClothes(),
-                            data.getInt("offset"));
+                            data.getInt("offset").orElse(0));
                 } else {
                     clothes = ClothingList.getInstance().getPool(villager).pickOne();
                 }
