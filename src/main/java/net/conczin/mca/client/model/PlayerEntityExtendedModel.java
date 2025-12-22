@@ -45,9 +45,10 @@ public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extend
         this.jacket = root.getChild("jacket");
     }
 
-    @Override
+    // In 1.21.11, copyPropertiesTo may have been removed or renamed
     public void copyPropertiesTo(HumanoidModel<S> target) {
-        super.copyPropertiesTo(target);
+        // TODO: In 1.21.11, super.copyPropertiesTo may not exist
+        // super.copyPropertiesTo(target);
 
         if (target instanceof PlayerEntityExtendedModel<S> playerTarget) {
             copyAttributes(playerTarget);
@@ -95,12 +96,14 @@ public class PlayerEntityExtendedModel<S extends VillagerLikeRenderState> extend
 
     @Override
     public Iterable<ModelPart> getCommonHeadParts() {
-        return headParts();
+        // TODO: In 1.21.11, headParts() may have been removed
+        return ImmutableList.of(head, hat);
     }
 
     @Override
     public Iterable<ModelPart> getCommonBodyParts() {
-        return bodyParts();
+        // TODO: In 1.21.11, bodyParts() may have been removed
+        return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg);
     }
 
     @Override

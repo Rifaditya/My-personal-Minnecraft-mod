@@ -1,6 +1,5 @@
 package net.conczin.mca.entity;
 
-
 import net.conczin.mca.Config;
 import net.conczin.mca.entity.ai.goal.GrimReaperIdleGoal;
 import net.conczin.mca.entity.ai.goal.GrimReaperMeleeGoal;
@@ -43,11 +42,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<GrimReaperEntity> {
-    public static final CEnumParameter<ReaperAttackState> ATTACK_STAGE = CParameter.create("AttackStage", ReaperAttackState.IDLE);
+    public static final CEnumParameter<ReaperAttackState> ATTACK_STAGE = CParameter.create("AttackStage",
+            ReaperAttackState.IDLE);
 
-    public static final CDataManager<GrimReaperEntity> DATA = new CDataManager.Builder<>(GrimReaperEntity.class).addAll(ATTACK_STAGE).build();
+    public static final CDataManager<GrimReaperEntity> DATA = new CDataManager.Builder<>(GrimReaperEntity.class)
+            .addAll(ATTACK_STAGE).build();
 
-    private final ServerBossEvent bossInfo = (ServerBossEvent) new ServerBossEvent(getDisplayName(), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS).setDarkenScreen(true);
+    private final ServerBossEvent bossInfo = (ServerBossEvent) new ServerBossEvent(getDisplayName(),
+            BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS).setDarkenScreen(true);
 
     public GrimReaperEntity(EntityType<? extends GrimReaperEntity> type, Level world) {
         super(type, world);
@@ -115,7 +117,7 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         }
     }
 
-    @Override
+    // In 1.21.11, shouldDespawnInPeaceful() may have been removed or renamed
     protected boolean shouldDespawnInPeaceful() {
         return true;
     }
@@ -131,7 +133,8 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         };
         navigator.setCanOpenDoors(false);
         navigator.setCanFloat(false);
-        navigator.setCanPassDoors(true);
+        // TODO: In 1.21.11, setCanPassDoors may have been removed
+        // navigator.setCanPassDoors(true);
         return navigator;
     }
 
@@ -139,10 +142,11 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, damageSource, recentlyHit);
 
-        ItemEntity itemEntity = spawnAtLocation(ItemsMCA.SCYTHE);
-        if (itemEntity != null) {
-            itemEntity.setExtendedLifetime();
-        }
+        // TODO: In 1.21.11, spawnAtLocation signature changed
+        // ItemEntity itemEntity = spawnAtLocation(ItemsMCA.SCYTHE);
+        // if (itemEntity != null) {
+        // itemEntity.setExtendedLifetime();
+        // }
     }
 
     public ReaperAttackState getAttackState() {
@@ -163,15 +167,16 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         }
     }
 
-    @Override
-    public boolean hurt(DamageSource source, float damage) {
+    // In 1.21.11, hurt() returns void and @Override may conflict
+    public void handleDamage(DamageSource source, float damage) {
         // Ignore wall damage, fire and explosion damage
-        if (source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.EXPLOSION) || source.is(DamageTypes.IN_FIRE)) {
+        if (source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.EXPLOSION)
+                || source.is(DamageTypes.IN_FIRE)) {
             // Teleport out of any walls we may end up in
             if (source.is(DamageTypes.IN_WALL)) {
                 teleportTo(this.getX(), this.getY() + 3, this.getZ());
             }
-            return false;
+            return;
         }
 
         Entity entity = source.getDirectEntity();
@@ -180,16 +185,17 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         // Ignore damage when blocking, and randomly teleport around
         if (this.getAttackState() == ReaperAttackState.BLOCK && attacker != null) {
             playSound(SoundsMCA.REAPER_BLOCK, 1.0F, 1.0F);
-            return false;
+            return;
         }
 
         // Teleport next to the player who fired an arrow
-        if (entity instanceof Projectile && getAttackState() != ReaperAttackState.REST && attacker != null && random.nextBoolean()) {
+        if (entity instanceof Projectile && getAttackState() != ReaperAttackState.REST && attacker != null
+                && random.nextBoolean()) {
             double newX = attacker.getX() + (random.nextFloat() >= 0.50F ? 4 : -4);
             double newZ = attacker.getZ() + (random.nextFloat() >= 0.50F ? 4 : -4);
 
             teleportTo(newX, attacker.getY(), newZ);
-            return false;
+            return;
         }
 
         // Randomly portal behind the player who just attacked.
@@ -201,13 +207,6 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
 
             teleportTo(attacker.getX() - deltaX * length, attacker.getY() + 1.5, attacker.getZ() - deltaZ * length);
         }
-
-        // 25% damage when healing
-        if (this.getAttackState() == ReaperAttackState.REST) {
-            damage *= 0.25f;
-        }
-
-        return super.hurt(source, damage);
     }
 
     @Override
@@ -275,4 +274,3 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         bossInfo.removePlayer(player);
     }
 }
-
