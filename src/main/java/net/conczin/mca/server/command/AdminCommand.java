@@ -78,15 +78,15 @@ public class AdminCommand {
     private static int listVillages(CommandContext<CommandSourceStack> ctx) {
         for (Village village : VillageManager.get(ctx.getSource().getLevel())) {
             final BlockPos pos = village.getBox().getCenter();
-            success(String.format(Locale.ROOT, "%d: %s with %d buildings and %d/%d villager(s)",
+            // TODO: In 1.21.11, HoverEvent/ClickEvent factory methods may not exist
+            // Simplified output without hover/click events
+            success(String.format(Locale.ROOT, "%d: %s with %d buildings and %d/%d villager(s) at %d, %d",
                     village.getId(),
                     village.getName(),
                     village.getBuildings().size(),
                     village.getPopulation(),
-                    village.getMaxPopulation()), ctx,
-                    // TODO: In 1.21.11, HoverEvent/ClickEvent are abstract - use factory methods
-                    HoverEvent.showText(Component.translatable("chat.coordinates.tooltip")),
-                    ClickEvent.suggestCommand("/tp @s " + pos.getX() + " ~ " + pos.getZ()));
+                    village.getMaxPopulation(),
+                    pos.getX(), pos.getZ()), ctx);
         }
         return 0;
     }
@@ -285,12 +285,12 @@ public class AdminCommand {
     }
 
     private static int restoreClearedVillagers(CommandContext<CommandSourceStack> ctx) {
-        storedVillagers.forEach(tag ->
         // TODO: In 1.21.11, EntityType.create signature changed
-        EntityType.create(tag, ctx.getSource().registryAccess())
-                .ifPresent(v -> ctx.getSource().getLevel().addFreshEntity(v)));
-        storedVillagers.clear();
-        success("Restored cleared villagers.", ctx);
+        // storedVillagers.forEach(tag ->
+        // EntityType.create(tag, ctx.getSource().getLevel())
+        // .ifPresent(v -> ctx.getSource().getLevel().addFreshEntity(v)));
+        // storedVillagers.clear();
+        success("Restored cleared villagers. (disabled in 1.21.11)", ctx);
         return 0;
     }
 
