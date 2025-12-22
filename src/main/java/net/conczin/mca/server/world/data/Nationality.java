@@ -16,15 +16,15 @@ import java.util.Map;
 public class Nationality extends SavedData {
     private static final int CHUNK_SIZE = 128;
     private static final int[][] neighbours = {
-            {0, 0},
-            {-1, 0},
-            {1, 0},
-            {0, -1},
-            {0, 1},
-            {-1, 1},
-            {1, 1},
-            {-1, -1},
-            {-1, 1},
+            { 0, 0 },
+            { -1, 0 },
+            { 1, 0 },
+            { 0, -1 },
+            { 0, 1 },
+            { -1, 1 },
+            { 1, 1 },
+            { -1, -1 },
+            { -1, 1 },
     };
     final RandomSource random = RandomSource.create();
     private Map<Long, Integer> map = new HashMap<>();
@@ -38,14 +38,15 @@ public class Nationality extends SavedData {
     }
 
     public static Nationality get(ServerLevel world) {
-        return WorldUtils.loadData(world.getServer().overworld(), Nationality::new, Nationality::new, "mca_nationality");
+        return WorldUtils.loadData(world.getServer().overworld(), Nationality::new, Nationality::new,
+                "mca_nationality");
     }
 
     private static long toId(long x, long z) {
         return x / CHUNK_SIZE * (long) Integer.MAX_VALUE + z / CHUNK_SIZE;
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         NbtHelper.fromMap(nbt, map, String::valueOf, IntTag::valueOf);
         return nbt;
@@ -74,4 +75,3 @@ public class Nationality extends SavedData {
         return id;
     }
 }
-

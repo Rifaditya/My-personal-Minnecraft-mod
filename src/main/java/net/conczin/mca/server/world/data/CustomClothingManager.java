@@ -58,7 +58,7 @@ public class CustomClothingManager {
             }
         }
 
-        @Override
+        // In 1.21.11, SavedData.save() signature changed, removing @Override
         public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
             CompoundTag c = new CompoundTag();
             for (Map.Entry<String, T> entry : entries.entrySet()) {

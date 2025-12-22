@@ -24,7 +24,8 @@ import java.util.*;
 import java.util.function.LongFunction;
 
 /**
- * Tracks the positions where a tombstone may be found and whether it is filled or empty.
+ * Tracks the positions where a tombstone may be found and whether it is filled
+ * or empty.
  */
 public class GraveyardManager extends SavedData {
     private final Map<TombstoneState, Long2ObjectMap<ChunkBase>> tombstones = new EnumMap<>(TombstoneState.class);
@@ -51,7 +52,7 @@ public class GraveyardManager extends SavedData {
         return ChunkPos.asLong(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         synchronized (tombstones) {
             tombstones.forEach((state, chunks) -> {
@@ -126,7 +127,8 @@ public class GraveyardManager extends SavedData {
             // first we check the immediate chunk
             return getChunk(state, getChunkPos(pos), ChunkBase::empty).findNearest(pos, mutable).or(() -> {
                 // then we iterate outwards checking surrounding chunks
-                BlockPos center = new BlockPos(SectionPos.blockToSectionCoord(pos.getX()), 0, SectionPos.blockToSectionCoord(pos.getZ()));
+                BlockPos center = new BlockPos(SectionPos.blockToSectionCoord(pos.getX()), 0,
+                        SectionPos.blockToSectionCoord(pos.getZ()));
                 // luckily BlockPos has a useful utility for this already
                 return BlockPos.withinManhattanStream(center, maxChunkRange, 0, maxChunkRange)
                         .map(p -> ChunkPos.asLong(p.getX(), p.getZ()))
@@ -264,4 +266,3 @@ public class GraveyardManager extends SavedData {
         }
     }
 }
-

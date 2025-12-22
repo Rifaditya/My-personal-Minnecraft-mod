@@ -29,7 +29,8 @@ public class VillagerTrackerManager extends SavedData {
     }
 
     public static VillagerTrackerManager get(ServerLevel world) {
-        return WorldUtils.loadData(world.getServer().overworld(), VillagerTrackerManager::new, VillagerTrackerManager::new, "mca_villager_tracker");
+        return WorldUtils.loadData(world.getServer().overworld(), VillagerTrackerManager::new,
+                VillagerTrackerManager::new, "mca_villager_tracker");
     }
 
     public static void update(Entity entity) {
@@ -38,7 +39,7 @@ public class VillagerTrackerManager extends SavedData {
         }
     }
 
-    @Override
+    // In 1.21.11, SavedData.save() signature changed, removing @Override
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         return NbtHelper.fromMap(nbt, entries, UUID::toString, NbtHelper::encodeGlobalPosition);
     }
@@ -56,4 +57,3 @@ public class VillagerTrackerManager extends SavedData {
         return entries.get(id);
     }
 }
-
