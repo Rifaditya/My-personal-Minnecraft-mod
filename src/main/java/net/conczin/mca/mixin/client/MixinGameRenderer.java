@@ -25,7 +25,8 @@ public abstract class MixinGameRenderer {
     Minecraft minecraft;
 
     @Shadow
-    @Nullable PostChain postEffect;
+    @Nullable
+    PostChain postEffect;
     @Unique
     private Tuple<String, Identifier> mca$currentShader;
 
@@ -37,8 +38,9 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void mca$injectTick(CallbackInfo ci) {
-        if (MCAClient.areShadersAllowed() && minecraft.cameraEntity != null) {
-            VillagerLike<?> villagerLike = CommonVillagerModel.getVillager(minecraft.cameraEntity);
+        // TODO: In 1.21.11, cameraEntity is now private, use getCameraEntity()
+        if (MCAClient.areShadersAllowed() && minecraft.getCameraEntity() != null) {
+            VillagerLike<?> villagerLike = CommonVillagerModel.getVillager(minecraft.getCameraEntity());
             if (villagerLike != null) {
                 if (postEffect == null) {
                     if (mca$currentShader != null) {
@@ -61,4 +63,3 @@ public abstract class MixinGameRenderer {
         }
     }
 }
-

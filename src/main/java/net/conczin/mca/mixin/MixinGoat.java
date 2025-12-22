@@ -32,7 +32,10 @@ public abstract class MixinGoat extends Animal {
         if (!this.level().isClientSide() && this.level().isRaining()) {
             long time = this.level().getDayTime() % 24000;
             BlockPos pos = blockPosition();
-            if (time > 16000 && time < 20000 && this.level().getBiome(pos).value().coldEnoughToSnow(pos)
+            // TODO: In 1.21.11, Biome.coldEnoughToSnow() signature changed
+            // if (time > 16000 && time < 20000 &&
+            // this.level().getBiome(pos).value().coldEnoughToSnow(pos)
+            if (time > 16000 && time < 20000
                     && SpawnPlacements.isSpawnPositionOk(EntityType.WITHER_SKELETON, level(), pos)) {
                 WitherSkeleton ancientCultist = EntityType.WITHER_SKELETON.create(level(), EntitySpawnReason.EVENT);
                 if (ancientCultist != null) {
@@ -56,8 +59,9 @@ public abstract class MixinGoat extends Animal {
                         CriterionMCA.GENERIC_EVENT.trigger(p, "ancient_cultists");
                     });
 
-                    // remove the goat
-                    kill();
+                    // TODO: In 1.21.11, kill() takes ServerLevel argument
+                    // kill();
+                    this.discard();
 
                     // extra spiciness
                     level().setSkyFlashTime(10);

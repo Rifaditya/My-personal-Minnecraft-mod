@@ -18,11 +18,14 @@ public abstract class MixinZombie extends Monster {
         super(entityType, world);
     }
 
-    @Inject(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
-    public void mca$injectKilledEntity(ServerLevel world, LivingEntity other, CallbackInfoReturnable<Boolean> cir) {
-        if (other instanceof VillagerEntityMCA) {
-            cir.setReturnValue(super.killedEntity(world, other));
-        }
-    }
+    // TODO: In 1.21.11, killedEntity signature changed
+    // @Inject(method =
+    // "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z",
+    // at = @At("HEAD"), cancellable = true)
+    // public void mca$injectKilledEntity(ServerLevel world, LivingEntity other,
+    // CallbackInfoReturnable<Boolean> cir) {
+    // if (other instanceof VillagerEntityMCA) {
+    // cir.setReturnValue(super.killedEntity(world, other));
+    // }
+    // }
 }
-
