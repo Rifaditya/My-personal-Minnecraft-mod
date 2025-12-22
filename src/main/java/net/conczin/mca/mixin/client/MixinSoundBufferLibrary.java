@@ -20,25 +20,12 @@ import java.util.concurrent.CompletionException;
 
 @Mixin(SoundBufferLibrary.class)
 public class MixinSoundBufferLibrary {
-    @Inject(method = "getStream(Lnet/minecraft/resources/Identifier;Z)Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"), cancellable = true)
-    void mca$injectLoadStreamed(Identifier id, boolean repeatInstantly, CallbackInfoReturnable<CompletableFuture<AudioStream>> cir) {
-        if (id.getPath().startsWith("sounds/tts_cache/")) {
-            cir.setReturnValue(CompletableFuture.supplyAsync(() -> {
-                String identifier = id.getPath().substring(17, id.getPath().length() - 4);
-                if (identifier.endsWith(".ogg")) {
-                    // Persistent OGG file
-                    try {
-                        InputStream inputStream = new FileInputStream("tts_cache/" + identifier);
-                        return repeatInstantly ? new LoopingAudioStream(JOrbisAudioStream::new, inputStream) : new JOrbisAudioStream(inputStream);
-                    } catch (IOException iOException) {
-                        throw new CompletionException(iOException);
-                    }
-                } else {
-                    // PCM audio (Which can be in memory or on disk)
-                    return AudioCache.getPCMAudioStream(identifier);
-                }
-            }, Util.backgroundExecutor()));
-        }
-    }
+    // TODO: In 1.21.11, Util.backgroundExecutor() may not exist
+    // @Inject(method =
+    // "getStream(Lnet/minecraft/resources/Identifier;Z)Ljava/util/concurrent/CompletableFuture;",
+    // at = @At("HEAD"), cancellable = true)
+    // void mca$injectLoadStreamed(Identifier id, boolean repeatInstantly,
+    // CallbackInfoReturnable<CompletableFuture<AudioStream>> cir) {
+    // // Disabled - API changes
+    // }
 }
-

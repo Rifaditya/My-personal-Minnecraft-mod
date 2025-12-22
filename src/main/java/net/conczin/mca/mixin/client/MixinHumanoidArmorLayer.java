@@ -20,37 +20,37 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// TODO: In 1.21.11, HumanoidArmorLayer type bounds changed
+// This mixin is disabled until proper type bounds are determined
 @Mixin(HumanoidArmorLayer.class)
-public abstract class MixinHumanoidArmorLayer<T extends LivingEntity, A extends HumanoidModel<T>> {
-    @Unique
-    protected final A mca$leggingsModel = mca$createModel(0.5F);
-    @Unique
-    protected final A mca$bodyModel = mca$createModel(1.0F);
-    @Unique
-    protected boolean mca$injectionActive;
-
-    @Shadow
-    protected abstract boolean usesInnerModel(EquipmentSlot slot);
-
-    @Unique
-    private A mca$createModel(float dilation) {
-        //noinspection unchecked
-        return (A) new PlayerArmorExtendedModel<T>(LayerDefinition.create(VillagerEntityModelMCA.armorData(new CubeDeformation(dilation)), 64, 32).bakeRoot());
-    }
-
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("HEAD"))
-    public void mca$injectRender(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
-        mca$injectionActive = livingEntity instanceof Player && MCAClient.useGeneticsRenderer(livingEntity.getUUID());
-    }
-
-    @Inject(method = "getArmorModel(Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/client/model/HumanoidModel;", at = @At("HEAD"), cancellable = true)
-    private void mca$injectGetArmorModel(EquipmentSlot slot, CallbackInfoReturnable<A> cir) {
-        if (mca$injectionActive) {
-            A model = this.usesInnerModel(slot) ? mca$leggingsModel : mca$bodyModel;
-            if (model != null) {
-                cir.setReturnValue(model);
-            }
-        }
-    }
+public abstract class MixinHumanoidArmorLayer {
+    // Mixin body disabled - type bounds incompatible in 1.21.11
+    /*
+     * @Unique
+     * protected final Object mca$leggingsModel = null;
+     * 
+     * @Unique
+     * protected final Object mca$bodyModel = null;
+     * 
+     * @Unique
+     * protected boolean mca$injectionActive;
+     * 
+     * @Shadow
+     * protected abstract boolean usesInnerModel(EquipmentSlot slot);
+     * 
+     * @Inject(method =
+     * "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V",
+     * at = @At("HEAD"))
+     * public void mca$injectRender(PoseStack matrixStack, MultiBufferSource
+     * vertexConsumerProvider, int i, Object livingEntity, float f, float g, float
+     * h, float j, float k, float l, CallbackInfo ci) {
+     * }
+     * 
+     * @Inject(method =
+     * "getArmorModel(Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/client/model/HumanoidModel;",
+     * at = @At("HEAD"), cancellable = true)
+     * private void mca$injectGetArmorModel(EquipmentSlot slot,
+     * CallbackInfoReturnable<Object> cir) {
+     * }
+     */
 }
-

@@ -8,14 +8,24 @@ import net.minecraft.data.recipes.RecipeOutput;
 
 import java.util.concurrent.CompletableFuture;
 
+// TODO: In 1.21.11, FabricRecipeProvider requires createRecipeProvider method
+// This class is disabled until proper implementation is determined
 public class FabricCribRecipeProvider extends FabricRecipeProvider {
-    public FabricCribRecipeProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+    public FabricCribRecipeProvider(FabricDataOutput output,
+            CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
 
     @Override
-    public void buildRecipes(RecipeOutput recipeOutput) {
-        CribRecipeProvider.generate(recipeOutput);
+    protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+        // TODO: Implement proper RecipeProvider for 1.21.11
+        CribRecipeProvider.generate(output);
+        return null;
     }
-}
 
+    // Old method - no longer used in 1.21.11
+    // @Override
+    // public void buildRecipes(RecipeOutput recipeOutput) {
+    // CribRecipeProvider.generate(recipeOutput);
+    // }
+}

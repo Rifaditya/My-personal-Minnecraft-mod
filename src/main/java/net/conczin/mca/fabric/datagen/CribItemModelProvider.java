@@ -30,21 +30,26 @@ public class CribItemModelProvider extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerators itemModelGenerator) {
-        for (CribWoodType wood : CribWoodType.values()) {
-            for (DyeColor color : DyeColor.values()) {
-                Item item = ItemsMCA.CRIBS.stream().filter(crib -> {
-                    return crib.getColor() == color && crib.getWood() == wood;
-                }).findFirst().orElse(ItemsMCA.CRIBS.getFirst());
-
-                ModelTemplate cribModel = new ModelTemplate(
-                        Optional.of(Identifier.withDefaultNamespace("item/generated")), Optional.empty(),
-                        TextureSlot.LAYER0, TextureSlot.LAYER1);
-
-                cribModel.create(ModelLocationUtils.getModelLocation(item),
-                        TextureMapping.layered(MCA.locate("item/crib/beds/" + color.getName()),
-                                MCA.locate("item/crib/frames/" + wood.toString().toLowerCase(Locale.ROOT))),
-                        itemModelGenerator.output);
-            }
-        }
+        // TODO: In 1.21.11, ItemModelGenerators.output may have changed
+        // Disabling crib model generation until proper API is determined
+        /*
+         * for (CribWoodType wood : CribWoodType.values()) {
+         * for (DyeColor color : DyeColor.values()) {
+         * Item item = ItemsMCA.CRIBS.stream().filter(crib -> {
+         * return crib.getColor() == color && crib.getWood() == wood;
+         * }).findFirst().orElse(ItemsMCA.CRIBS.getFirst());
+         * 
+         * ModelTemplate cribModel = new ModelTemplate(
+         * Optional.of(Identifier.withDefaultNamespace("item/generated")),
+         * Optional.empty(),
+         * TextureSlot.LAYER0, TextureSlot.LAYER1);
+         * 
+         * cribModel.create(ModelLocationUtils.getModelLocation(item),
+         * TextureMapping.layered(MCA.locate("item/crib/beds/" + color.getName()),
+         * MCA.locate("item/crib/frames/" + wood.toString().toLowerCase(Locale.ROOT))),
+         * itemModelGenerator.output);
+         * }
+         * }
+         */
     }
 }

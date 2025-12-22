@@ -53,10 +53,12 @@ public final class MCAFabric implements ModInitializer {
 
     Network.Registrar fabricRegistrar = new Network.Registrar() {
         @Override
-        public <T extends HandleablePayload> void register(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, boolean isServer) {
+        public <T extends HandleablePayload> void register(CustomPacketPayload.Type<T> type,
+                StreamCodec<? super RegistryFriendlyByteBuf, T> codec, boolean isServer) {
             if (isServer) {
                 PayloadTypeRegistry.playC2S().register(type, codec);
-                ServerPlayNetworking.registerGlobalReceiver(type, (payload, ctx) -> ctx.server().execute(() -> payload.handle(ctx.player())));
+                ServerPlayNetworking.registerGlobalReceiver(type,
+                        (payload, ctx) -> ctx.server().execute(() -> payload.handle(ctx.player())));
             } else {
                 PayloadTypeRegistry.playS2C().register(type, codec);
                 if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -89,8 +91,10 @@ public final class MCAFabric implements ModInitializer {
         TagsMCA.Blocks.bootstrap();
         TagsMCA.Items.bootstrap();
 
-        BlockEntityTypesMCA.registerBlockEntityTypes((name, factory, blocks) ->
-                Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, name, BlockEntityType.Builder.of(factory::create, blocks).build(null)));
+        // TODO: In 1.21.11, BlockEntityType.Builder.build() may not accept null
+        BlockEntityTypesMCA.registerBlockEntityTypes(
+                (name, factory, blocks) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, name,
+                        BlockEntityType.Builder.of(factory::create, blocks).build()));
 
         EntitiesMCA.registerAttributes(FabricDefaultAttributeRegistry::register);
         MessagesMCA.register(fabricRegistrar);
@@ -108,7 +112,8 @@ public final class MCAFabric implements ModInitializer {
         managerHelper.registerReloadListener(new FabricBuildingTypes());
 
         // Create the creative mode tab
-        ResourceKey<CreativeModeTab> mcaTab = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), MCA.locate("mca_tab"));
+        ResourceKey<CreativeModeTab> mcaTab = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(),
+                MCA.locate("mca_tab"));
         CreativeModeTab build = FabricItemGroup.builder()
                 .title(Component.translatable("itemGroup.mca.mca_tab"))
                 .icon(() -> new ItemStack(ItemsMCA.ENGAGEMENT_RING))
@@ -125,9 +130,8 @@ public final class MCAFabric implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(s -> ServerInteractionManager.getInstance().tick());
         ServerTickEvents.END_SERVER_TICK.register(MCA::setServer);
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) ->
-                ServerInteractionManager.getInstance().onPlayerJoin(handler.player)
-        );
+        ServerPlayConnectionEvents.JOIN.register(
+                (handler, sender, server) -> ServerInteractionManager.getInstance().onPlayerJoin(handler.player));
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             AdminCommand.register(dispatcher);
@@ -137,9 +141,8 @@ public final class MCAFabric implements ModInitializer {
 
     private static final class ClientProxy {
         public static <T extends HandleablePayload> void register(HandleablePayload.Type<T> type) {
-            ClientPlayNetworking.registerGlobalReceiver(type, (payload, ctx) -> ctx.client().execute(() -> payload.handle(ctx.player())));
+            ClientPlayNetworking.registerGlobalReceiver(type,
+                    (payload, ctx) -> ctx.client().execute(() -> payload.handle(ctx.player())));
         }
     }
 }
-
-
