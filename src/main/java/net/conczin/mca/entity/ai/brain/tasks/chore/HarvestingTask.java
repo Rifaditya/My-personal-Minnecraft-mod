@@ -46,13 +46,13 @@ public class HarvestingTask extends AbstractChoreTask {
     public HarvestingTask() {
         super(ImmutableMap.of(
                 MemoryModuleType.LOOK_TARGET, MemoryStatus.VALUE_ABSENT,
-                MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT
-        ));
+                MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT));
     }
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel world, VillagerEntityMCA villager) {
-        return villager.getVillagerBrain().getCurrentJob() == Chore.HARVEST && super.checkExtraStartConditions(world, villager);
+        return villager.getVillagerBrain().getCurrentJob() == Chore.HARVEST
+                && super.checkExtraStartConditions(world, villager);
     }
 
     @Override
@@ -80,7 +80,8 @@ public class HarvestingTask extends AbstractChoreTask {
         super.start(world, villager, time);
 
         if (!villager.hasItemInSlot(villager.getDominantSlot())) {
-            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(), stack -> stack.getItem() instanceof HoeItem);
+            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(),
+                    stack -> stack.getItem() instanceof HoeItem);
             if (i == -1) {
                 abandonJobWithMessage("chore.harvesting.nohoe");
             } else {
@@ -94,10 +95,12 @@ public class HarvestingTask extends AbstractChoreTask {
         }
 
         // equip hoe
-        if (!InventoryUtils.contains(villager.getInventory(), HoeItem.class) && !villager.hasItemInSlot(villager.getDominantSlot())) {
+        if (!InventoryUtils.contains(villager.getInventory(), HoeItem.class)
+                && !villager.hasItemInSlot(villager.getDominantSlot())) {
             abandonJobWithMessage("chore.harvesting.nohoe");
         } else if (!villager.hasItemInSlot(villager.getDominantSlot())) {
-            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(), stack -> stack.getItem() instanceof HoeItem);
+            int i = InventoryUtils.getFirstSlotContainingItem(villager.getInventory(),
+                    stack -> stack.getItem() instanceof HoeItem);
             ItemStack stack = villager.getInventory().getItem(i);
             villager.setItemInHand(villager.getDominantHand(), stack);
         }
@@ -114,7 +117,7 @@ public class HarvestingTask extends AbstractChoreTask {
             lastCropScan = villager.tickCount;
         }
 
-        //try to find a planting task
+        // try to find a planting task
         currentPos = TaskUtils.getNearestPoint(villager.blockPosition(), plantable);
         if (currentPos == null) {
             currentPos = TaskUtils.getNearestPoint(villager.blockPosition(), harvestable);
@@ -130,14 +133,14 @@ public class HarvestingTask extends AbstractChoreTask {
     private boolean isValidFarmland(BlockPos pos) {
         BlockState state = villager.level().getBlockState(pos);
         return state.getBlock() instanceof FarmBlock
-               && state.canSurvive(villager.level(), pos)
-               && villager.level().getBlockState(pos.above()).isAir();
+                && state.canSurvive(villager.level(), pos)
+                && villager.level().getBlockState(pos.above()).isAir();
     }
 
     private boolean isValidMature(BlockPos pos) {
         BlockState state = villager.level().getBlockState(pos);
         return (state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state))
-               || state.getBlock() instanceof StemBlock;
+                || state.getBlock() instanceof StemBlock;
     }
 
     private boolean isValidImmature(BlockPos pos) {
@@ -147,7 +150,8 @@ public class HarvestingTask extends AbstractChoreTask {
 
     private void searchCrop(int rangeX, int rangeY) {
         List<BlockPos> nearbyCrops = TaskUtils.getNearbyBlocks(villager.blockPosition(), villager.level(),
-                blockState -> blockState.getBlock() instanceof CropBlock || blockState.getBlock() instanceof StemBlock, rangeX, rangeY);
+                blockState -> blockState.getBlock() instanceof CropBlock || blockState.getBlock() instanceof StemBlock,
+                rangeX, rangeY);
 
         harvestable.addAll(nearbyCrops.stream().filter(this::isValidMature).toList());
 
@@ -164,7 +168,7 @@ public class HarvestingTask extends AbstractChoreTask {
 
     private void searchUnusedFarmLand(int rangeX, int rangeY) {
         plantable.addAll(TaskUtils.getNearbyBlocks(villager.blockPosition(), villager.level(),
-                        blockState -> blockState.is(Blocks.FARMLAND), rangeX, rangeY)
+                blockState -> blockState.is(Blocks.FARMLAND), rangeX, rangeY)
                 .stream()
                 .filter(this::isValidFarmland)
                 .toList());
@@ -180,7 +184,7 @@ public class HarvestingTask extends AbstractChoreTask {
             if (workingTick % 5 == 0) {
                 villager.swing(villager.getDominantHand());
             }
-            if (workingTick > 40) { //todo magic number
+            if (workingTick > 40) { // todo magic number
                 plantable.remove(currentPos);
                 harvestable.remove(currentPos);
                 bonemealable.remove(currentPos);
@@ -231,21 +235,23 @@ public class HarvestingTask extends AbstractChoreTask {
                 Vec3.atBottomCenterOf(target),
                 Direction.DOWN,
                 target,
-                true
-        );
+                true);
 
         Optional<ItemStack> stack = InventoryUtils.stream(villager.getInventory())
-                .filter(s -> !s.isEmpty() && s.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == block)
+                .filter(s -> !s.isEmpty() && s.getItem() instanceof BlockItem blockItem
+                        && blockItem.getBlock() == block)
                 .findAny();
 
         if (stack.isEmpty()) {
             stack = InventoryUtils.stream(villager.getInventory())
-                    .filter(s -> !s.isEmpty() && s.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof CropBlock)
+                    .filter(s -> !s.isEmpty() && s.getItem() instanceof BlockItem blockItem
+                            && blockItem.getBlock() instanceof CropBlock)
                     .findAny();
         }
 
         stack.ifPresentOrElse(s -> {
-            world.setBlock(hitResult.getBlockPos(), ((BlockItem) s.getItem()).getBlock().defaultBlockState(), Block.UPDATE_ALL);
+            world.setBlock(hitResult.getBlockPos(), ((BlockItem) s.getItem()).getBlock().defaultBlockState(),
+                    Block.UPDATE_ALL);
             s.shrink(1);
             villager.swing(villager.getDominantHand());
             bonemealable.add(target);
@@ -255,7 +261,8 @@ public class HarvestingTask extends AbstractChoreTask {
     }
 
     private void bonemealCrop(ServerLevel world, VillagerEntityMCA villager, BlockPos pos) {
-        if (swapItem(stack -> stack.getItem() instanceof BoneMealItem) == ITEM_READY && BoneMealItem.growCrop(villager.getItemBySlot(villager.getDominantSlot()), world, pos)) {
+        if (swapItem(stack -> stack.getItem() instanceof BoneMealItem) == ITEM_READY
+                && BoneMealItem.growCrop(villager.getItemBySlot(villager.getDominantSlot()), world, pos)) {
             villager.swing(villager.getDominantHand());
         }
     }
@@ -270,11 +277,17 @@ public class HarvestingTask extends AbstractChoreTask {
                     .withParameter(LootContextParams.BLOCK_STATE, state)
                     .withLuck(0);
 
-            List<ItemStack> drops = world.getServer().reloadableRegistries().getLootTable(state.getBlock().getLootTable()).getRandomItems(builder.create(LootContextParamSets.BLOCK));
+            // TODO: In 1.21.11, getLootTable() returns Optional<ResourceKey<LootTable>>
+            // List<ItemStack> drops =
+            // world.getServer().reloadableRegistries().getLootTable(state.getBlock().getLootTable()).getRandomItems(builder.create(LootContextParamSets.BLOCK));
+            List<ItemStack> drops = new java.util.ArrayList<>();
+            state.getBlock().getLootTable().ifPresent(lootTableKey -> {
+                drops.addAll(world.getServer().reloadableRegistries().getLootTable(lootTableKey)
+                        .getRandomItems(builder.create(LootContextParamSets.BLOCK)));
+            });
             for (ItemStack stack : drops) {
                 villager.getInventory().addItem(stack);
             }
         }
     }
 }
-

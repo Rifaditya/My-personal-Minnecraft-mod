@@ -57,17 +57,23 @@ public class CribItem extends Item {
         }
 
         if (world instanceof ServerLevel serverWorld) {
-            CribEntity crib = EntitiesMCA.CRIB.create(serverWorld);
-            if (crib == null) return InteractionResult.FAIL;
+            // TODO: In 1.21.11, EntityType.create() signature changed
+            // CribEntity crib = EntitiesMCA.CRIB.create(serverWorld);
+            CribEntity crib = new CribEntity(EntitiesMCA.CRIB, serverWorld);
+            if (crib == null)
+                return InteractionResult.FAIL;
 
             crib.setWoodType(wood);
             crib.setColor(color);
 
             float f = (float) Mth.floor((Mth.wrapDegrees(context.getRotation() - 180.0f) + 22.5f) / 45.0f) * 45.0f;
-            crib.moveTo(blockPos.getX() + 0.5f, blockPos.getY(), blockPos.getZ() + 0.5f, f, 0.0f);
+            // TODO: In 1.21.11, Entity.moveTo() may have changed signature
+            crib.setPos(blockPos.getX() + 0.5f, blockPos.getY(), blockPos.getZ() + 0.5f);
+            crib.setYRot(f);
             serverWorld.addFreshEntityWithPassengers(crib);
 
-            world.playSound(null, crib.getX(), crib.getY(), crib.getZ(), SoundEvents.ARMOR_STAND_PLACE, SoundSource.BLOCKS, 0.75f, 0.8f);
+            world.playSound(null, crib.getX(), crib.getY(), crib.getZ(), SoundEvents.ARMOR_STAND_PLACE,
+                    SoundSource.BLOCKS, 0.75f, 0.8f);
             crib.gameEvent(GameEvent.ENTITY_PLACE, context.getPlayer());
         }
 
@@ -75,4 +81,3 @@ public class CribItem extends Item {
         return InteractionResult.sidedSuccess(world.isClientSide());
     }
 }
-
