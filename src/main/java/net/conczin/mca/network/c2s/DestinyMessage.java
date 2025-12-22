@@ -66,8 +66,11 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         pos = ExtendedFuzzyPositions.downWhile(pos, 1,
                 p -> !player.level().getBlockState(p.below()).isCollisionShapeFullBlock(player.level(), p));
         ChunkPos chunkPos = new ChunkPos(pos);
-        ((ServerLevel) player.level()).getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkPos, 1,
-                player.getId());
+        // TODO: In 1.21.11, addRegionTicket API may have changed
+        // ((ServerLevel)
+        // player.level()).getChunkSource().addRegionTicket(TicketType.POST_TELEPORT,
+        // chunkPos, 1,
+        // player.getId());
         // In 1.21.11, RelativeMovement was removed. Use simpler teleport method
         // requestTeleport without flags or use teleportTo(x, y, z, yaw, pitch)
         player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), player.getYRot(), player.getXRot());

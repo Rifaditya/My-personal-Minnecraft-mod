@@ -98,7 +98,9 @@ public final class MCAFabric implements ModInitializer {
 
         EntitiesMCA.registerAttributes(FabricDefaultAttributeRegistry::register);
         MessagesMCA.register(fabricRegistrar);
-        Network.registerSender(ServerPlayNetworking::send);
+        // In 1.21.11, wrap ServerPlayNetworking::send in lambda to match Sender
+        // interface
+        Network.registerSender((player, payload) -> ServerPlayNetworking.send(player, payload));
 
         // Register resource reload listeners
         ResourceManagerHelper managerHelper = ResourceManagerHelper.get(PackType.SERVER_DATA);
