@@ -13,15 +13,16 @@ import net.minecraft.world.entity.Entity;
 import java.util.UUID;
 
 public record InteractionCloseRequest(UUID villagerUUID) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<InteractionCloseRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("interaction_close_request"));
+    public static final CustomPacketPayload.Type<InteractionCloseRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("interaction_close_request"));
     public static final StreamCodec<FriendlyByteBuf, InteractionCloseRequest> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, InteractionCloseRequest::villagerUUID,
-            InteractionCloseRequest::new
-    );
+            InteractionCloseRequest::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
-        Entity v = (ServerLevel) player.level().getEntity(villagerUUID);
+        // TODO: In 1.21.11, fixed wrong cast\n Entity v =
+        // player.level().getEntity(villagerUUID);
         if (v instanceof VillagerEntityMCA villager) {
             villager.getInteractions().stopInteracting();
         }
@@ -32,4 +33,3 @@ public record InteractionCloseRequest(UUID villagerUUID) implements HandleablePa
         return TYPE;
     }
 }
-

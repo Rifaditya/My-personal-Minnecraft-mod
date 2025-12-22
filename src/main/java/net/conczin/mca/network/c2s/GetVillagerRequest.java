@@ -21,11 +21,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public record GetVillagerRequest(UUID id) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<GetVillagerRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("get_villager_request"));
+    public static final CustomPacketPayload.Type<GetVillagerRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("get_villager_request"));
     public static final StreamCodec<FriendlyByteBuf, GetVillagerRequest> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, GetVillagerRequest::id,
-            GetVillagerRequest::new
-    );
+            GetVillagerRequest::new);
 
     private static void storeNode(CompoundTag data, Optional<FamilyTreeNode> entry, String prefix) {
         if (entry.isPresent()) {
@@ -59,7 +59,7 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
 
     @Override
     public void handleServer(ServerPlayer player) {
-        Entity e = (ServerLevel) player.level().getEntity(id);
+        // TODO: In 1.21.11, fixed wrong cast\n Entity e = player.level().getEntity(id);
         CompoundTag villagerData = getVillagerData(e);
         if (villagerData != null) {
             Network.sendToPlayer(new GetVillagerResponse(villagerData), player);
@@ -71,4 +71,3 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
         return TYPE;
     }
 }
-

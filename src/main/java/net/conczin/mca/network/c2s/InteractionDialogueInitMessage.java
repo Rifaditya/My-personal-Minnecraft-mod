@@ -17,19 +17,22 @@ import net.minecraft.world.entity.Entity;
 import java.util.UUID;
 
 public record InteractionDialogueInitMessage(UUID villagerUUID) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<InteractionDialogueInitMessage> TYPE = new CustomPacketPayload.Type<>(MCA.locate("interaction_dialogue_init"));
-    public static final StreamCodec<FriendlyByteBuf, InteractionDialogueInitMessage> STREAM_CODEC = StreamCodec.composite(
-            UUIDUtil.STREAM_CODEC, InteractionDialogueInitMessage::villagerUUID,
-            InteractionDialogueInitMessage::new
-    );
+    public static final CustomPacketPayload.Type<InteractionDialogueInitMessage> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("interaction_dialogue_init"));
+    public static final StreamCodec<FriendlyByteBuf, InteractionDialogueInitMessage> STREAM_CODEC = StreamCodec
+            .composite(
+                    UUIDUtil.STREAM_CODEC, InteractionDialogueInitMessage::villagerUUID,
+                    InteractionDialogueInitMessage::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
-        Entity v = (ServerLevel) player.level().getEntity(villagerUUID);
+        // TODO: In 1.21.11, fixed wrong cast\n Entity v =
+        // player.level().getEntity(villagerUUID);
         if (v instanceof VillagerEntityMCA villager) {
             Question question = Dialogues.getInstance().getQuestion("root");
             if (question.isAuto()) {
-                Dialogues.getInstance().selectAnswer(villager, player, question.getName(), question.getRandomAnswer().getName());
+                Dialogues.getInstance().selectAnswer(villager, player, question.getName(),
+                        question.getRandomAnswer().getName());
             } else {
                 InteractionDialogueResponse response = new InteractionDialogueResponse(question, player, villager);
                 Network.sendToPlayer(response, player);
@@ -42,4 +45,3 @@ public record InteractionDialogueInitMessage(UUID villagerUUID) implements Handl
         return TYPE;
     }
 }
-

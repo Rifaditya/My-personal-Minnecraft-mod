@@ -14,16 +14,17 @@ import net.minecraft.world.entity.Entity;
 import java.util.UUID;
 
 public record InteractionVillagerMessage(String command, UUID villagerUUID) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<InteractionVillagerMessage> TYPE = new CustomPacketPayload.Type<>(MCA.locate("interaction_villager"));
+    public static final CustomPacketPayload.Type<InteractionVillagerMessage> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("interaction_villager"));
     public static final StreamCodec<FriendlyByteBuf, InteractionVillagerMessage> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, InteractionVillagerMessage::command,
             UUIDUtil.STREAM_CODEC, InteractionVillagerMessage::villagerUUID,
-            InteractionVillagerMessage::new
-    );
+            InteractionVillagerMessage::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
-        Entity v = (ServerLevel) player.level().getEntity(villagerUUID);
+        // TODO: In 1.21.11, fixed wrong cast\n Entity v =
+        // player.level().getEntity(villagerUUID);
         if (v instanceof VillagerLike<?> villager && villager.getInteractions().handle(player, command)) {
             villager.getInteractions().stopInteracting();
         }
@@ -34,4 +35,3 @@ public record InteractionVillagerMessage(String command, UUID villagerUUID) impl
         return TYPE;
     }
 }
-
