@@ -24,15 +24,16 @@ public class ServerInteractionManager {
     private static final ServerInteractionManager INSTANCE = new ServerInteractionManager();
 
     /**
-     * Maps a player's UUID to a list of UUIDs that have proposed to them with /mca propose
+     * Maps a player's UUID to a list of UUIDs that have proposed to them with /mca
+     * propose
      */
     private final Map<UUID, List<UUID>> proposals = new HashMap<>();
 
     /**
-     * List of UUIDs that initiated procreation mapped to the time the request expires.
+     * List of UUIDs that initiated procreation mapped to the time the request
+     * expires.
      */
     private final Object2LongArrayMap<UUID> procreateMap = new Object2LongArrayMap<>();
-
 
     private ServerInteractionManager() {
     }
@@ -64,13 +65,11 @@ public class ServerInteractionManager {
             } else if (Config.getInstance().allowDestinyCommandOnce) {
                 Network.sendToPlayer(new ShowToastRequest(
                         "server.destinyNotSet.title",
-                        "server.destinyNotSet.description"
-                ), player);
+                        "server.destinyNotSet.description"), player);
             } else if (Config.getInstance().allowFullPlayerEditor) {
                 Network.sendToPlayer(new ShowToastRequest(
                         "server.playerNotCustomized.title",
-                        "server.playerNotCustomized.description"
-                ), player);
+                        "server.playerNotCustomized.description"), player);
             }
         }
 
@@ -226,7 +225,8 @@ public class ServerInteractionManager {
      * @param sender The person ending their marriage.
      */
     public void endMarriage(ServerPlayer sender) {
-        // Retrieve all data instances and an instance of the ex-spouse if they are present.
+        // Retrieve all data instances and an instance of the ex-spouse if they are
+        // present.
         EntityRelationship.of(sender).ifPresent(senderData -> {
             // Ensure the sender is married
             if (!senderData.isMarried()) {
@@ -241,9 +241,8 @@ public class ServerInteractionManager {
             }
 
             // Notify the sender of the success and end both marriages.
-            senderData.getPartnerName().ifPresent(name ->
-                    successMessage(sender, Component.translatable("server.endMarriage", name.getString()))
-            );
+            senderData.getPartnerName().ifPresent(
+                    name -> successMessage(sender, Component.translatable("server.endMarriage", name.getString())));
             senderData.getPartner().ifPresent(spouse -> {
                 if (spouse instanceof Player player) {
                     // Notify the ex if they are online.
@@ -251,7 +250,8 @@ public class ServerInteractionManager {
                 }
             });
             senderData.endRelationShip(RelationshipState.SINGLE);
-            senderData.getPartnerUUID().map(id -> PlayerSaveData.get(sender)).ifPresent(r -> r.endRelationShip(RelationshipState.SINGLE));
+            senderData.getPartnerUUID().map(id -> PlayerSaveData.get(sender))
+                    .ifPresent(r -> r.endRelationShip(RelationshipState.SINGLE));
         });
     }
 
@@ -283,7 +283,8 @@ public class ServerInteractionManager {
 
         // Ensure the spouse is online.
         senderData.getPartner().filter(e -> e instanceof Player).map(Player.class::cast).ifPresentOrElse(spouse -> {
-            // If the spouse is online and has previously sent a procreation request that hasn't expired, we can continue.
+            // If the spouse is online and has previously sent a procreation request that
+            // hasn't expired, we can continue.
             // Otherwise, we notify the spouse that they must also enter the command.
             if (!procreateMap.containsKey(spouse.getUUID())) {
                 procreateMap.put(sender.getUUID(), System.currentTimeMillis() + 10000);
@@ -298,16 +299,15 @@ public class ServerInteractionManager {
         }, () -> failMessage(sender, Component.translatable("server.spouseNotPresent")));
     }
 
-    private void successMessage(Player player, MutableComponent message) {
+    private void successMessage(ServerPlayer player, MutableComponent message) {
         player.sendSystemMessage(message.withStyle(ChatFormatting.GREEN));
     }
 
-    private void failMessage(Player player, MutableComponent message) {
+    private void failMessage(ServerPlayer player, MutableComponent message) {
         player.sendSystemMessage(message.withStyle(ChatFormatting.RED));
     }
 
-    private void infoMessage(Player player, MutableComponent message) {
+    private void infoMessage(ServerPlayer player, MutableComponent message) {
         player.sendSystemMessage(message.withStyle(ChatFormatting.YELLOW));
     }
 }
-
