@@ -90,9 +90,13 @@ public class SpawnQueue {
                     .withName(ze.hasCustomName() ? ze.getName().getString() : null)
                     .withGender(Gender.getRandom())
                     .withPosition(ze)
-                    .withType(VillagerType.byBiome(ze.level().getBiome(ze.blockPosition())))
+                    // In 1.21.11, VillagerType.byBiome returns ResourceKey, need registry lookup
+                    .withType(BuiltInRegistries.VILLAGER_TYPE
+                            .getValue(VillagerType.byBiome(ze.level().getBiome(ze.blockPosition()))))
+                    // In 1.21.11, VillagerProfession.NONE is ResourceKey, get actual value from
+                    // registry
                     .withProfession(BuiltInRegistries.VILLAGER_PROFESSION.getRandom(ze.getRandom()).map(Holder::value)
-                            .orElse(VillagerProfession.NONE))
+                            .orElse(BuiltInRegistries.VILLAGER_PROFESSION.getValue(VillagerProfession.NONE)))
                     .spawn(EntitySpawnReason.NATURAL);
 
             copyPastaIntensifies(villager, ze);
