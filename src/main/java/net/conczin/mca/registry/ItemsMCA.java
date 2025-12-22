@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.ToolMaterial;
 
 import java.util.*;
 import java.util.stream.Collectors;
