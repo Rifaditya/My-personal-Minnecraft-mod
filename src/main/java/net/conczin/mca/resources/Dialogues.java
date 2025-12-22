@@ -1,6 +1,7 @@
 package net.conczin.mca.resources;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import net.conczin.mca.MCA;
 import net.conczin.mca.entity.VillagerEntityMCA;
 import net.conczin.mca.network.Network;
@@ -14,22 +15,21 @@ import net.conczin.mca.resources.data.dialogue.Result;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InputStreamReader;
 import java.util.*;
 
-public class Dialogues extends SimpleJsonResourceReloadListener {
+// Changed from SimpleJsonResourceReloadListener to SimplePreparableReloadListener for 1.21.11 compatibility
+public class Dialogues extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     protected static final Identifier ID = MCA.locate("dialogues");
 
     private static Dialogues INSTANCE;
     private final Map<String, Question> questions = new HashMap<>();
 
     public Dialogues() {
-        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
-        // super(Resources.GSON, "dialogues");
-        super("dialogues");
         INSTANCE = this;
     }
 
@@ -49,18 +49,31 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
         return finalAnalysis;
     }
 
-    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
-    // Object
     @Override
-    @SuppressWarnings("unchecked")
-    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
-        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
+    protected Map<Identifier, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> result = new HashMap<>();
+        String directory = "dialogues";
+        for (Identifier id : manager.listResources(directory, path -> path.getPath().endsWith(".json")).keySet()) {
+            try (var reader = new InputStreamReader(manager.getResource(id).orElseThrow().open())) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                MCA.LOGGER.error("Failed to load JSON resource {}", id, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         questions.clear();
-        data.forEach(this::loadDialogue);
+        prepared.forEach(this::loadDialogue);
     }
 
     private void loadDialogue(Identifier identifier, JsonElement element) {
         String id = identifier.getPath().substring(identifier.getPath().lastIndexOf('/') + 1);
+        if (id.endsWith(".json")) {
+            id = id.substring(0, id.length() - 5);
+        }
         if (!this.checkIsMcaDialogue(element)) {
             MCA.LOGGER.warn("Dialogue {} is not properly formatted, not loading", identifier);
             return;
