@@ -19,12 +19,16 @@ public class Supporters extends SimpleJsonResourceReloadListener {
     private final Map<String, List<String>> supporterGroups = new HashMap<>();
 
     public Supporters() {
-        super(Resources.GSON, ID.getPath());
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, ID.getPath());
+        super(ID.getPath());
         INSTANCE = this;
     }
 
-    public Supporters(Gson gson, String dataType) {
-        super(gson, dataType);
+    public Supporters(com.google.gson.Gson gson, String dataType) {
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(gson, dataType);
+        super(dataType);
     }
 
     public static String getRandomSupporter() {

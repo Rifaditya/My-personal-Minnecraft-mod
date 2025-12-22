@@ -23,7 +23,9 @@ public class Names extends SimpleJsonResourceReloadListener {
     static final RandomSource random = RandomSource.create();
 
     public Names() {
-        super(Resources.GSON, ID.getPath());
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, ID.getPath());
+        super(ID.getPath());
     }
 
     public static String getCitizenNation(Entity entity) {

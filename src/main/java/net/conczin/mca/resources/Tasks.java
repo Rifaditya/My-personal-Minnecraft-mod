@@ -21,7 +21,9 @@ public class Tasks extends SimpleJsonResourceReloadListener {
     public final Map<Rank, List<Task>> tasks = new HashMap<>();
 
     public Tasks() {
-        super(Resources.GSON, ID.getPath());
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, ID.getPath());
+        super(ID.getPath());
         INSTANCE = this;
     }
 

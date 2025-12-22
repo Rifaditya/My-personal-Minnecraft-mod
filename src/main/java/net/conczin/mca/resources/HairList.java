@@ -21,7 +21,9 @@ public class HairList extends SimpleJsonResourceReloadListener {
     public final HashMap<String, Hair> hair = new HashMap<>();
 
     public HairList() {
-        super(Resources.GSON, "skins/hair");
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, "skins/hair");
+        super("skins/hair");
         INSTANCE = this;
     }
 

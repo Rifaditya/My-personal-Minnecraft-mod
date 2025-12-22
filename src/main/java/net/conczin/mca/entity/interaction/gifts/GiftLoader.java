@@ -16,7 +16,9 @@ public class GiftLoader extends SimpleJsonResourceReloadListener {
     protected static final Identifier ID = MCA.locate("gifts");
 
     public GiftLoader() {
-        super(Resources.GSON, "gifts");
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, "gifts");
+        super("gifts");
     }
 
     // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to

@@ -27,7 +27,9 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
     private final Map<String, Question> questions = new HashMap<>();
 
     public Dialogues() {
-        super(Resources.GSON, "dialogues");
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, "dialogues");
+        super("dialogues");
         INSTANCE = this;
     }
 

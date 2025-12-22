@@ -26,7 +26,9 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
     private final Map<String, Icon> icons = new HashMap<>();
 
     public MCAScreens() {
-        super(Resources.GSON, "api/gui");
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, "api/gui");
+        super("api/gui");
         INSTANCE = this;
     }
 

@@ -19,7 +19,9 @@ public class BuildingTypes extends SimpleJsonResourceReloadListener implements I
     private final Map<String, BuildingType> buildingTypesClient = new HashMap<>();
 
     public BuildingTypes() {
-        super(Resources.GSON, ID.getPath());
+        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
+        // super(Resources.GSON, ID.getPath());
+        super(ID.getPath());
         INSTANCE = this;
     }
 
