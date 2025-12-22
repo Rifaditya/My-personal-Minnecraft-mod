@@ -20,18 +20,23 @@ import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 abstract class MixinServerWorld extends Level implements WorldGenLevel {
-    protected MixinServerWorld(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
-        super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
+    // TODO: In 1.21.11, Level constructor signature changed
+    // protected MixinServerWorld(WritableLevelData writableLevelData,
+    // ResourceKey<Level> resourceKey, RegistryAccess registryAccess,
+    // Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl,
+    // boolean bl2, long l, int i) {
+    // super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl,
+    // bl2, l, i);
+    // }
+    protected MixinServerWorld(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey,
+            RegistryAccess registryAccess, Holder<DimensionType> holder, boolean bl, boolean bl2, long l, int i) {
+        super(writableLevelData, resourceKey, registryAccess, holder, bl, bl2, l, i);
     }
 
-    @Inject(method = "addEntity(Lnet/minecraft/world/entity/Entity;)Z",
-            at = @At("HEAD"),
-            cancellable = true
-    )
+    @Inject(method = "addEntity(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
     private void onAddEntity(Entity entity, CallbackInfoReturnable<Boolean> info) {
         if (SpawnQueue.getInstance().addVillager(entity)) {
             info.setReturnValue(false);
         }
     }
 }
-

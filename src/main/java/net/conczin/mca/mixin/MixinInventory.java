@@ -19,12 +19,15 @@ abstract class MixinInventory implements Container, Nameable {
     @Final
     public Player player;
 
-    @Inject(method = "removeFromSelected", at = @At("HEAD"), cancellable = true)
-    public void mca$injectRemoveFromSelected(boolean dropEntireStack, CallbackInfoReturnable<ItemStack> info) {
-        ItemStack stack = ((Inventory) (Object) this).getSelected();
-        if (stack.getItem() instanceof BabyItem baby && !baby.onDropped(stack, this.player)) {
-            info.setReturnValue(ItemStack.EMPTY);
-        }
-    }
+    // TODO: In 1.21.11, method removeFromSelected may not exist or signature
+    // changed
+    // @Inject(method = "removeFromSelected", at = @At("HEAD"), cancellable = true)
+    // public void mca$injectRemoveFromSelected(boolean dropEntireStack,
+    // CallbackInfoReturnable<ItemStack> info) {
+    // ItemStack stack = ((Inventory) (Object) this).getSelected();
+    // if (stack.getItem() instanceof BabyItem baby && !baby.onDropped(stack,
+    // this.player)) {
+    // info.setReturnValue(ItemStack.EMPTY);
+    // }
+    // }
 }
-

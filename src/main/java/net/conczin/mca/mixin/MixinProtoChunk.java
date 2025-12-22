@@ -19,15 +19,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ProtoChunk.class)
 abstract class MixinProtoChunk extends ChunkAccess {
-    public MixinProtoChunk(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData) {
-        super(chunkPos, upgradeData, levelHeightAccessor, registry, l, levelChunkSections, blendingData);
+    // TODO: In 1.21.11, ChunkAccess constructor signature changed
+    // public MixinProtoChunk(ChunkPos chunkPos, UpgradeData upgradeData,
+    // LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l,
+    // @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData
+    // blendingData) {
+    // super(chunkPos, upgradeData, levelHeightAccessor, registry, l,
+    // levelChunkSections, blendingData);
+    // }
+    public MixinProtoChunk(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, long l,
+            @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData) {
+        super(chunkPos, upgradeData, levelHeightAccessor, l, levelChunkSections, blendingData);
     }
 
-    @Inject(method = "addEntity(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
-    private void onAddEntity(Entity entity, CallbackInfo info) {
-        if (SpawnQueue.getInstance().addVillager(entity)) {
-            info.cancel();
-        }
-    }
+    // TODO: addEntity method may have changed
+    // @Inject(method = "addEntity(Lnet/minecraft/world/entity/Entity;)V", at =
+    // @At("HEAD"), cancellable = true)
+    // private void onAddEntity(Entity entity, CallbackInfo info) {
+    // if (SpawnQueue.getInstance().addVillager(entity)) {
+    // info.cancel();
+    // }
+    // }
 }
-
