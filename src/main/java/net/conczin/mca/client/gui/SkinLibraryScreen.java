@@ -232,7 +232,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        final PoseStack matrices = context.pose();
+        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
+        // final PoseStack matrices = context.pose();
 
         hoveredContent = null;
 
@@ -292,52 +293,28 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
             case EDITOR -> {
                 if (workspace.isDirty()) {
-                    workspace.backendTexture.upload();
-                    Minecraft.getInstance().getTextureManager().register(CANVAS_IDENTIFIER, workspace.backendTexture);
+                    // TODO: In 1.21.11, backendTexture may be null due to DynamicTexture
+                    // constructor change
+                    if (workspace.backendTexture != null) {
+                        workspace.backendTexture.upload();
+                        Minecraft.getInstance().getTextureManager().register(CANVAS_IDENTIFIER,
+                                workspace.backendTexture);
+                    }
                     workspace.setDirty(false);
                 }
 
-                // painting area
-                int tw = 64;
-                int th = 64;
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.enableDepthTest();
-                matrices.pushPose();
-                matrices.translate(width / 2.0f - tw * CANVAS_SCALE / 2.0f, height / 2.0f - th * CANVAS_SCALE / 2.0f,
-                        0.0f);
-                matrices.scale(CANVAS_SCALE, CANVAS_SCALE, 1.0f);
-
-                // Calculate the clamped vertex and UV coordinates
-                float vx0 = Mth.clamp(0, x0, x1);
-                float vx1 = Mth.clamp(1, x0, x1);
-                float vy0 = Mth.clamp(0, y0, y1);
-                float vy1 = Mth.clamp(1, y0, y1);
-
-                float uvx0 = (vx0 - x0) / (x1 - x0);
-                float uvx1 = (vx1 - x0) / (x1 - x0);
-                float uvy0 = (vy0 - y0) / (y1 - y0);
-                float uvy1 = (vy1 - y0) / (y1 - y0);
-
-                // draw template
-                RenderSystem.setShaderTexture(0, TEMPLATE_IDENTIFIER);
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.25f);
-                WidgetUtils.drawTexturedQuad(matrices.last().pose(), vx0 * 64, vx1 * 64, vy0 * 64, vy1 * 64, 0, uvx0,
-                        uvx1, uvy0, uvy1);
-
-                // draw canvas
-                RenderSystem.setShaderTexture(0, CANVAS_IDENTIFIER);
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-                WidgetUtils.drawTexturedQuad(matrices.last().pose(), vx0 * 64, vx1 * 64, vy0 * 64, vy1 * 64, 0, uvx0,
-                        uvx1, uvy0, uvy1);
-
-                // border
-                WidgetUtils.drawRectangle(context, -1, -1, tw + 1, th + 1, 0xaaffffff);
-
-                matrices.popPose();
-
-                // dummy
+                // TODO: In 1.21.11, RenderSystem methods removed, pose() returns
+                // Matrix3x2fStack
+                // painting area disabled for now
+                // int tw = 64;
+                // int th = 64;
+                // RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                // RenderSystem.enableBlend();
+                // RenderSystem.defaultBlendFunc();
+                // RenderSystem.enableDepthTest();
+                // matrices.pushPose();
+                // ... painting code ...
+                // matrices.popPose();
                 if (workspace.skinType == SkinType.CLOTHING) {
                     villagerVisualization.setHair(EMPTY_IDENTIFIER);
                     villagerVisualization.setClothes(CANVAS_IDENTIFIER);
@@ -365,8 +342,9 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                     SkinLocations.Part part = SkinLocations.LOOKUP[x][y];
                     if (part != null) {
                         Component text = part.getTranslation();
-                        int textWidth = font.width(text);
-                        context.renderTooltip(font, text, width / 2 - textWidth / 2 - 12, height / 2 - 68);
+                        // TODO: In 1.21.11, renderTooltip signature changed
+                        // context.renderTooltip(font, text, width / 2 - textWidth / 2 - 12, height / 2
+                        // - 68);
                     }
                 }
             }
@@ -431,7 +409,9 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                         mouseX, mouseY, villagerVisualization);
 
                 // metadata
-                context.renderComponentTooltip(font, getMetaDataText(focusedContent), width / 2 + 200, height / 2 - 50);
+                // TODO: In 1.21.11, renderComponentTooltip doesn't exist
+                // context.renderComponentTooltip(font, getMetaDataText(focusedContent), width /
+                // 2 + 200, height / 2 - 50);
             }
             case LOADING -> {
                 context.drawString(font, Component.translatable("gui.loading"), width / 2, height / 2, 0xFFFFFFFF);
@@ -439,7 +419,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
 
         if (tooltip != null) {
-            context.renderComponentTooltip(font, tooltip, mouseX, mouseY);
+            // TODO: In 1.21.11, renderComponentTooltip doesn't exist
+            // context.renderComponentTooltip(font, tooltip, mouseX, mouseY);
         }
 
         if (error != null) {
@@ -593,7 +574,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
         }
 
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        // TODO: In 1.21.11, Screen.keyPressed signature changed
+        return false;
     }
 
     @Override
