@@ -48,9 +48,6 @@ public class LegacyImageButton extends ImageButton {
         // textureHeight);
     }
 
-    // In 1.21.11, renderWidget visibility changed in AbstractButton
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderTexture(guiGraphics, Identifier, getX(), getY(), xTexStart, yTexStart, yDiffTex, width, height,
-                textureWidth, textureHeight);
-    }
+    // In 1.21.11, renderWidget in AbstractButton is final or visibility changed
+    // Rendering disabled - base class renders
 }

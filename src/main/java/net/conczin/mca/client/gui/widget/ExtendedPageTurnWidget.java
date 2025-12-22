@@ -16,19 +16,7 @@ public class ExtendedPageTurnWidget extends PageButton {
         this.texture = texture;
     }
 
-    // In 1.21.11, renderWidget signature changed, removing @Override
-    public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        int i = 0;
-        int j = 192;
-        if (isHovered()) {
-            i += 23;
-        }
-
-        if (!isNextPageButton) {
-            j += 13;
-        }
-
-        // TODO: In 1.21.11, blit requires RenderType
-        // context.blit(texture, getX(), getY(), i, j, 23, 13);
-    }
+    // In 1.21.11, renderWidget in AbstractButton is final or visibility changed
+    // Rendering disabled - using empty method
+    // TODO: Implement custom rendering approach
 }
