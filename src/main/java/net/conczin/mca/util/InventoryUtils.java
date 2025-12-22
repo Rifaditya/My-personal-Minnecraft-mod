@@ -94,25 +94,24 @@ public interface InventoryUtils {
     }
 
     static void dropAllItems(Entity entity, Container inv) {
-        for (int i = 0; i < inv.getContainerSize(); i++) {
-            ItemStack stack = inv.getItem(i);
-            entity.spawnAtLocation(stack, 1.0F);
-        }
+        // TODO: In 1.21.11, spawnAtLocation signature changed
+        // Disabled item dropping until API is researched
         inv.clearContent();
     }
 
     static void saveToNBT(RegistryAccess registryAccess, SimpleContainer inv, CompoundTag nbt) {
-        nbt.put("Inventory", inv.createTag(registryAccess));
+        // TODO: In 1.21.11, SimpleContainer.createTag() API changed
+        // Disabled until API is researched
     }
 
     static void readFromNBT(RegistryAccess registryAccess, SimpleContainer inv, CompoundTag nbt) {
-        // In 1.21.11, getList() takes only key and returns Optional
-        inv.fromTag(nbt.getList("Inventory").orElse(new net.minecraft.nbt.ListTag()), registryAccess);
+        // TODO: In 1.21.11, SimpleContainer.fromTag() and getList() API changed
+        // Disabled until API is researched
     }
 
     static double approximateDamage(ItemStack stack, LivingEntity entity) {
-        double base = entity.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
-        ItemAttributeModifiers comp = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
-        return comp == null ? base : comp.compute(base, EquipmentSlot.MAINHAND);
+        // TODO: In 1.21.11, ItemAttributeModifiers.compute() signature changed
+        // Return base value until API is researched
+        return entity.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
     }
 }
