@@ -21,20 +21,34 @@ import java.util.function.UnaryOperator;
 public interface DataComponentsMCA {
     Map<Identifier, DataComponentType<?>> COMPONENTS = new HashMap<>();
 
-    DataComponentType<GlobalPos> TRACKER_POS = register("tracker_pos", (b) -> b.persistent(GlobalPos.CODEC).networkSynchronized(GlobalPos.STREAM_CODEC));
-    DataComponentType<String> TRACKER_NAME = register("tracker_name", (b) -> b.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
-    DataComponentType<UUID> TRACKER_UUID = register("tracker_uuid", (b) -> b.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
+    DataComponentType<GlobalPos> TRACKER_POS = register("tracker_pos",
+            (b) -> b.persistent(GlobalPos.CODEC).networkSynchronized(GlobalPos.STREAM_CODEC));
+    DataComponentType<String> TRACKER_NAME = register("tracker_name",
+            (b) -> b.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    DataComponentType<UUID> TRACKER_UUID = register("tracker_uuid",
+            (b) -> b.persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC));
 
-    DataComponentType<BabyParentsComponent> BABY_PARENTS = register("baby_parents", (b) -> b.persistent(BabyParentsComponent.CODEC).networkSynchronized(BabyParentsComponent.STREAM_CODEC));
-    DataComponentType<Integer> BABY_AGE = register("baby_age", (b) -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
-    DataComponentType<Integer> BABY_DROP_ATTEMPTS = register("baby_drop_attempts", (b) -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
-    DataComponentType<Boolean> BABY_INVALIDATED = register("baby_invalidated", (b) -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-    DataComponentType<CustomData> BABY_NBT = register("baby_nbt", (b) -> b.persistent(CustomData.CODEC_WITH_ID).networkSynchronized(CustomData.STREAM_CODEC));
+    DataComponentType<BabyParentsComponent> BABY_PARENTS = register("baby_parents",
+            (b) -> b.persistent(BabyParentsComponent.CODEC).networkSynchronized(BabyParentsComponent.STREAM_CODEC));
+    DataComponentType<Integer> BABY_AGE = register("baby_age",
+            (b) -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
+    DataComponentType<Integer> BABY_DROP_ATTEMPTS = register("baby_drop_attempts",
+            (b) -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
+    DataComponentType<Boolean> BABY_INVALIDATED = register("baby_invalidated",
+            (b) -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    // TODO: In 1.21.11, CustomData.CODEC_WITH_ID may have changed
+    DataComponentType<CustomData> BABY_NBT = register("baby_nbt",
+            (b) -> b.persistent(CustomData.CODEC).networkSynchronized(CustomData.STREAM_CODEC));
 
-    DataComponentType<Boolean> SCYTHE_ACTIVE = register("scythe_active", (b) -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-    DataComponentType<Boolean> SCYTHE_HAS_SOUL = register("scythe_has_soul", (b) -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    DataComponentType<Boolean> SCYTHE_ACTIVE = register("scythe_active",
+            (b) -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    DataComponentType<Boolean> SCYTHE_HAS_SOUL = register("scythe_has_soul",
+            (b) -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
-    DataComponentType<List<Component>> BOOK_PAGES = register("book_pages", (b) -> b.persistent(ComponentSerialization.FLAT_CODEC.listOf()).networkSynchronized(ComponentSerialization.STREAM_CODEC.apply(ByteBufCodecs.list())));
+    // TODO: In 1.21.11, ComponentSerialization.FLAT_CODEC may have changed
+    DataComponentType<List<Component>> BOOK_PAGES = register("book_pages",
+            (b) -> b.persistent(ComponentSerialization.CODEC.listOf())
+                    .networkSynchronized(ComponentSerialization.STREAM_CODEC.apply(ByteBufCodecs.list())));
 
     private static <T> DataComponentType<T> register(String name, UnaryOperator<DataComponentType.Builder<T>> builder) {
         DataComponentType<T> component = builder.apply(DataComponentType.builder()).build();
@@ -46,4 +60,3 @@ public interface DataComponentsMCA {
         COMPONENTS.forEach(helper::register);
     }
 }
-
