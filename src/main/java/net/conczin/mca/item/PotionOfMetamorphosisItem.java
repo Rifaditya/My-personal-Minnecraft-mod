@@ -46,7 +46,8 @@ public class PotionOfMetamorphosisItem extends TooltippedItem {
             // remove item
             ItemStack stack = player.getItemInHand(hand);
             stack.shrink(1);
-            return InteractionResultHolder.success(stack);
+            // TODO: In 1.21.11, InteractionResultHolder removed\n return
+            // InteractionResult.SUCCESS;
         }
         return super.use(world, player, hand);
     }
@@ -75,4 +76,3 @@ public class PotionOfMetamorphosisItem extends TooltippedItem {
         entry.setGender(gender);
     }
 }
-

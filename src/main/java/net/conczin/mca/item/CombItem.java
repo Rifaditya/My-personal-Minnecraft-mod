@@ -23,12 +23,14 @@ public class CombItem extends TooltippedItem {
         if (player instanceof ServerPlayer serverPlayer) {
             ItemStack stack = player.getItemInHand(hand);
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.COMB), serverPlayer);
-            return InteractionResultHolder.success(stack);
+            // TODO: In 1.21.11, InteractionResultHolder removed\n return
+            // InteractionResult.SUCCESS;
         }
         return super.use(world, player, hand);
     }
 
-    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
+    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity,
+            InteractionHand hand) {
         if (entity instanceof VillagerLike && !entity.level().isClientSide() && player instanceof ServerPlayer) {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.COMB, entity), (ServerPlayer) player);
             return InteractionResult.SUCCESS;
@@ -37,4 +39,3 @@ public class CombItem extends TooltippedItem {
         }
     }
 }
-

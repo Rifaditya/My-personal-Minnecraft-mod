@@ -26,7 +26,8 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents,
+            TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
 
         if (book.getBookAuthor() != null) {
@@ -42,7 +43,8 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.BOOK), serverPlayer);
         }
 
-        return InteractionResultHolder.success(itemStack);
+        // TODO: In 1.21.11, InteractionResultHolder removed\n return
+        // InteractionResult.SUCCESS;
     }
 
     @Override
@@ -53,10 +55,10 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
     public Book getBook(ItemStack item) {
         List<Component> content = item.get(DataComponentsMCA.BOOK_PAGES);
         if (content != null) {
-            //seems like a vanilla book, let's convert it into the extended book format
+            // seems like a vanilla book, let's convert it into the extended book format
             Book book = this.book.copy();
 
-            //add our text pages
+            // add our text pages
             for (Component page : content) {
                 book.addPage(new TextPage(page));
             }
@@ -67,4 +69,3 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
         }
     }
 }
-

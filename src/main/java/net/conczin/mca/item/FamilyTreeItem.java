@@ -23,7 +23,7 @@ public class FamilyTreeItem extends TooltippedItem {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.FAMILY_TREE), serverPlayer);
         }
 
-        return InteractionResultHolder.success(stack);
+        // TODO: In 1.21.11, InteractionResultHolder removed\n return
+        // InteractionResult.SUCCESS;
     }
 }
-
