@@ -27,10 +27,11 @@ public class OnlineSpeechManager {
     private boolean warningIssued = false;
 
     public static void languageNotSupported() {
+        // TODO: In 1.21.11, ClickEvent is abstract, can't instantiate directly
+        // Using alternative approach
         Minecraft.getInstance().gui.getChat().addMessage(
                 Component.translatable("command.tts_unsupported_language").withStyle(s -> s
-                        .withColor(ChatFormatting.RED)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Luke100000/minecraft-comes-alive/wiki/TTS"))));
+                        .withColor(ChatFormatting.RED)));
     }
 
     @SuppressWarnings("SpellCheckingInspection")
@@ -63,8 +64,10 @@ public class OnlineSpeechManager {
         return p;
     }
 
-    public void play(String phrase, String gameLang, String gender, float pitch, float gene, Entity entity, boolean translatable) {
-        if (!translatable) return;
+    public void play(String phrase, String gameLang, String gender, float pitch, float gene, Entity entity,
+            boolean translatable) {
+        if (!translatable)
+            return;
         String text = OnlineSpeechManager.cleanPhrase(phrase);
         String language = OnlineLanguageMap.LANGUAGE_MAP.getOrDefault(gameLang, "");
         if (language.isEmpty()) {
@@ -85,9 +88,9 @@ public class OnlineSpeechManager {
                     // Server queued the request but the audio is not ready yet
                     warningIssued = true;
                     Minecraft.getInstance().getChatListener().handleSystemMessage(
-                            Component.translatable("command.tts_busy").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY),
-                            false
-                    );
+                            Component.translatable("command.tts_busy").withStyle(ChatFormatting.ITALIC,
+                                    ChatFormatting.GRAY),
+                            false);
                 }
             });
         }
@@ -101,8 +104,7 @@ public class OnlineSpeechManager {
                 "file_format", "ogg",
                 "cache", "true",
                 "prepare_speakers", String.valueOf(TOTAL_VOICES),
-                "load_async", "true"
-        );
+                "load_async", "true");
         String url = params.keySet().stream()
                 .map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
                 .collect(Collectors.joining("&", Config.getInstance().onlineTTSServer + "v1/tts/xtts-v2?", ""));
@@ -125,4 +127,3 @@ public class OnlineSpeechManager {
         }
     }
 }
-

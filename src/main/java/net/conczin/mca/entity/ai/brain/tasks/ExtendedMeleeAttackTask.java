@@ -22,7 +22,8 @@ public class ExtendedMeleeAttackTask extends Behavior<Mob> {
     }
 
     public ExtendedMeleeAttackTask(int interval, float range, MemoryModuleType<? extends LivingEntity> target) {
-        super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.REGISTERED, target, MemoryStatus.VALUE_PRESENT, MemoryModuleType.ATTACK_COOLING_DOWN, MemoryStatus.VALUE_ABSENT));
+        super(ImmutableMap.of(MemoryModuleType.LOOK_TARGET, MemoryStatus.REGISTERED, target, MemoryStatus.VALUE_PRESENT,
+                MemoryModuleType.ATTACK_COOLING_DOWN, MemoryStatus.VALUE_ABSENT));
         this.range = range;
         this.interval = interval;
         this.target = target;
@@ -43,7 +44,8 @@ public class ExtendedMeleeAttackTask extends Behavior<Mob> {
         } else {
             mobEntity.swing(InteractionHand.MAIN_HAND);
         }
-        mobEntity.doHurtTarget(livingEntity);
+        // TODO: In 1.21.11, doHurtTarget requires ServerLevel parameter
+        mobEntity.doHurtTarget(world, livingEntity);
         mobEntity.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_COOLING_DOWN, true, interval);
 
         // kill phrase
@@ -64,4 +66,3 @@ public class ExtendedMeleeAttackTask extends Behavior<Mob> {
         return mobEntity.getBrain().getMemoryInternal(target).get();
     }
 }
-
