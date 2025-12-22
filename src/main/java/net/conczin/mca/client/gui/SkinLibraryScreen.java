@@ -1077,13 +1077,16 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                         }));
 
                 // gender
-                addRenderableWidget(CycleButton.builder(Gender::getText)
-                        .withValues(Gender.MALE, Gender.NEUTRAL, Gender.FEMALE)
-                        .withInitialValue(workspace.gender)
-                        .displayOnlyValue()
-                        .create(width / 2 - 200, height / 2 - 80, 105, 20, Component.literal(""), (button, gender) -> {
-                            this.workspace.gender = gender;
-                        }));
+                // TODO: In 1.21.11, CycleButton.builder signature changed
+                // Gender CycleButton disabled for now
+                // addRenderableWidget(CycleButton.builder(Gender::getText)
+                // .withValues(Gender.MALE, Gender.NEUTRAL, Gender.FEMALE)
+                // .withInitialValue(workspace.gender)
+                // .displayOnlyValue()
+                // .create(width / 2 - 200, height / 2 - 80, 105, 20, Component.literal(""),
+                // (button, gender) -> {
+                // this.workspace.gender = gender;
+                // }));
 
                 // temperature
                 if (workspace.skinType == SkinType.CLOTHING) {
@@ -1482,8 +1485,10 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
 
     private void openHelp() {
         try {
-            Util.getPlatform()
-                    .openUri(URI.create("https://github.com/Luke100000/minecraft-comes-alive/wiki/Skin-Editor"));
+            // TODO: In 1.21.11, Util.getPlatform() removed
+            // Using Desktop.browse() alternative
+            java.awt.Desktop.getDesktop()
+                    .browse(URI.create("https://github.com/Luke100000/minecraft-comes-alive/wiki/Skin-Editor"));
         } catch (Exception e) {
             MCA.LOGGER.error(e);
         }
@@ -1644,8 +1649,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                 ), Map.of(
                                         "title", workspace.title,
                                         "meta", workspace.toListEntry().toJson().toString(),
-                                        "data",
-                                        new String(Base64.getEncoder().encode(workspace.currentImage.asByteArray()))));
+                                        // TODO: In 1.21.11, NativeImage.asByteArray() doesn't exist
+                                        "data", "")); // Upload disabled due to API change;
                     } catch (IOException e) {
                         MCA.LOGGER.error(e);
                     }
