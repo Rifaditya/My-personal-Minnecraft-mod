@@ -11,17 +11,18 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record FamilyTreeUUIDLookup(String search) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<FamilyTreeUUIDLookup> TYPE = new CustomPacketPayload.Type<>(MCA.locate("family_tree_uuid_lookup"));
+    public static final CustomPacketPayload.Type<FamilyTreeUUIDLookup> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("family_tree_uuid_lookup"));
     public static final StreamCodec<FriendlyByteBuf, FamilyTreeUUIDLookup> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, FamilyTreeUUIDLookup::search,
-            FamilyTreeUUIDLookup::new
-    );
+            FamilyTreeUUIDLookup::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
@@ -41,4 +42,3 @@ public record FamilyTreeUUIDLookup(String search) implements HandleablePayload {
         return TYPE;
     }
 }
-

@@ -42,7 +42,8 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
             data = PlayerSaveData.get(serverPlayer).getEntityData();
         } else if (e instanceof LivingEntity) {
             data = new CompoundTag();
-            e.save(data);
+            // TODO: In 1.21.11, Entity.save takes ValueOutput
+            // e.save(data);
         } else {
             return null;
         }
@@ -59,7 +60,8 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
 
     @Override
     public void handleServer(ServerPlayer player) {
-        // TODO: In 1.21.11, fixed wrong cast\n Entity e = player.level().getEntity(id);
+        // TODO: In 1.21.11, fixed wrong cast
+        Entity e = player.level().getEntity(id);
         CompoundTag villagerData = getVillagerData(e);
         if (villagerData != null) {
             Network.sendToPlayer(new GetVillagerResponse(villagerData), player);

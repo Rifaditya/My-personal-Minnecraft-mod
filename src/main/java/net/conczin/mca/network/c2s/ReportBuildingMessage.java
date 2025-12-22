@@ -10,18 +10,21 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Locale;
 import java.util.Optional;
 
 public record ReportBuildingMessage(Action action, String data) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<ReportBuildingMessage> TYPE = new CustomPacketPayload.Type<>(MCA.locate("report_building"));
+    public static final CustomPacketPayload.Type<ReportBuildingMessage> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("report_building"));
     public static final StreamCodec<FriendlyByteBuf, ReportBuildingMessage> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.idMapper(i -> Action.values()[i], Action::ordinal), ReportBuildingMessage::action,
-            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).map(o -> o.orElse(null), o -> o == null ? java.util.Optional.empty() : java.util.Optional.of(o)), ReportBuildingMessage::data,
-            ReportBuildingMessage::new
-    );
+            ByteBufCodecs.optional(ByteBufCodecs.STRING_UTF8).map(o -> o.orElse(null),
+                    o -> o == null ? java.util.Optional.empty() : java.util.Optional.of(o)),
+            ReportBuildingMessage::data,
+            ReportBuildingMessage::new);
 
     public ReportBuildingMessage(Action action) {
         this(action, null);
@@ -32,15 +35,15 @@ public record ReportBuildingMessage(Action action, String data) implements Handl
         VillageManager villages = VillageManager.get((ServerLevel) player.level());
         switch (action) {
             case ADD, ADD_ROOM -> {
-                Building.validationResult result = villages.processBuilding(player.blockPosition(), true, action == Action.ADD_ROOM);
-                player.displayClientMessage(Component.translatable("blueprint.scan." + result.name().toLowerCase(Locale.ENGLISH)), true);
+                Building.validationResult result = villages.processBuilding(player.blockPosition(), true,
+                        action == Action.ADD_ROOM);
+                player.displayClientMessage(
+                        Component.translatable("blueprint.scan." + result.name().toLowerCase(Locale.ENGLISH)), true);
             }
             case AUTO_SCAN -> villages.findNearestVillage(player).ifPresent(Village::toggleAutoScan);
-            case FULL_SCAN -> villages.findNearestVillage(player).ifPresent(buildings ->
-                    buildings.getBuildings().values().stream().toList().forEach(b ->
-                            villages.processBuilding(b.getCenter(), true, b.isStrictScan())
-                    )
-            );
+            case FULL_SCAN ->
+                villages.findNearestVillage(player).ifPresent(buildings -> buildings.getBuildings().values().stream()
+                        .toList().forEach(b -> villages.processBuilding(b.getCenter(), true, b.isStrictScan())));
             case FORCE_TYPE, REMOVE -> {
                 Optional<Village> village = villages.findNearestVillage(player);
                 Optional<Building> building = village.flatMap(v -> v.getBuildings().values().stream()
@@ -57,7 +60,7 @@ public record ReportBuildingMessage(Action action, String data) implements Handl
                             b.setType(data);
                         }
                     } else {
-                        //noinspection OptionalGetWithoutIsPresent
+                        // noinspection OptionalGetWithoutIsPresent
                         village.get().removeBuilding(b.getId());
                     }
                 }, () -> {
@@ -81,4 +84,3 @@ public record ReportBuildingMessage(Action action, String data) implements Handl
         FULL_SCAN
     }
 }
-

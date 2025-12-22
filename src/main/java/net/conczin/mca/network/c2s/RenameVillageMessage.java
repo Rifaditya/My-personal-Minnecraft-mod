@@ -7,15 +7,16 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public record RenameVillageMessage(int id, String name) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<RenameVillageMessage> TYPE = new CustomPacketPayload.Type<>(MCA.locate("rename_village"));
+    public static final CustomPacketPayload.Type<RenameVillageMessage> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("rename_village"));
     public static final StreamCodec<FriendlyByteBuf, RenameVillageMessage> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, RenameVillageMessage::id,
             ByteBufCodecs.STRING_UTF8, RenameVillageMessage::name,
-            RenameVillageMessage::new
-    );
+            RenameVillageMessage::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
@@ -27,4 +28,3 @@ public record RenameVillageMessage(int id, String name) implements HandleablePay
         return TYPE;
     }
 }
-

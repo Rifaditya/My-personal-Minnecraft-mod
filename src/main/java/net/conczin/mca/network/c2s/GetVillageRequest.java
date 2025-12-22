@@ -12,14 +12,17 @@ import net.conczin.mca.server.world.data.Village;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Optional;
 import java.util.Set;
 
 public record GetVillageRequest() implements HandleablePayload {
-    public static final CustomPacketPayload.Type<GetVillageRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("get_village_request"));
-    public static final StreamCodec<FriendlyByteBuf, GetVillageRequest> STREAM_CODEC = StreamCodec.unit(new GetVillageRequest());
+    public static final CustomPacketPayload.Type<GetVillageRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("get_village_request"));
+    public static final StreamCodec<FriendlyByteBuf, GetVillageRequest> STREAM_CODEC = StreamCodec
+            .unit(new GetVillageRequest());
 
     @Override
     public void handleServer(ServerPlayer player) {
@@ -42,4 +45,3 @@ public record GetVillageRequest() implements HandleablePayload {
         return TYPE;
     }
 }
-
