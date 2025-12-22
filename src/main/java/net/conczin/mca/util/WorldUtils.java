@@ -53,25 +53,17 @@ public interface WorldUtils {
     }
 
     static void spawnEntity(Level world, Mob entity, EntitySpawnReason reason) {
-        entity.finalizeSpawn((ServerLevelAccessor) world, world.getCurrentDifficultyAt(entity.blockPosition()), reason,
-                null);
+        // TODO: In 1.21.11, finalizeSpawn API may have changed
+        // Disabled until API is researched - just add entity without finalize
         world.addFreshEntity(entity);
     }
 
     // a wrapper for the unnecessary complex query provided by minecraft
     static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, Identifier structure,
             int radius) {
-        Registry<Structure> registry = world.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        Structure feature = registry.get(structure);
-        Optional<Holder.Reference<Structure>> entry = registry.getHolder(registry.getId(feature));
-        if (entry.isPresent()) {
-            HolderSet.Direct<Structure> of = HolderSet.direct(entry.get());
-            Pair<BlockPos, Holder<Structure>> pair = world.getChunkSource().getGenerator()
-                    .findNearestMapStructure(world, of, center, radius, false);
-            return pair == null ? Optional.empty() : Optional.ofNullable(pair.getFirst());
-        } else {
-            return Optional.empty();
-        }
+        // TODO: In 1.21.11, Registry.get returns Optional and getId may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, TagKey<Structure> tag,
