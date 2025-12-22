@@ -1114,9 +1114,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                                 Items.OAK_SAPLING.getDefaultInstance()),
                                         v -> {
                                             // TODO: In 1.21.11, VillagerProfession is now ResourceKey based
-                                            // workspace.profession = profession == VillagerProfession.NONE ? null :
-                                            // profession.name();
-                                            workspace.profession = profession.name();
+                                            // In 1.21.11, name() returns Component, use key().location().toString()
+                                            workspace.profession = profession.key().location().toString();
                                             widgets.forEach(b -> b.active = true);
                                             v.active = false;
                                         }));
