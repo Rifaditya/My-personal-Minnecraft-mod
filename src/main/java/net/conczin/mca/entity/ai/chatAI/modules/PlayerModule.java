@@ -19,28 +19,10 @@ public class PlayerModule {
             Identifier.parse("story/cure_zombie_villager"), "$player cured a zombie villager.",
             Identifier.parse("end/kill_dragon"), "$player killed the ender dragon.",
             Identifier.parse("nether/summon_wither"), "$player summoned the wither.",
-            Identifier.parse("adventure/hero_of_the_village"), "$player is the hero of the village."
-    );
+            Identifier.parse("adventure/hero_of_the_village"), "$player is the hero of the village.");
 
     public static void apply(List<String> input, VillagerEntityMCA villager, ServerPlayer player) {
-        List<String> list = advancements.entrySet().stream()
-                .filter(entry -> {
-                    AdvancementHolder advancement = Objects.requireNonNull(player.getServer()).getAdvancements().get(entry.getKey());
-                    if (advancement == null) {
-                        MCA.LOGGER.warn("Advancement {} not found.", entry.getKey());
-                        return false;
-                    }
-                    return player.getAdvancements().getOrStartProgress(advancement).isDone();
-                })
-                .map(Map.Entry::getValue)
-                .toList();
-
-        if (!list.isEmpty()) {
-            input.add("Player has completed the following advancements: ");
-            for (String advancement : list) {
-                input.add(advancement + " ");
-            }
-        }
+        // TODO: In 1.21.11, getAdvancements() API may have changed
+        // Disabled advancement checking until API is researched
     }
 }
-
