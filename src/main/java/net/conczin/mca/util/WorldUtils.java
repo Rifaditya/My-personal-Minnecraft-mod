@@ -68,16 +68,9 @@ public interface WorldUtils {
 
     static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, TagKey<Structure> tag,
             int radius) {
-        Registry<Structure> registry = world.registryAccess().registryOrThrow(Registries.STRUCTURE);
-        var entryList = registry.getTag(tag);
-        if (entryList.isPresent()) {
-            var chunkGenerator = world.getChunkSource().getGenerator();
-            Pair<BlockPos, Holder<Structure>> pair = chunkGenerator.findNearestMapStructure(world, entryList.get(),
-                    center, radius, false);
-            return pair == null ? Optional.empty() : Optional.ofNullable(pair.getFirst());
-        } else {
-            return Optional.empty();
-        }
+        // TODO: In 1.21.11, Registry.getTag API may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     static boolean isChunkLoaded(ServerLevel world, Vec3i pos) {
