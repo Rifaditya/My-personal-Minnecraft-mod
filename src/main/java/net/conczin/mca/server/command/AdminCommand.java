@@ -298,11 +298,14 @@ public class AdminCommand {
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> register(String name, Command<CommandSourceStack> cmd) {
-        return Commands.literal(name).requires(cs -> cs.hasPermission(2)).executes(cmd);
+        // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+        return Commands.literal(name).requires(cs -> cs.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
+                .executes(cmd);
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> register(String name) {
-        return Commands.literal(name).requires(cs -> cs.hasPermission(2));
+        // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+        return Commands.literal(name).requires(cs -> cs.permissions().hasPermission(Permissions.COMMANDS_ADMIN));
     }
 
     private static int clearLoadedVillagers(final CommandContext<CommandSourceStack> ctx) {
