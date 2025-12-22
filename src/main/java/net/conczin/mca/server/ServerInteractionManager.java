@@ -244,9 +244,10 @@ public class ServerInteractionManager {
             senderData.getPartnerName().ifPresent(
                     name -> successMessage(sender, Component.translatable("server.endMarriage", name.getString())));
             senderData.getPartner().ifPresent(spouse -> {
-                if (spouse instanceof Player player) {
+                if (spouse instanceof ServerPlayer serverPlayer) {
                     // Notify the ex if they are online.
-                    failMessage(player, Component.translatable("server.marriageEnded", sender.getScoreboardName()));
+                    failMessage(serverPlayer,
+                            Component.translatable("server.marriageEnded", sender.getScoreboardName()));
                 }
             });
             senderData.endRelationShip(RelationshipState.SINGLE);
@@ -282,21 +283,24 @@ public class ServerInteractionManager {
         }
 
         // Ensure the spouse is online.
-        senderData.getPartner().filter(e -> e instanceof Player).map(Player.class::cast).ifPresentOrElse(spouse -> {
-            // If the spouse is online and has previously sent a procreation request that
-            // hasn't expired, we can continue.
-            // Otherwise, we notify the spouse that they must also enter the command.
-            if (!procreateMap.containsKey(spouse.getUUID())) {
-                procreateMap.put(sender.getUUID(), System.currentTimeMillis() + 10000);
-                infoMessage(spouse, Component.translatable("server.procreationRequest", sender.getScoreboardName()));
-            } else {
-                // On success, add a randomly generated baby to the original requester.
-                successMessage(sender, Component.translatable("server.procreationSuccessful"));
-                successMessage(spouse, Component.translatable("server.procreationSuccessful"));
+        // In 1.21.11, need ServerPlayer for sendSystemMessage, not Player
+        senderData.getPartner().filter(e -> e instanceof ServerPlayer).map(ServerPlayer.class::cast)
+                .ifPresentOrElse(spouse -> {
+                    // If the spouse is online and has previously sent a procreation request that
+                    // hasn't expired, we can continue.
+                    // Otherwise, we notify the spouse that they must also enter the command.
+                    if (!procreateMap.containsKey(spouse.getUUID())) {
+                        procreateMap.put(sender.getUUID(), System.currentTimeMillis() + 10000);
+                        infoMessage(spouse,
+                                Component.translatable("server.procreationRequest", sender.getScoreboardName()));
+                    } else {
+                        // On success, add a randomly generated baby to the original requester.
+                        successMessage(sender, Component.translatable("server.procreationSuccessful"));
+                        successMessage(spouse, Component.translatable("server.procreationSuccessful"));
 
-                spouse.addItem(BabyItem.createItem(spouse, sender, spouse.getRandom().nextLong()));
-            }
-        }, () -> failMessage(sender, Component.translatable("server.spouseNotPresent")));
+                        spouse.addItem(BabyItem.createItem(spouse, sender, spouse.getRandom().nextLong()));
+                    }
+                }, () -> failMessage(sender, Component.translatable("server.spouseNotPresent")));
     }
 
     private void successMessage(ServerPlayer player, MutableComponent message) {
