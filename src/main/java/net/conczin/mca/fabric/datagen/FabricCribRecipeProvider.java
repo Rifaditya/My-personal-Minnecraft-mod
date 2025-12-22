@@ -5,11 +5,11 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 
 import java.util.concurrent.CompletableFuture;
 
-// TODO: In 1.21.11, FabricRecipeProvider requires createRecipeProvider method
-// This class is disabled until proper implementation is determined
+// TODO: In 1.21.11, FabricRecipeProvider requires createRecipeProvider and getName methods
 public class FabricCribRecipeProvider extends FabricRecipeProvider {
     public FabricCribRecipeProvider(FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture) {
@@ -20,12 +20,16 @@ public class FabricCribRecipeProvider extends FabricRecipeProvider {
     protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
         // TODO: Implement proper RecipeProvider for 1.21.11
         CribRecipeProvider.generate(output);
-        return null;
+        return new RecipeProvider(registries, output) {
+            @Override
+            protected void buildRecipes() {
+                CribRecipeProvider.generate(output);
+            }
+        };
     }
 
-    // Old method - no longer used in 1.21.11
-    // @Override
-    // public void buildRecipes(RecipeOutput recipeOutput) {
-    // CribRecipeProvider.generate(recipeOutput);
-    // }
+    @Override
+    public String getName() {
+        return "MCA Crib Recipes";
+    }
 }
