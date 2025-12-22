@@ -16,7 +16,7 @@ The mod currently appears as "MCA Dasik Edition" in the code because:
 
 1. I originally planned to add my own edits to this branch
 2. I didn't know how to properly use GitHub's fork feature at the time
-3. It's now too late to revert all the naming changes throughout the codebase
+3. It's now too late to revert all the naming changes throughout the codebase or I'm just lazy.
 4. I want to keep this as a "clean port" of the original while maintaining a separate branch for my personal edits
 
 ### Why Fabric Only?

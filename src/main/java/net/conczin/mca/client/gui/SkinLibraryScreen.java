@@ -124,17 +124,21 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
 
         if (villagerVisualization != null) {
-            CompoundTag nbt = new CompoundTag();
-            villagerVisualization.addAdditionalSaveData(nbt);
-            this.villagerVisualization.readAdditionalSaveData(nbt);
+            // TODO: In 1.21.11, Entity.addAdditionalSaveData/readAdditionalSaveData use
+            // ValueOutput/ValueInput
+            // CompoundTag nbt = new CompoundTag();
+            // villagerVisualization.addAdditionalSaveData(nbt);
+            // this.villagerVisualization.readAdditionalSaveData(nbt);
         } else {
             assert Minecraft.getInstance().player != null;
             VillagerLike<?> villagerLike = CommonVillagerModel.getVillager(Minecraft.getInstance().level,
                     Minecraft.getInstance().player.getUUID());
             if (villagerLike instanceof VillagerEntityMCA villager) {
-                CompoundTag nbt = new CompoundTag();
-                villager.addAdditionalSaveData(nbt);
-                this.villagerVisualization.readAdditionalSaveData(nbt);
+                // TODO: In 1.21.11, Entity.addAdditionalSaveData/readAdditionalSaveData use
+                // ValueOutput/ValueInput
+                // CompoundTag nbt = new CompoundTag();
+                // villager.addAdditionalSaveData(nbt);
+                // this.villagerVisualization.readAdditionalSaveData(nbt);
             }
         }
     }
