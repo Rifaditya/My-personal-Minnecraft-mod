@@ -6,10 +6,12 @@ import net.minecraft.world.entity.ai.sensing.NearestVisibleLivingEntitySensor;
 import net.minecraft.world.entity.monster.Creeper;
 
 public class ExplodingCreeperSensor extends NearestVisibleLivingEntitySensor {
+    // In 1.21.11, isMatchingEntity now requires ServerLevel parameter
     @Override
-    protected boolean isMatchingEntity(LivingEntity entity, LivingEntity target) {
+    protected boolean isMatchingEntity(net.minecraft.server.level.ServerLevel level, LivingEntity entity,
+            LivingEntity target) {
         return target instanceof Creeper
-               && ((Creeper) target).isIgnited();
+                && ((Creeper) target).isIgnited();
     }
 
     @Override
@@ -17,4 +19,3 @@ public class ExplodingCreeperSensor extends NearestVisibleLivingEntitySensor {
         return MemoryModuleType.NEAREST_HOSTILE;
     }
 }
-

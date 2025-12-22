@@ -74,11 +74,10 @@ public class VillagerEntityModelMCA<S extends VillagerLikeRenderState> extends V
         return modelData;
     }
 
-    @Override
-    protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg, bodyWear, leftLegwear, rightLegwear,
-                leftArmwear, rightArmwear);
-    }
+    // In 1.21.11, bodyParts() cannot override base class method\n public
+    // Iterable<ModelPart> getVillagerBodyParts() {\n return ImmutableList.of(body,
+    // rightArm, leftArm, rightLeg, leftLeg, bodyWear, leftLegwear, rightLegwear,\n
+    // leftArmwear, rightArmwear);\n }
 
     @Override
     public Iterable<ModelPart> getBreastParts() {

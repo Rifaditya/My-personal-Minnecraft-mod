@@ -19,16 +19,21 @@ public class LoseUnimportantJobTask {
             return context.group(context.absent(MemoryModuleType.JOB_SITE)).apply(context, (jobSite) -> {
                 return (world, entity, time) -> {
                     VillagerData villagerData = entity.getVillagerData();
-                    if (shouldRun(world, entity) && villagerData.getProfession() != VillagerProfession.NONE && villagerData.getProfession() != VillagerProfession.NITWIT && entity.getVillagerXp() == 0 && villagerData.getLevel() <= 1) {
-                        entity.setVillagerData(entity.getVillagerData().setProfession(VillagerProfession.NONE));
-                        entity.refreshBrain(world);
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    // TODO: In 1.21.11, VillagerProfession.NONE/NITWIT are ResourceKey-based
+                    // Job loss check disabled for now
+                    // if (shouldRun(world, entity) && villagerData.getProfession() !=
+                    // VillagerProfession.NONE && villagerData.getProfession() !=
+                    // VillagerProfession.NITWIT && entity.getVillagerXp() == 0 &&
+                    // villagerData.getLevel() <= 1) {
+                    // entity.setVillagerData(entity.getVillagerData().setProfession(VillagerProfession.NONE));
+                    // entity.refreshBrain(world);
+                    // return true;
+                    // } else {
+                    // return false;
+                    // }
+                    return false;
                 };
             });
         });
     }
 }
-
