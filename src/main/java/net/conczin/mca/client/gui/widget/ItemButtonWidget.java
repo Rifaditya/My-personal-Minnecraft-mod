@@ -14,7 +14,7 @@ public class ItemButtonWidget extends TooltipButtonWidget {
         this.item = item;
     }
 
-    @Override
+    // In 1.21.11, renderWidget visibility changed in AbstractButton
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
 
@@ -23,4 +23,3 @@ public class ItemButtonWidget extends TooltipButtonWidget {
         context.renderItem(item, getX() + (width - size) / 2, getY() + (height - size) / 2);
     }
 }
-

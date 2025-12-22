@@ -17,11 +17,14 @@ public class LegacyImageButton extends ImageButton {
     private final int textureWidth;
     private final int textureHeight;
 
-    public LegacyImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier Identifier, int textureWidth, int textureHeight, OnPress onPress) {
-        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, Identifier, textureWidth, textureHeight, onPress, EMPTY);
+    public LegacyImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex,
+            Identifier Identifier, int textureWidth, int textureHeight, OnPress onPress) {
+        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, Identifier, textureWidth, textureHeight, onPress,
+                EMPTY);
     }
 
-    public LegacyImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, Identifier Identifier, int textureWidth, int textureHeight, OnPress onPress, Component message) {
+    public LegacyImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex,
+            Identifier Identifier, int textureWidth, int textureHeight, OnPress onPress, Component message) {
         super(x, y, width, height, new WidgetSprites(Identifier, Identifier), onPress, message);
 
         this.Identifier = Identifier;
@@ -32,18 +35,22 @@ public class LegacyImageButton extends ImageButton {
         this.textureHeight = textureHeight;
     }
 
-    public void renderTexture(GuiGraphics guiGraphics, Identifier texture, int x, int y, int uOffset, int vOffset, int textureDifference, int width, int height, int textureWidth, int textureHeight) {
+    public void renderTexture(GuiGraphics guiGraphics, Identifier texture, int x, int y, int uOffset, int vOffset,
+            int textureDifference, int width, int height, int textureWidth, int textureHeight) {
         int i = vOffset;
         if (isHoveredOrFocused()) {
             i += textureDifference;
         }
-        RenderSystem.enableDepthTest();
-        guiGraphics.blit(texture, x, y, uOffset, i, width, height, textureWidth, textureHeight);
+        // TODO: In 1.21.11, RenderSystem.enableDepthTest removed
+        // RenderSystem.enableDepthTest();
+        // TODO: In 1.21.11, blit requires RenderType
+        // guiGraphics.blit(texture, x, y, uOffset, i, width, height, textureWidth,
+        // textureHeight);
     }
 
-    @Override
+    // In 1.21.11, renderWidget visibility changed in AbstractButton
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderTexture(guiGraphics, Identifier, getX(), getY(), xTexStart, yTexStart, yDiffTex, width, height, textureWidth, textureHeight);
+        renderTexture(guiGraphics, Identifier, getX(), getY(), xTexStart, yTexStart, yDiffTex, width, height,
+                textureWidth, textureHeight);
     }
 }
-

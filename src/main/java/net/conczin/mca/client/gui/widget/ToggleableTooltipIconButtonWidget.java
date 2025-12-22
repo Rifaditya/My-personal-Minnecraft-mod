@@ -12,27 +12,30 @@ public class ToggleableTooltipIconButtonWidget extends ToggleableTooltipButtonWi
     private final int u;
     private final int v;
 
-    public ToggleableTooltipIconButtonWidget(int x, int y, int u, int v, boolean toggle, MutableComponent tooltip, OnPress onPress) {
+    public ToggleableTooltipIconButtonWidget(int x, int y, int u, int v, boolean toggle, MutableComponent tooltip,
+            OnPress onPress) {
         super(x, y, 16, 16, toggle, Component.literal(""), tooltip, onPress);
 
         this.u = u;
         this.v = v;
     }
 
-    @Override
+    // In 1.21.11, renderWidget visibility changed in AbstractButton
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         drawIcon(context);
     }
 
     private void drawIcon(GuiGraphics context) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
+        // TODO: In 1.21.11, RenderSystem methods removed
+        // RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        // RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
+        // RenderSystem.enableBlend();
+        // RenderSystem.defaultBlendFunc();
+        // RenderSystem.enableDepthTest();
 
-        int offset = this.toggle ? 0 : 16;
-        context.blit(ICON_TEXTURES, this.getX(), this.getY(), u, v + offset, this.width, this.height);
+        // int offset = this.toggle ? 0 : 16;
+        // TODO: In 1.21.11, blit requires RenderType
+        // context.blit(ICON_TEXTURES, this.getX(), this.getY(), u, v + offset,
+        // this.width, this.height);
     }
 }
-

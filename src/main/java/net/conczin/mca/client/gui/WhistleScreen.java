@@ -124,8 +124,8 @@ public class WhistleScreen extends Screen {
 
     public void setVillagerData(@NotNull CompoundTag data) {
         villagerData = data;
-        // TODO: In 1.21.11, CompoundTag.getAllKeys() renamed to keys()
-        keys = new ArrayList<>(data.keys());
+        // TODO: In 1.21.11, CompoundTag.getAllKeys() renamed - trying keySet()\n keys =
+        // new ArrayList<>(data.keySet());
         loadingAnimationTicks = -1;
         selectedIndex = 0;
 
