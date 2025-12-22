@@ -77,7 +77,8 @@ public class DestinyScreen extends VillagerEditorScreen {
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        final PoseStack matrices = context.pose();
+        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
+        // Removed unused PoseStack variable
 
         switch (page) {
             case "general" -> {
