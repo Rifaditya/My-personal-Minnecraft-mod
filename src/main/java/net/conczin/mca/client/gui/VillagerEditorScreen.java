@@ -243,7 +243,8 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                             18,
                             Component.translatable("gui.villager_editor.relation." + who.toLowerCase(Locale.ROOT))));
                     textFieldWidget.setMaxLength(64);
-                    textFieldWidget.setValue(villagerData.getString("FamilyTree" + who + "Name"));
+                    // In 1.21.11, getString returns Optional
+                    textFieldWidget.setValue(villagerData.getString("FamilyTree" + who + "Name").orElse(""));
                     textFieldWidget.setResponder(name -> villagerData.putString("FamilyTreeNew" + who + "Name", name));
                     y += 20;
                 }
@@ -482,8 +483,10 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                 // profession
                 boolean right = false;
                 List<ButtonWidget> professionButtons = new LinkedList<>();
+                // TODO: In 1.21.11, VillagerProfession.NONE is a ResourceKey, simplified for
+                // now
                 for (VillagerProfession p : new VillagerProfession[] {
-                        VillagerProfession.NONE,
+                        // VillagerProfession.NONE removed - ResourceKey type mismatch
                         ProfessionsMCA.GUARD,
                         ProfessionsMCA.ARCHER,
                         ProfessionsMCA.OUTLAW,
@@ -756,8 +759,10 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                         villagerSkinWidget.active = false;
                         vanillaSkinWidget.active = true;
                     }));
-            villagerSkinWidget.active = villagerData.getInt("PlayerModel") != VillagerLike.PlayerModel.VILLAGER
-                    .ordinal();
+            // In 1.21.11, getInt returns Optional
+            villagerSkinWidget.active = villagerData.getInt("PlayerModel")
+                    .orElse(0) != VillagerLike.PlayerModel.VILLAGER
+                            .ordinal();
 
             playerSkinWidget = addRenderableWidget(new TooltipButtonWidget(x + DATA_WIDTH / 3, y, DATA_WIDTH / 3, 20,
                     "gui.villager_editor.player_skin", b -> {
@@ -767,7 +772,8 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                         villagerSkinWidget.active = true;
                         vanillaSkinWidget.active = true;
                     }));
-            playerSkinWidget.active = villagerData.getInt("PlayerModel") != VillagerLike.PlayerModel.PLAYER.ordinal();
+            playerSkinWidget.active = villagerData.getInt("PlayerModel").orElse(0) != VillagerLike.PlayerModel.PLAYER
+                    .ordinal();
 
             vanillaSkinWidget = addRenderableWidget(new TooltipButtonWidget(x + DATA_WIDTH / 3 * 2, y, DATA_WIDTH / 3,
                     20, "gui.villager_editor.vanilla_skin", b -> {
@@ -777,7 +783,8 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                         playerSkinWidget.active = true;
                         vanillaSkinWidget.active = false;
                     }));
-            vanillaSkinWidget.active = villagerData.getInt("PlayerModel") != VillagerLike.PlayerModel.VANILLA.ordinal();
+            vanillaSkinWidget.active = villagerData.getInt("PlayerModel").orElse(0) != VillagerLike.PlayerModel.VANILLA
+                    .ordinal();
         } else {
             addRenderableWidget(
                     new TooltipButtonWidget(x, y, DATA_WIDTH, 20, "gui.villager_editor.model_blacklist_hint", b -> {
