@@ -19,14 +19,15 @@ public class VillageModule {
             "town_center", "town center",
             "building", "",
             "blocked", "",
-            "house", ""
-    );
+            "house", "");
 
     public static void apply(List<String> input, VillagerEntityMCA villager, ServerPlayer player) {
         Optional<Village> village = villager.getResidency().getHomeVillage();
 
-        // Probably completely over-detailed fact
-        String biome = villager.level().getBiome(villager.blockPosition()).unwrapKey().map(v -> v.location().getPath()).orElse("plains");
+        // TODO: In 1.21.11, unwrapKey().map() returns Object not String\n // String
+        // biome = villager.level().getBiome(villager.blockPosition()).unwrapKey().map(v
+        // -> v.location().getPath()).orElse(\"plains\");\n String biome = \"plains\";
+        // // Simplified for now
 
         String size = "small";
         if (village.isPresent()) {
@@ -56,4 +57,3 @@ public class VillageModule {
         });
     }
 }
-

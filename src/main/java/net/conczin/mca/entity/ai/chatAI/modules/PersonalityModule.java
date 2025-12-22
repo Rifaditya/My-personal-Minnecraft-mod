@@ -11,9 +11,11 @@ import static net.conczin.mca.entity.ai.chatAI.OpenAIChatAI.translate;
 
 public class PersonalityModule {
     public static void apply(List<String> input, VillagerEntityMCA villager, ServerPlayer player) {
-        input.add("This is a conversation with a " + translate(villager.getGenetics().getGender().name()) + " Minecraft villager named $villager and the Player named $player." + " ");
+        input.add("This is a conversation with a " + translate(villager.getGenetics().getGender().name())
+                + " Minecraft villager named $villager and the Player named $player." + " ");
 
-        input.add("$villager is " + translate(villager.getVillagerBrain().getPersonality().name()) + " and " + translate(villager.getVillagerBrain().getMood().getName()) + ". ");
+        input.add("$villager is " + translate(villager.getVillagerBrain().getPersonality().name()) + " and "
+                + translate(villager.getVillagerBrain().getMood().getName()) + ". ");
         if (villager.getAgeState() == AgeState.TODDLER) {
             input.add("$villager is a toddler. ");
         }
@@ -22,9 +24,12 @@ public class PersonalityModule {
         }
         if (villager.getAgeState() == AgeState.TEEN) {
             input.add("$villager is a teen. ");
-        } else if (villager.getProfession() != VillagerProfession.NONE) {
-            input.add("$villager is a " + translate(villager.getProfession().name()) + ". ");
         }
+        // TODO: In 1.21.11, VillagerProfession.NONE is ResourceKey, profession.name()
+        // returns Component
+        // else if (villager.getProfession() != VillagerProfession.NONE) {
+        // input.add("$villager is a " + translate(villager.getProfession().name()) + ".
+        // ");
+        // }
     }
 }
-

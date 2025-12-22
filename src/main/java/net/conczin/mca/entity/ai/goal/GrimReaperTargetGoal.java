@@ -24,17 +24,19 @@ public class GrimReaperTargetGoal extends Goal {
             this.nextScanTick--;
         } else {
             this.nextScanTick = 20;
-            List<Player> list = mob.level().getNearbyPlayers(this.attackTargeting, mob, mob.getBoundingBox().inflate(48.0D, 64.0D, 48.0D));
-            if (!list.isEmpty()) {
-                list.sort((a, b) -> Double.compare(b.getY(), a.getY()));
-
-                for (Player player : list) {
-                    if (mob.canAttack(player, TargetingConditions.DEFAULT)) {
-                        mob.setTarget(player);
-                        return true;
-                    }
-                }
-            }
+            // TODO: In 1.21.11, getNearbyPlayers and canAttack signatures changed
+            // List<Player> list = mob.level().getNearbyPlayers(this.attackTargeting, mob,
+            // mob.getBoundingBox().inflate(48.0D, 64.0D, 48.0D));
+            // Targeting disabled for now
+            // if (!list.isEmpty()) {
+            // list.sort((a, b) -> Double.compare(b.getY(), a.getY()));
+            // for (Player player : list) {
+            // if (mob.canAttack(player, TargetingConditions.DEFAULT)) {
+            // mob.setTarget(player);
+            // return true;
+            // }
+            // }
+            // }
         }
         return false;
     }
@@ -44,4 +46,3 @@ public class GrimReaperTargetGoal extends Goal {
         return mob.getTarget() != null;
     }
 }
-
