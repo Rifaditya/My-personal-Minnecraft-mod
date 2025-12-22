@@ -174,7 +174,8 @@ public abstract class AbstractDynamicScreen extends Screen {
         // In 1.21.11, AbstractButton requires this method to be implemented
         @Override
         protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            this.renderString(graphics, net.minecraft.client.Minecraft.getInstance().font, getFGColor());
+            // TODO: renderString doesn't exist on Button in 1.21.11
+            // Empty for now - buttons won't render text until fixed
         }
     }
 }

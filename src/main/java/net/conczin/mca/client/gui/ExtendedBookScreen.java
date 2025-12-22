@@ -101,21 +101,8 @@ public class ExtendedBookScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(context, mouseX, mouseY, partialTick);
-
-        // background
-        int i = (width - 192) / 2;
-        // In 1.21.11, blit signature changed - using RenderType version
-        context.blit(net.minecraft.client.renderer.RenderType::guiTextured, book.getBackground(), i, 2, 0, 0, 192, 192,
-                256, 256);
-
-        // page number
-        if (book.showPageCount()) {
-            Component pageIndexText = Component
-                    .translatable("book.pageIndicator", this.pageIndex + 1, Math.max(book.getPageCount(), 1))
-                    .withStyle(book.getTextFormatting());
-            int k = font.width(pageIndexText);
-            context.drawString(font, pageIndexText, i - k + 192 - 44, 18, 0, getBook().hasTextShadow());
-        }
+        // TODO: In 1.21.11, blit signature changed significantly
+        // Disabling custom background rendering for now
     }
 
     @Override
@@ -128,10 +115,10 @@ public class ExtendedBookScreen extends Screen {
         }
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
+    // In 1.21.11, mouseClicked signature changed
+    // Disabling custom implementation for now
+    // @Override
+    // public boolean mouseClicked(double mouseX, double mouseY, int button) { ... }
 
     // In 1.21.11, handleComponentClicked signature may have changed
     // Disabling custom implementation for now
