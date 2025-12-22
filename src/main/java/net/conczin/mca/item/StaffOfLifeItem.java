@@ -30,7 +30,9 @@ public class StaffOfLifeItem extends TooltippedItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable(getDescriptionId(stack) + ".uses", stack.getMaxDamage() - stack.getDamageValue()));
+        // TODO: In 1.21.11, getDescriptionId(stack) removed, using getDescriptionId()\n
+        // tooltip.add(Component.translatable(getDescriptionId() + \".uses\",
+        // stack.getMaxDamage() - stack.getDamageValue()));
 
         super.appendHoverText(stack, context, tooltip, flag);
     }
@@ -45,4 +47,3 @@ public class StaffOfLifeItem extends TooltippedItem {
         return false;
     }
 }
-

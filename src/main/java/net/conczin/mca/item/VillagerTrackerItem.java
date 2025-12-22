@@ -38,11 +38,12 @@ public class VillagerTrackerItem extends Item {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.VILLAGER_TRACKER), serverPlayer);
         }
 
-        // TODO: In 1.21.11, InteractionResultHolder removed\n return
-        // InteractionResult.SUCCESS;
+        // TODO: In 1.21.11, InteractionResultHolder removed
+        return InteractionResult.SUCCESS;
     }
 
-    @Override
+    // TODO: In 1.21.11, inventoryTick signature changed
+    // @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (world instanceof ServerLevel serverWorld) {
             if (world.getGameTime() % Config.getInstance().trackVillagerPositionEveryNTicks == 0
@@ -56,12 +57,14 @@ public class VillagerTrackerItem extends Item {
         }
     }
 
-    @Override
+    // TODO: In 1.21.11, appendHoverText signature changed and
+    // getDescriptionId(stack) removed
+    // @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         if (stack.has(DataComponentsMCA.TRACKER_NAME)) {
             // noinspection ConstantConditions
             tooltip.add(Component
-                    .translatable(this.getDescriptionId(stack) + ".active", stack.get(DataComponentsMCA.TRACKER_NAME))
+                    .translatable(this.getDescriptionId() + ".active", stack.get(DataComponentsMCA.TRACKER_NAME))
                     .withStyle(ChatFormatting.GREEN));
 
             GlobalPos pos = stack.get(DataComponentsMCA.TRACKER_POS);
@@ -71,12 +74,12 @@ public class VillagerTrackerItem extends Item {
                     int precision = 5;
                     int distance = ((int) Math.sqrt(pos.pos().distToCenterSqr(player.position()))) / precision
                             * precision;
-                    tooltip.add(Component.translatable(this.getDescriptionId(stack) + ".distance", distance)
+                    tooltip.add(Component.translatable(this.getDescriptionId() + ".distance", distance)
                             .withStyle(ChatFormatting.ITALIC));
                 }
             }
         }
         tooltip.addAll(FlowingText.wrap(
-                Component.translatable(getDescriptionId(stack) + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
+                Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
     }
 }
