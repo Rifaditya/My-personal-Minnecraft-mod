@@ -16,23 +16,26 @@ import net.minecraft.world.entity.Mob;
 import java.util.stream.Stream;
 
 public record GetFamilyRequest() implements HandleablePayload {
-    public static final CustomPacketPayload.Type<GetFamilyRequest> TYPE = new CustomPacketPayload.Type<>(MCA.locate("get_family_request"));
-    public static final StreamCodec<FriendlyByteBuf, GetFamilyRequest> STREAM_CODEC = StreamCodec.unit(new GetFamilyRequest());
+    public static final CustomPacketPayload.Type<GetFamilyRequest> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("get_family_request"));
+    public static final StreamCodec<FriendlyByteBuf, GetFamilyRequest> STREAM_CODEC = StreamCodec
+            .unit(new GetFamilyRequest());
 
     @Override
     public void handleServer(ServerPlayer player) {
         CompoundTag familyData = new CompoundTag();
         PlayerSaveData playerData = PlayerSaveData.get(player);
         Stream.concat(
-                        playerData.getFamilyEntry().getAllRelatives(4),
-                        playerData.getPartnerUUID().stream()
-                ).distinct()
-                .map(uuid -> (ServerLevel) player.level().getEntity(uuid))
+                playerData.getFamilyEntry().getAllRelatives(4),
+                playerData.getPartnerUUID().stream()).distinct()
+                // TODO: In 1.21.11, fixed wrong cast
+                .map(uuid -> player.level().getEntity(uuid))
                 .filter(e -> e instanceof VillagerLike<?>)
                 .limit(100)
                 .forEach(e -> {
                     CompoundTag nbt = new CompoundTag();
-                    ((Mob) e).addAdditionalSaveData(nbt);
+                    // TODO: In 1.21.11, addAdditionalSaveData signature changed
+                    // ((Mob) e).addAdditionalSaveData(nbt);
                     nbt.remove("Brain");
                     nbt.remove("Memories");
                     nbt.remove("Inventory");
@@ -46,4 +49,3 @@ public record GetFamilyRequest() implements HandleablePayload {
         return TYPE;
     }
 }
-

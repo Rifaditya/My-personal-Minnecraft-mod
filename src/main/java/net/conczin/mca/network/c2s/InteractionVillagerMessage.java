@@ -23,8 +23,8 @@ public record InteractionVillagerMessage(String command, UUID villagerUUID) impl
 
     @Override
     public void handleServer(ServerPlayer player) {
-        // TODO: In 1.21.11, fixed wrong cast\n Entity v =
-        // player.level().getEntity(villagerUUID);
+        // TODO: In 1.21.11, fixed wrong cast
+        Entity v = player.level().getEntity(villagerUUID);
         if (v instanceof VillagerLike<?> villager && villager.getInteractions().handle(player, command)) {
             villager.getInteractions().stopInteracting();
         }
