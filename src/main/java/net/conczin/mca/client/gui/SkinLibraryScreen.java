@@ -537,7 +537,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
     }
 
-    @Override
+    // TODO: In 1.21.11, keyPressed signature may have changed
+    // @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         // Pan
         if (keyCode == GLFW.GLFW_KEY_SPACE && (textFieldWidget == null || !textFieldWidget.isFocused())) {
@@ -1113,16 +1114,16 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                         ProfessionIcons.ICONS.getOrDefault(profession.name(),
                                                 Items.OAK_SAPLING.getDefaultInstance()),
                                         v -> {
-                                            // TODO: In 1.21.11, VillagerProfession is now ResourceKey based
-                                            // In 1.21.11, name() returns Component, use key().location().toString()
-                                            workspace.profession = profession.key().location().toString();
+                                            // TODO: In 1.21.11, VillagerProfession API changed
+                                            // Using name().getString() since name() returns Component
+                                            workspace.profession = profession.name().getString();
                                             widgets.forEach(b -> b.active = true);
                                             v.active = false;
                                         }));
                         // TODO: In 1.21.11, VillagerProfession.NONE comparison changed
                         // widget.active = !Objects.equals(workspace.profession,
                         // profession == VillagerProfession.NONE ? null : profession.name());
-                        widget.active = !Objects.equals(workspace.profession, profession.name());
+                        widget.active = !Objects.equals(workspace.profession, profession.name().getString());
                         widgets.add(widget);
                         ox++;
                         if (ox >= 5) {
