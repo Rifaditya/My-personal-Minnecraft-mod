@@ -389,6 +389,9 @@ public class AdminCommand {
     }
 
     private static void sendMessage(Entity commandSender, String message) {
-        commandSender.sendSystemMessage(Component.literal(GOLD + "[MCA] " + RESET + message));
+        // In 1.21.11, sendSystemMessage is only on ServerPlayer/Player, not Entity
+        if (commandSender instanceof net.minecraft.server.level.ServerPlayer player) {
+            player.sendSystemMessage(Component.literal(GOLD + "[MCA] " + RESET + message));
+        }
     }
 }

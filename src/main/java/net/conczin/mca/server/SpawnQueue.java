@@ -59,9 +59,10 @@ public class SpawnQueue {
                     .withGender(Gender.getRandom())
                     .withAge(ve.getAge())
                     .withPosition(ve)
-                    .withType(ve.getVillagerData().getType().value())
-                    // In 1.21.11, getType/getProfession return Holder, unwrap with .value()
-                    .withProfession(ve.getVillagerData().getProfession().value(), ve.getVillagerData().getLevel(),
+                    // In 1.21.11, getVillagerData returns Holder-based types
+                    // Extract values properly from VillagerData
+                    .withType(ve.getVillagerData().type().value())
+                    .withProfession(ve.getVillagerData().profession().value(), ve.getVillagerData().level(),
                             ve.getOffers())
                     .spawn(((IVillagerEntity) ve).mca$getSpawnReason());
 
@@ -75,9 +76,10 @@ public class SpawnQueue {
                     .withName(zve.hasCustomName() ? zve.getName().getString() : null)
                     .withGender(Gender.getRandom())
                     .withPosition(zve)
-                    // In 1.21.11, getType/getProfession return Holder, unwrap with .value()
-                    .withType(zve.getVillagerData().getType().value())
-                    .withProfession(zve.getVillagerData().getProfession().value(), zve.getVillagerData().getLevel())
+                    // In 1.21.11, VillagerData uses type() and profession() methods with Holder
+                    // return
+                    .withType(zve.getVillagerData().type().value())
+                    .withProfession(zve.getVillagerData().profession().value(), zve.getVillagerData().level())
                     .spawn(((IVillagerEntity) zve).mca$getSpawnReason());
 
             copyPastaIntensifies(villager, zve);
