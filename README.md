@@ -19,6 +19,15 @@ The mod currently appears as "MCA Dasik Edition" in the code because:
 3. It's now too late to revert all the naming changes throughout the codebase
 4. I want to keep this as a "clean port" of the original while maintaining a separate branch for my personal edits
 
+### Why Fabric Only?
+
+The original MCA Reborn is a multiloader mod supporting both Fabric and Forge/NeoForge. This port only supports **Fabric** because:
+
+1. **I don't understand how to port multiloader mods** - The architecture is complex and I'm not experienced enough
+2. **Easier AI control** - Porting one loader at a time is more manageable. When trying to port both, the AI kept going back and forth between loaders and getting confused
+3. **Mod size** - MCA is a very large mod with many files. The AI assistance works better when focused on a single target
+4. **Practical limitation** - It's simply easier to control the porting process one loader at a time
+
 ### Credits
 
 **Original Mod: [Minecraft Comes Alive: Reborn](https://github.com/Luke100000/minecraft-comes-alive)**
