@@ -76,10 +76,9 @@ public interface InventoryUtils {
     }
 
     static Optional<ItemStack> getBestArmor(Container inv, EquipmentSlot slot) {
-        return stream(inv)
-                .filter(s -> s.getItem() instanceof ArmorItem)
-                .filter(s -> ((ArmorItem) s.getItem()).getEquipmentSlot() == slot)
-                .max(Comparator.comparingDouble(s -> ((ArmorItem) s.getItem()).getDefense()));
+        // TODO: In 1.21.11, ArmorItem.getEquipmentSlot() and getDefense() API changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     static Optional<ItemStack> getBestSword(Container inv) {
