@@ -41,41 +41,47 @@ public interface WorldUtils {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    static <T extends SavedData> T loadData(ServerLevel world, BiFunction<CompoundTag, HolderLookup.Provider, T> loader, Function<ServerLevel, T> factory, String dataId) {
+    static <T extends SavedData> T loadData(ServerLevel world, BiFunction<CompoundTag, HolderLookup.Provider, T> loader,
+            Function<ServerLevel, T> factory, String dataId) {
+        // In 1.21.11, SavedData.Factory constructor no longer takes null third
+        // parameter
         return world.getDataStorage().computeIfAbsent(
                 new SavedData.Factory<>(
                         () -> factory.apply(world),
-                        loader,
-                        null
-                ),
+                        loader),
                 dataId);
     }
 
     static void spawnEntity(Level world, Mob entity, EntitySpawnReason reason) {
-        entity.finalizeSpawn((ServerLevelAccessor) world, world.getCurrentDifficultyAt(entity.blockPosition()), reason, null);
+        entity.finalizeSpawn((ServerLevelAccessor) world, world.getCurrentDifficultyAt(entity.blockPosition()), reason,
+                null);
         world.addFreshEntity(entity);
     }
 
-    //a wrapper for the unnecessary complex query provided by minecraft
-    static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, Identifier structure, int radius) {
+    // a wrapper for the unnecessary complex query provided by minecraft
+    static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, Identifier structure,
+            int radius) {
         Registry<Structure> registry = world.registryAccess().registryOrThrow(Registries.STRUCTURE);
         Structure feature = registry.get(structure);
         Optional<Holder.Reference<Structure>> entry = registry.getHolder(registry.getId(feature));
         if (entry.isPresent()) {
             HolderSet.Direct<Structure> of = HolderSet.direct(entry.get());
-            Pair<BlockPos, Holder<Structure>> pair = world.getChunkSource().getGenerator().findNearestMapStructure(world, of, center, radius, false);
+            Pair<BlockPos, Holder<Structure>> pair = world.getChunkSource().getGenerator()
+                    .findNearestMapStructure(world, of, center, radius, false);
             return pair == null ? Optional.empty() : Optional.ofNullable(pair.getFirst());
         } else {
             return Optional.empty();
         }
     }
 
-    static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, TagKey<Structure> tag, int radius) {
+    static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, TagKey<Structure> tag,
+            int radius) {
         Registry<Structure> registry = world.registryAccess().registryOrThrow(Registries.STRUCTURE);
         var entryList = registry.getTag(tag);
         if (entryList.isPresent()) {
             var chunkGenerator = world.getChunkSource().getGenerator();
-            Pair<BlockPos, Holder<Structure>> pair = chunkGenerator.findNearestMapStructure(world, entryList.get(), center, radius, false);
+            Pair<BlockPos, Holder<Structure>> pair = chunkGenerator.findNearestMapStructure(world, entryList.get(),
+                    center, radius, false);
             return pair == null ? Optional.empty() : Optional.ofNullable(pair.getFirst());
         } else {
             return Optional.empty();
@@ -90,7 +96,8 @@ public interface WorldUtils {
         ChunkPos chunkPos = new ChunkPos(pos);
         LevelChunk worldChunk = world.getChunkSource().getChunkNow(chunkPos.x, chunkPos.z);
         if (worldChunk != null) {
-            return worldChunk.getFullStatus() == FullChunkStatus.ENTITY_TICKING && world.areEntitiesLoaded(chunkPos.toLong());
+            return worldChunk.getFullStatus() == FullChunkStatus.ENTITY_TICKING
+                    && world.areEntitiesLoaded(chunkPos.toLong());
         }
         return false;
     }
@@ -107,4 +114,3 @@ public interface WorldUtils {
         return true;
     }
 }
-
