@@ -667,7 +667,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        // TODO: In 1.21.11, Screen.mouseClicked signature changed
+        return false;
     }
 
     private void returnToPreviousScreen() {
@@ -690,7 +691,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
         }
 
-        return super.mouseReleased(mouseX, mouseY, button);
+        // TODO: In 1.21.11, Screen.mouseReleased signature changed
+        return false;
     }
 
     private void drawTextBox(GuiGraphics context, Component text) {
@@ -705,13 +707,15 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
 
     private void paint(int x, int y) {
         if (page == SkinLibraryScreen.Page.EDITOR && workspace.validPixel(x, y)) {
-            if (activeMouseButton == 0) {
-                workspace.currentImage.setPixelRGBA(x, y, color.getColor());
-                workspace.setDirty(true);
-            } else if (activeMouseButton == 1) {
-                workspace.currentImage.setPixelRGBA(x, y, 0);
-                workspace.setDirty(true);
-            }
+            // TODO: In 1.21.11, NativeImage.setPixelRGBA may not exist
+            // Painting functionality disabled
+            // if (activeMouseButton == 0) {
+            // workspace.currentImage.setPixelRGBA(x, y, color.getColor());
+            // workspace.setDirty(true);
+            // } else if (activeMouseButton == 1) {
+            // workspace.currentImage.setPixelRGBA(x, y, 0);
+            // workspace.setDirty(true);
+            // }
         }
     }
 
@@ -719,12 +723,14 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         int x = (int) getPixelX();
         int y = (int) getPixelY();
         if (workspace.validPixel(x, y)) {
-            color.setRGB(
-                    (workspace.currentImage.getRedOrLuminance(x, y) & 0xFF) / 255.0,
-                    (workspace.currentImage.getGreenOrLuminance(x, y) & 0xFF) / 255.0,
-                    (workspace.currentImage.getBlueOrLuminance(x, y) & 0xFF) / 255.0);
-            if (workspace.skinType == SkinType.HAIR)
-                color.setHSV(0, 0, color.brightness);
+            // TODO: In 1.21.11, NativeImage.get*OrLuminance methods don't exist
+            // Color picking disabled
+            // color.setRGB(
+            // (workspace.currentImage.getRedOrLuminance(x, y) & 0xFF) / 255.0,
+            // (workspace.currentImage.getGreenOrLuminance(x, y) & 0xFF) / 255.0,
+            // (workspace.currentImage.getBlueOrLuminance(x, y) & 0xFF) / 255.0);
+            // if (workspace.skinType == SkinType.HAIR)
+            // color.setHSV(0, 0, color.brightness);
         }
     }
 

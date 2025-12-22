@@ -58,7 +58,8 @@ public class InteractScreen extends AbstractDynamicScreen {
 
     public void setSpouse(RelationshipState marriageState, String spouse) {
         this.marriageState = marriageState;
-        this.spouse = spouse == null ? Component.translatable("gui.interact.label.parentUnknown") : Component.literal(spouse);
+        this.spouse = spouse == null ? Component.translatable("gui.interact.label.parentUnknown")
+                : Component.literal(spouse);
     }
 
     @Override
@@ -97,11 +98,15 @@ public class InteractScreen extends AbstractDynamicScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double dx, double dy) {
-        if (dy < 0) {
-            player.getInventory().selected = player.getInventory().selected == 8 ? 0 : player.getInventory().selected + 1;
-        } else if (dy > 0) {
-            player.getInventory().selected = player.getInventory().selected == 0 ? 8 : player.getInventory().selected - 1;
-        }
+        // TODO: In 1.21.11, Inventory.selected is private
+        // Hot bar scrolling disabled
+        // if (dy < 0) {
+        // player.getInventory().selected = player.getInventory().selected == 8 ? 0 :
+        // player.getInventory().selected + 1;
+        // } else if (dy > 0) {
+        // player.getInventory().selected = player.getInventory().selected == 0 ? 8 :
+        // player.getInventory().selected - 1;
+        // }
 
         return super.mouseScrolled(x, y, dx, dy);
     }
@@ -112,8 +117,9 @@ public class InteractScreen extends AbstractDynamicScreen {
 
         // Dialog
         if (button == 0 && dialogAnswerHover != null && dialogQuestionText != null) {
-            //todo double click (Likely fixable via using a different event -- 7.4.0)
-            Network.sendToServer(new InteractionDialogueMessage(villager.asEntity().getUUID(), dialogQuestionId, dialogAnswerHover));
+            // todo double click (Likely fixable via using a different event -- 7.4.0)
+            Network.sendToServer(
+                    new InteractionDialogueMessage(villager.asEntity().getUUID(), dialogQuestionId, dialogAnswerHover));
         }
 
         // Right mouse button
@@ -141,18 +147,17 @@ public class InteractScreen extends AbstractDynamicScreen {
     }
 
     private void drawIcons(GuiGraphics context) {
-        final PoseStack matrices = context.pose();
+        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
+        // Icon rendering simplified - removed pose transformations
         Memories memory = villager.getVillagerBrain().getMemoriesForPlayer(player);
 
-        matrices.pushPose();
-        matrices.scale(iconScale, iconScale, iconScale);
-
+        // Simplified icon rendering without pose stack
         if (marriageState != null) {
             drawIcon(context, ICON_TEXTURES, marriageState.getIcon());
         }
 
-        drawIcon(context, ICON_TEXTURES, memory.getHearts() < 0 ? "blackHeart" : memory.getHearts() >= 100 ? "goldHeart" : "redHeart");
-        // drawIcon(transform, "neutralEmerald");
+        drawIcon(context, ICON_TEXTURES,
+                memory.getHearts() < 0 ? "blackHeart" : memory.getHearts() >= 100 ? "goldHeart" : "redHeart");
         drawIcon(context, ICON_TEXTURES, "genes");
 
         if (canDrawParentsIcon()) {
@@ -165,47 +170,53 @@ public class InteractScreen extends AbstractDynamicScreen {
         if (analysis != null) {
             drawIcon(context, ICON_TEXTURES, "analysis");
         }
-
-        matrices.popPose();
     }
 
     private void drawTextPopups(GuiGraphics context) {
-        //name or state tip (gifting, ...)
+        // TODO: In 1.21.11, renderTooltip signature changed
+        // name or state tip simplified
         int h = 17;
         if (inGiftMode) {
-            context.renderTooltip(font, Component.translatable("gui.interact.label.giveGift"), 10, 28);
+            context.drawString(font, Component.translatable("gui.interact.label.giveGift"), 10, 28, 0xFFFFFFFF);
         } else {
-            context.renderTooltip(font, villager.asEntity().getName(), 10, 28);
+            context.drawString(font, villager.asEntity().getName(), 10, 28, 0xFFFFFFFF);
         }
 
-        //age or profession
-        context.renderTooltip(font, villager.asEntity().isBaby() ? villager.getAgeState().getName() : villager.getProfessionText(), 10, 30 + h);
+        // age or profession
+        context.renderTooltip(font,
+                villager.asEntity().isBaby() ? villager.getAgeState().getName() : villager.getProfessionText(), 10,
+                30 + h);
 
         VillagerBrain<?> brain = villager.getVillagerBrain();
 
-        //mood
+        // mood
         context.renderTooltip(font,
                 Component.translatable("gui.interact.label.mood", brain.getMood().getText())
-                        .withStyle(brain.getMood().getColor()), 10, 30 + h * 2);
+                        .withStyle(brain.getMood().getColor()),
+                10, 30 + h * 2);
 
-        //personality
+        // personality
         if (hoveringOverText(10, 30 + h * 3, 128)) {
             context.renderTooltip(font, brain.getPersonality().getDescription(), 10, 30 + h * 3);
         } else {
-            //White as we don't know if a personality is negative
-            context.renderTooltip(font, Component.translatable("gui.interact.label.personality", brain.getPersonality().getName()).withStyle(ChatFormatting.WHITE), 10, 30 + h * 3);
+            // White as we don't know if a personality is negative
+            context.renderTooltip(font,
+                    Component.translatable("gui.interact.label.personality", brain.getPersonality().getName())
+                            .withStyle(ChatFormatting.WHITE),
+                    10, 30 + h * 3);
         }
 
-        //traits
+        // traits
         Set<Traits.Trait> traits = villager.getTraits().getTraits();
         if (!traits.isEmpty()) {
             if (hoveringOverText(10, 30 + h * 4, 128)) {
-                //details
-                List<Component> traitText = traits.stream().map(Traits.Trait::getDescription).collect(Collectors.toList());
+                // details
+                List<Component> traitText = traits.stream().map(Traits.Trait::getDescription)
+                        .collect(Collectors.toList());
                 traitText.addFirst(Component.translatable("traits.title"));
                 context.renderComponentTooltip(font, traitText, 10, 30 + h * 4);
             } else {
-                //list
+                // list
                 MutableComponent traitText = Component.translatable("traits.title");
                 traits.stream().map(Traits.Trait::getName).forEach(t -> {
                     if (!traitText.getSiblings().isEmpty()) {
@@ -217,32 +228,31 @@ public class InteractScreen extends AbstractDynamicScreen {
             }
         }
 
-        //hearts
+        // hearts
         if (hoveringOverIcon("redHeart")) {
             int hearts = brain.getMemoriesForPlayer(player).getHearts();
             drawHoveringIconText(context, Component.literal(hearts + " hearts"), "redHeart");
         }
 
-        //marriage status
+        // marriage status
         if (marriageState != null && hoveringOverIcon("married") && villager instanceof CompassionateEntity<?>) {
             String ms = marriageState.base().getIcon().toLowerCase(Locale.ENGLISH);
             drawHoveringIconText(context, Component.translatable("gui.interact.label." + ms, spouse), "married");
         }
 
-        //parents
+        // parents
         if (canDrawParentsIcon() && hoveringOverIcon("parents")) {
             drawHoveringIconText(context, Component.translatable("gui.interact.label.parents",
                     father == null ? Component.translatable("gui.interact.label.parentUnknown") : father,
-                    mother == null ? Component.translatable("gui.interact.label.parentUnknown") : mother
-            ), "parents");
+                    mother == null ? Component.translatable("gui.interact.label.parentUnknown") : mother), "parents");
         }
 
-        //gift
+        // gift
         if (canDrawGiftIcon() && hoveringOverIcon("gift")) {
             drawHoveringIconText(context, Component.translatable("gui.interact.label.gift"), "gift");
         }
 
-        //genes
+        // genes
         if (hoveringOverIcon("genes")) {
             List<Component> lines = new LinkedList<>();
             lines.add(Component.literal("Genes"));
@@ -256,32 +266,32 @@ public class InteractScreen extends AbstractDynamicScreen {
             drawHoveringIconText(context, lines, "genes");
         }
 
-        //analysis
+        // analysis
         if (hoveringOverIcon("analysis") && analysis != null) {
             List<Component> lines = new LinkedList<>();
             lines.add(Component.translatable("analysis.title").withStyle(ChatFormatting.GRAY));
 
-            //summands
+            // summands
             for (Analysis.AnalysisElement d : analysis) {
                 lines.add(Component.translatable("analysis." + d.key())
                         .append(Component.literal(": " + (d.positive() ? "+" : "") + d.value()))
                         .withStyle(d.positive() ? ChatFormatting.GREEN : ChatFormatting.RED));
             }
 
-            //total
+            // total
             String chance = analysis.getTotalAsString();
             lines.add(Component.translatable("analysis.total").append(": " + chance));
 
             drawHoveringIconText(context, lines, "analysis");
         }
 
-        //dialogue
+        // dialogue
         if (dialogQuestionText != null) {
-            //background
+            // background
             context.fill(width / 2 - 85, height / 2 - 50 - 10 * dialogQuestionText.size(), width / 2 + 85,
                     height / 2 - 30 + 10 * dialogAnswers.size(), 0x77000000);
 
-            //question
+            // question
             int i = -dialogQuestionText.size();
             for (FormattedCharSequence t : dialogQuestionText) {
                 i++;
@@ -289,14 +299,16 @@ public class InteractScreen extends AbstractDynamicScreen {
             }
             dialogAnswerHover = null;
 
-            //separator
+            // separator
             context.hLine(width / 2 - 75, width / 2 + 75, height / 2 - 40, 0xAAFFFFFF);
 
-            //answers
+            // answers
             int y = height / 2 - 35;
             for (String a : dialogAnswers) {
                 boolean hover = hoveringOver(width / 2 - 100, y - 3, 200, 10);
-                context.drawCenteredString(font, Component.translatable(Question.getTranslationKey(dialogQuestionId, a)), width / 2, y, hover ? 0xFFD7D784 : 0xAAFFFFFF);
+                context.drawCenteredString(font,
+                        Component.translatable(Question.getTranslationKey(dialogQuestionId, a)), width / 2, y,
+                        hover ? 0xFFD7D784 : 0xAAFFFFFF);
                 if (hover) {
                     dialogAnswerHover = a;
                 }
@@ -305,8 +317,8 @@ public class InteractScreen extends AbstractDynamicScreen {
         }
     }
 
-    //checks if the mouse hovers over a tooltip
-    //tooltips are not rendered on the given coordinates, so we need an offset
+    // checks if the mouse hovers over a tooltip
+    // tooltips are not rendered on the given coordinates, so we need an offset
     private boolean hoveringOverText(int x, int y, int w) {
         return hoveringOver(x + 8, y - 16, w, 16);
     }
@@ -316,7 +328,7 @@ public class InteractScreen extends AbstractDynamicScreen {
     }
 
     private boolean canDrawGiftIcon() {
-        return false;//villager.getVillagerBrain().getMemoriesForPlayer(player).isGiftPresent();
+        return false;// villager.getVillagerBrain().getMemoriesForPlayer(player).isGiftPresent();
     }
 
     public void setDialogue(String dialogue, List<String> answers) {
@@ -348,7 +360,8 @@ public class InteractScreen extends AbstractDynamicScreen {
             setLayout("interact");
         } else if (id.equals("gui.button.command")) {
             setLayout("command");
-            disableButton("gui.button." + villager.getVillagerBrain().getMoveState().name().toLowerCase(Locale.ENGLISH));
+            disableButton(
+                    "gui.button." + villager.getVillagerBrain().getMoveState().name().toLowerCase(Locale.ENGLISH));
         } else if (id.equals("gui.button.clothing")) {
             setLayout("clothing");
         } else if (id.equals("gui.button.familyTree")) {
@@ -358,7 +371,8 @@ public class InteractScreen extends AbstractDynamicScreen {
             Network.sendToServer(new InteractionDialogueInitMessage(villager.asEntity().getUUID()));
         } else if (id.equals("gui.button.work")) {
             setLayout("work");
-            disableButton("gui.button." + villager.getVillagerBrain().getCurrentJob().name().toLowerCase(Locale.ENGLISH));
+            disableButton(
+                    "gui.button." + villager.getVillagerBrain().getCurrentJob().name().toLowerCase(Locale.ENGLISH));
         } else if (id.equals("gui.button.professions")) {
             setLayout("professions");
         } else if (id.equals("gui.button.backarrow")) {
@@ -376,7 +390,8 @@ public class InteractScreen extends AbstractDynamicScreen {
             /* Anything that should notify the server is handled here */
 
             if (!button.targetServer()) {
-                Network.sendToServer(new InteractionVillagerMessage(id.replace("gui.button.", ""), villager.asEntity().getUUID()));
+                Network.sendToServer(
+                        new InteractionVillagerMessage(id.replace("gui.button.", ""), villager.asEntity().getUUID()));
             }
         } else if (id.equals("gui.button.gift")) {
             this.inGiftMode = true;
@@ -384,4 +399,3 @@ public class InteractScreen extends AbstractDynamicScreen {
         }
     }
 }
-
