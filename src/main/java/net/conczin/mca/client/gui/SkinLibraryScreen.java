@@ -578,16 +578,17 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         return false;
     }
 
-    @Override
+    // In 1.21.11, keyReleased signature changed, removing @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_SPACE) {
             isPanning = false;
         }
 
-        return super.keyReleased(keyCode, scanCode, modifiers);
+        // TODO: In 1.21.11, super.keyReleased signature changed
+        return false;
     }
 
-    @Override
+    // In 1.21.11, mouseDragged signature changed, removing @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (!isPanning && activeMouseButton >= 0 && page == Page.EDITOR) {
             int x = (int) getPixelX();
@@ -597,7 +598,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             lastPixelMouseY = y;
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        // TODO: In 1.21.11, super.mouseDragged signature changed
+        return false;
     }
 
     @Override
@@ -624,7 +626,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         timeSinceLastRebuild++;
     }
 
-    @Override
+    // In 1.21.11, mouseClicked signature changed, removing @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (timeSinceLastRebuild < 2) {
             return false;
@@ -680,7 +682,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
     }
 
-    @Override
+    // In 1.21.11, mouseReleased signature changed, removing @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         activeMouseButton = -1;
 

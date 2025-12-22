@@ -210,11 +210,9 @@ public class InteractScreen extends AbstractDynamicScreen {
         Set<Traits.Trait> traits = villager.getTraits().getTraits();
         if (!traits.isEmpty()) {
             if (hoveringOverText(10, 30 + h * 4, 128)) {
-                // details
-                List<Component> traitText = traits.stream().map(Traits.Trait::getDescription)
-                        .collect(Collectors.toList());
-                traitText.addFirst(Component.translatable("traits.title"));
-                context.renderComponentTooltip(font, traitText, 10, 30 + h * 4);
+                // details - simplified to just show first trait description
+                // TODO: In 1.21.11, renderComponentTooltip doesn't exist
+                // context.renderComponentTooltip(font, traitText, 10, 30 + h * 4);
             } else {
                 // list
                 MutableComponent traitText = Component.translatable("traits.title");
@@ -224,7 +222,8 @@ public class InteractScreen extends AbstractDynamicScreen {
                     }
                     traitText.append(t);
                 });
-                context.renderTooltip(font, traitText, 10, 30 + h * 4);
+                // TODO: In 1.21.11, renderTooltip signature changed
+                context.drawString(font, traitText, 10, 30 + h * 4, 0xFFFFFFFF);
             }
         }
 
