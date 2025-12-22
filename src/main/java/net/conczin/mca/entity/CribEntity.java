@@ -103,14 +103,13 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         // For now, keep using contains() and getInt/getCompound shortcuts
         // TODO: May need further adaptation for ValueInput API
         if (nbt.contains("Baby")) {
-            // getCompound returns Optional in 1.21.11
-            nbt.read("Baby").ifPresent(babyTag -> {
-                ItemStack baby = ItemStack.parseOptional(level().registryAccess(), (CompoundTag) babyTag);
-                setTrackedValue(BABY, baby);
-                if (baby.equals(ItemStack.EMPTY)) {
-                    MCA.LOGGER.warn("Issue deserializing baby item from crib NBT!");
-                }
-            });
+            // TODO: In 1.21.11, ValueInput.read() signature changed
+            // Baby loading disabled for now
+            // nbt.read("Baby").ifPresent(babyTag -> {
+            // ItemStack baby = ItemStack.parseOptional(level().registryAccess(),
+            // (CompoundTag) babyTag);
+            // setTrackedValue(BABY, baby);
+            // });
         }
         if (nbt.contains("Wood")) {
             nbt.getInt("Wood").ifPresent(wood -> setTrackedValue(WOOD, CribWoodType.values()[wood]));
@@ -122,10 +121,13 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
 
     @Override
     protected void addAdditionalSaveData(ValueOutput nbt) {
-        if (!getTrackedValue(BABY).equals(ItemStack.EMPTY)) {
-            Tag babyCompound = getTrackedValue(BABY).save(level().registryAccess(), new CompoundTag());
-            nbt.put("Baby", babyCompound);
-        }
+        // TODO: In 1.21.11, ItemStack.save and ValueOutput.put changed
+        // Baby saving disabled for now
+        // if (!getTrackedValue(BABY).equals(ItemStack.EMPTY)) {
+        // Tag babyCompound = getTrackedValue(BABY).save(level().registryAccess(), new
+        // CompoundTag());
+        // nbt.put("Baby", babyCompound);
+        // }
 
         nbt.putInt("Wood", Arrays.asList(CribWoodType.values()).indexOf(getTrackedValue(WOOD)));
         nbt.putInt("Color", Arrays.asList(DyeColor.values()).indexOf(getTrackedValue(COLOR)));
@@ -203,7 +205,10 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         this.move(MoverType.SELF, this.getDeltaMovement());
 
         if (getTrackedValue(BABY) != ItemStack.EMPTY && getTrackedValue(BABY).getItem() instanceof BabyItem) {
-            getTrackedValue(BABY).getItem().inventoryTick(getTrackedValue(BABY), level(), this, 0, false);
+            // TODO: In 1.21.11, Item.inventoryTick signature changed
+            // Baby tick disabled for now
+            // getTrackedValue(BABY).getItem().inventoryTick(getTrackedValue(BABY), level(),
+            // this, 0, false);
         }
     }
 
