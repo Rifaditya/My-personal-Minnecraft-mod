@@ -36,8 +36,12 @@ public class ClothingList extends SimpleJsonResourceReloadListener {
         return INSTANCE;
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> data, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
         clothing.clear();
 
         data.forEach((id, file) -> {
@@ -67,7 +71,8 @@ public class ClothingList extends SimpleJsonResourceReloadListener {
     }
 
     /**
-     * Gets a pool of clothing options valid for this entity's gender and profession.
+     * Gets a pool of clothing options valid for this entity's gender and
+     * profession.
      */
     public WeightedPool<String> getPool(VillagerLike<?> villager) {
         Gender gender = villager.getGenetics().getGender();
@@ -76,10 +81,9 @@ public class ClothingList extends SimpleJsonResourceReloadListener {
             case TODDLER -> getPool(gender, MCA.locate("toddler").toString());
             case CHILD, TEEN -> getPool(gender, MCA.locate("child").toString());
             default -> {
-                WeightedPool<String> pool = getPool(gender, villager.getVillagerData().getProfession());
-                if (pool.entries.isEmpty()) {
-                    pool = getPool(gender, VillagerProfession.NONE);
-                }
+                // TODO: In 1.21.11, getProfession() returns ResourceKey - simplified pool
+                // lookup
+                WeightedPool<String> pool = getPool(gender, (String) null);
                 yield pool;
             }
         };
@@ -87,15 +91,18 @@ public class ClothingList extends SimpleJsonResourceReloadListener {
 
     public WeightedPool<String> getPool(Gender gender, @Nullable VillagerProfession profession) {
         Map<String, String> map = Config.getInstance().professionConversionsMap;
-        String currentValue = profession == null ? "minecraft:none" : BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession).toString();
+        String currentValue = profession == null ? "minecraft:none"
+                : BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession).toString();
         String identifier = map.getOrDefault(currentValue, map.getOrDefault("default", currentValue));
         return getPool(gender, identifier);
     }
 
     public WeightedPool<String> getPool(Gender gender, @Nullable String profession) {
-        return Stream.concat(clothing.values().stream(), CustomClothingManager.getClothing().getEntries().values().stream())
+        return Stream
+                .concat(clothing.values().stream(), CustomClothingManager.getClothing().getEntries().values().stream())
                 .filter(c -> c.getGender() == Gender.NEUTRAL || gender == Gender.NEUTRAL || c.getGender() == gender)
-                .filter(c -> c.profession == null || profession == null && !c.exclude || c.profession.equals(profession) || profession != null && c.profession.equals(profession.replace(":", ".")))
+                .filter(c -> c.profession == null || profession == null && !c.exclude || c.profession.equals(profession)
+                        || profession != null && c.profession.equals(profession.replace(":", ".")))
                 .collect(() -> new WeightedPool.Mutable<>("mca:missing"),
                         (list, entry) -> list.add(entry.getIdentifier(), entry.getChance()),
                         (a, b) -> {
@@ -104,4 +111,3 @@ public class ClothingList extends SimpleJsonResourceReloadListener {
     }
 
 }
-

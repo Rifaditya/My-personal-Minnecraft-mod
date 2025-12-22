@@ -47,8 +47,12 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
         return finalAnalysis;
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> data, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
         questions.clear();
         data.forEach(this::loadDialogue);
     }
@@ -80,12 +84,12 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
         return questions.get(i);
     }
 
-    //selects a specific answer while being in given question
+    // selects a specific answer while being in given question
     public void selectAnswer(VillagerEntityMCA villager, ServerPlayer player, String questionId, String answerId) {
         Question question = getQuestion(questionId);
         Answer answer = question.getAnswer(answerId);
 
-        //fetch chances for each result
+        // fetch chances for each result
         int total = 0;
         List<Analysis> analysis = new LinkedList<>();
         for (Result r : answer.getResults()) {
@@ -94,7 +98,7 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
             total += Math.max(0, a.getTotal());
         }
 
-        //choose weighted random
+        // choose weighted random
         int chosen = -1;
         total = total == 0 ? 0 : villager.getRandom().nextInt(total);
         for (Analysis a : analysis) {
@@ -107,14 +111,13 @@ public class Dialogues extends SimpleJsonResourceReloadListener {
 
         Actions chosenActions = answer.getResults().get(chosen).getActions();
 
-        //send analysis (if there is a heart impact at all)
+        // send analysis (if there is a heart impact at all)
         if (chosenActions.isNegative() || chosenActions.isPositive()) {
             Analysis finalAnalysis = getFinalAnalysis(analysis, answer);
             Network.sendToPlayer(new AnalysisResults(finalAnalysis), player);
         }
 
-        //execute that results actions
+        // execute that results actions
         chosenActions.trigger(villager, player);
     }
 }
-

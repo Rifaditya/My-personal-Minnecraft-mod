@@ -27,9 +27,13 @@ public class BuildingTypes extends SimpleJsonResourceReloadListener implements I
         return INSTANCE;
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
-        for (Map.Entry<Identifier, JsonElement> pair : prepared.entrySet()) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> preparedMap = (Map<Identifier, JsonElement>) prepared;
+        for (Map.Entry<Identifier, JsonElement> pair : preparedMap.entrySet()) {
             String name = pair.getKey().getPath();
             buildingTypes.put(name, new BuildingType(name, pair.getValue().getAsJsonObject()));
         }
@@ -59,4 +63,3 @@ public class BuildingTypes extends SimpleJsonResourceReloadListener implements I
         return buildingTypesClient.values().iterator();
     }
 }
-
