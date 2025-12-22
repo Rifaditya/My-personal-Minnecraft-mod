@@ -24,6 +24,7 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
     private static MCAScreens INSTANCE;
     private final Map<String, MCAButton[]> buttons = new HashMap<>();
     private final Map<String, Icon> icons = new HashMap<>();
+
     public MCAScreens() {
         super(Resources.GSON, "api/gui");
         INSTANCE = this;
@@ -33,8 +34,12 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
         return INSTANCE;
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> data, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
         buttons.clear();
         icons.clear();
         data.forEach(this::loadScreen);
@@ -77,4 +82,3 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
         return Arrays.stream(buttons.get(key)).filter(b -> b.identifier().equals(id)).findFirst();
     }
 }
-

@@ -19,8 +19,12 @@ public class GiftLoader extends SimpleJsonResourceReloadListener {
         super(Resources.GSON, "gifts");
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> data, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
         GiftType.REGISTRY.clear();
         data.forEach((id, json) -> {
             try {
@@ -30,11 +34,12 @@ public class GiftLoader extends SimpleJsonResourceReloadListener {
             }
         });
 
-        //extend from mca entries to avoid copy pasta commonly used stuff
+        // extend from mca entries to avoid copy pasta commonly used stuff
         for (GiftType type : GiftType.REGISTRY) {
             if (!type.getId().getNamespace().equals(MCA.MOD_ID) && type.getConditions().isEmpty()) {
                 for (GiftType extendingType : GiftType.REGISTRY) {
-                    if (extendingType.getId().getNamespace().equals(MCA.MOD_ID) && extendingType.getId().getPath().equals(type.getId().getPath())) {
+                    if (extendingType.getId().getNamespace().equals(MCA.MOD_ID)
+                            && extendingType.getId().getPath().equals(type.getId().getPath())) {
                         type.extendFrom(extendingType);
                         break;
                     }
@@ -43,4 +48,3 @@ public class GiftLoader extends SimpleJsonResourceReloadListener {
         }
     }
 }
-
