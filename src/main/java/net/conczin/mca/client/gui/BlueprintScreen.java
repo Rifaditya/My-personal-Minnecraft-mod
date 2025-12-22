@@ -404,74 +404,17 @@ public class BlueprintScreen extends ExtendedScreen {
         }
 
         // TODO: Map rendering with pose transformation disabled for now
+        // Building rendering and tooltip logic also disabled due to mouseLocalX/Y
+        // dependency
+        /*
+         * // buildings
+         * List<Building> hoverBuildings = new LinkedList<>();
+         * // ... building rendering code disabled ...
+         */
 
-        // show the players location
-        assert minecraft != null;
-        LocalPlayer player = minecraft.player;
-        if (player != null) {
-            WidgetUtils.drawRectangle(context, (int) player.getX() - 1, (int) player.getZ() - 1,
-                    (int) player.getX() + 1, (int) player.getZ() + 1, 0xffff00ff);
-        }
-
-        // buildings
-        List<Building> hoverBuildings = new LinkedList<>();
-        for (Building building : village.getBuildings().values()) {
-            if (!building.isComplete())
-                continue;
-
-            BuildingType bt = building.getBuildingType();
-            if (bt.isIcon()) {
-                BlockPos c = building.getCenter();
-                drawBuildingIcon(context, ICON_TEXTURES, c.getX(), c.getZ(), bt.iconU(), bt.iconV());
-
-                // tooltip
-                int margin = 6;
-                if (c.distSqr(new Vec3i(mouseLocalX, c.getY(), mouseLocalY)) < margin * margin) {
-                    hoverBuildings.add(building);
-                }
-            } else {
-                BlockPos p0 = building.getPos0();
-                BlockPos p1 = building.getPos1();
-                WidgetUtils.drawRectangle(context, p0.getX(), p0.getZ(), p1.getX(), p1.getZ(), bt.getColor());
-
-                // icon
-                if (bt.visible()) {
-                    BlockPos c = building.getCenter();
-                    drawBuildingIcon(context, ICON_TEXTURES, c.getX(), c.getZ(), bt.iconU(), bt.iconV());
-                }
-
-                // tooltip
-                int margin = 1;
-                if (mouseLocalX >= p0.getX() - margin && mouseLocalX <= p1.getX() + margin
-                        && mouseLocalY >= p0.getZ() - margin && mouseLocalY <= p1.getZ() + margin) {
-                    hoverBuildings.add(building);
-                }
-            }
-        }
-
-        matrices.popPose();
-
-        // sort vertically
-        hoverBuildings.sort((a, b) -> b.getCenter().getY() - a.getCenter().getY());
-
-        // get tooltips
-        List<List<Component>> tooltips = new LinkedList<>();
-        for (Building b : hoverBuildings) {
-            tooltips.add(getBuildingTooltip(b));
-        }
-
-        // get height
-        int h = 0;
-        for (List<Component> b : tooltips) {
-            h += getTooltipHeight(b) + 9;
-        }
-
-        // TODO: renderComponentTooltip removed in 1.21.11
-        // int py = mouseY - h / 2 + 12;
-        // for (List<Component> b : tooltips) {
-        // context.renderComponentTooltip(font, b, mouseX, py);
-        // py += getTooltipHeight(b) + 9;
-        // }
+        // TODO: All map rendering, building display, and tooltip code disabled for
+        // 1.21.11
+        // due to Matrix3x2fStack incompatibility with PoseStack
     }
 
     private List<Component> getBuildingTooltip(Building hoverBuilding) {
@@ -624,13 +567,9 @@ public class BlueprintScreen extends ExtendedScreen {
     }
 
     private Component getBlockName(Identifier id) {
-        if (BuiltInRegistries.BLOCK.containsKey(id)) {
-            // In 1.21.11, BuiltInRegistries.BLOCK.get() returns Optional
-            return BuiltInRegistries.BLOCK.get(id).map(block -> Component.translatable(block.getDescriptionId()))
-                    .orElse(Component.literal(id.toString()));
-        } else {
-            return Component.translatable("tag.block." + id.getNamespace() + "." + id.getPath());
-        }
+        // TODO: In 1.21.11, BuiltInRegistries.BLOCK.get() signature changed
+        // Simplified for now - just return the ID path
+        return Component.literal(id.getPath());
     }
 
     private void toggleButtons(ButtonWidget[] buttons, boolean active) {
