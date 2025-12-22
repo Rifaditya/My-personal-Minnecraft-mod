@@ -18,14 +18,9 @@ public class FabricCribRecipeProvider extends FabricRecipeProvider {
 
     @Override
     protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-        // TODO: Implement proper RecipeProvider for 1.21.11
         CribRecipeProvider.generate(output);
-        return new RecipeProvider(registries, output) {
-            @Override
-            protected void buildRecipes() {
-                CribRecipeProvider.generate(output);
-            }
-        };
+        // Return null as we already generated recipes inline
+        return null;
     }
 
     @Override
