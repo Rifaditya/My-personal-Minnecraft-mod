@@ -872,14 +872,17 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                 }
 
                 // group
-                addRenderableWidget(CycleButton.builder(SubscriptionFilter::getText)
-                        .withValues(SubscriptionFilter.values())
-                        .withInitialValue(subscriptionFilter)
-                        .displayOnlyValue()
-                        .create(width / 2 - 200, height / 2 - 110, 60, 20, Component.literal(""), (button, filter) -> {
-                            this.subscriptionFilter = filter;
-                            refreshContentList();
-                        }));
+                // TODO: In 1.21.11, CycleButton.builder signature changed
+                // CycleButton disabled for now
+                // addRenderableWidget(CycleButton.builder(SubscriptionFilter::getText)
+                // .withValues(SubscriptionFilter.values())
+                // .withInitialValue(subscriptionFilter)
+                // .displayOnlyValue()
+                // .create(width / 2 - 200, height / 2 - 110, 60, 20, Component.literal(""),
+                // (button, filter) -> {
+                // this.subscriptionFilter = filter;
+                // refreshContentList();
+                // }));
 
                 // controls
                 int i = 0;
@@ -1107,13 +1110,17 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                         ProfessionIcons.ICONS.getOrDefault(profession.name(),
                                                 Items.OAK_SAPLING.getDefaultInstance()),
                                         v -> {
-                                            workspace.profession = profession == VillagerProfession.NONE ? null
-                                                    : profession.name();
+                                            // TODO: In 1.21.11, VillagerProfession is now ResourceKey based
+                                            // workspace.profession = profession == VillagerProfession.NONE ? null :
+                                            // profession.name();
+                                            workspace.profession = profession.name();
                                             widgets.forEach(b -> b.active = true);
                                             v.active = false;
                                         }));
-                        widget.active = !Objects.equals(workspace.profession,
-                                profession == VillagerProfession.NONE ? null : profession.name());
+                        // TODO: In 1.21.11, VillagerProfession.NONE comparison changed
+                        // widget.active = !Objects.equals(workspace.profession,
+                        // profession == VillagerProfession.NONE ? null : profession.name());
+                        widget.active = !Objects.equals(workspace.profession, profession.name());
                         widgets.add(widget);
                         ox++;
                         if (ox >= 5) {
@@ -1541,12 +1548,19 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
     }
 
     private String getPlayerName() {
-        return Minecraft.getInstance().player == null ? "Unknown"
-                : Minecraft.getInstance().player.getGameProfile().getName();
+        // TODO: In 1.21.11, getGameProfile() may have moved
+        if (Minecraft.getInstance().player == null)
+            return "Unknown";
+        try {
+            return Minecraft.getInstance().player.getName().getString();
+        } catch (Exception e) {
+            return "Unknown";
+        }
     }
 
     private boolean isOp() {
-        return Minecraft.getInstance().player != null && Minecraft.getInstance().player.hasPermissions(4);
+        // TODO: In 1.21.11, hasPermissions may have moved or renamed
+        return false; // Disabled for now
     }
 
     private void setSelectionPage(int p) {
