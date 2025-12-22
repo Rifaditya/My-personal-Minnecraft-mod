@@ -7,29 +7,34 @@ import net.minecraft.world.item.ItemStack;
 public class NbtCompoundDefaultGetters {
 
     public static int getInt(CompoundTag nbt, String key, int def) {
-        return nbt.contains(key) ? nbt.getInt(key) : def;
+        // In 1.21.11, getInt returns Optional<Integer>
+        return nbt.getInt(key).orElse(def);
     }
 
     public static float getFloat(CompoundTag nbt, String key, float def) {
-        return nbt.contains(key) ? nbt.getFloat(key) : def;
+        // In 1.21.11, getFloat returns Optional<Float>
+        return nbt.getFloat(key).orElse(def);
     }
 
     public static String getString(CompoundTag nbt, String key, String def) {
-        return nbt.contains(key) ? nbt.getString(key) : def;
+        // In 1.21.11, getString returns Optional<String>
+        return nbt.getString(key).orElse(def);
     }
 
     public static CompoundTag getCompound(CompoundTag nbt, String key, CompoundTag def) {
-        return nbt.contains(key, 10) ? nbt.getCompound(key) : def.copy();
+        // In 1.21.11, getCompound returns Optional<CompoundTag>, contains() only takes
+        // key
+        return nbt.getCompound(key).orElse(def.copy());
     }
 
     public static ItemStack getItemStack(CompoundTag nbt, String key, ItemStack def, HolderLookup.Provider provider) {
         try {
-            if (nbt.contains(key, 10)) {
-                return ItemStack.parse(provider, nbt.getCompound(key)).orElse(def);
+            // In 1.21.11, contains() only takes key, not type
+            if (nbt.contains(key)) {
+                return nbt.getCompound(key).flatMap(compound -> ItemStack.parse(provider, compound)).orElse(def);
             }
         } catch (ClassCastException ignored) {
         }
         return def;
     }
 }
-
