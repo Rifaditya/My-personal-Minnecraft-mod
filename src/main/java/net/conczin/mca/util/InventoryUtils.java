@@ -82,15 +82,15 @@ public interface InventoryUtils {
     }
 
     static Optional<ItemStack> getBestSword(Container inv) {
-        return stream(inv)
-                .filter(s -> s.getItem() instanceof SwordItem)
-                .max(Comparator.comparingDouble(ItemStack::getMaxDamage));
+        // TODO: In 1.21.11, SwordItem API may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     static Optional<ItemStack> getBestRanged(Container inv) {
-        return stream(inv)
-                .filter(s -> s.getItem() instanceof ProjectileWeaponItem)
-                .max(Comparator.comparingDouble(ItemStack::getMaxDamage));
+        // TODO: In 1.21.11, ProjectileWeaponItem API may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     static void dropAllItems(Entity entity, Container inv) {
