@@ -37,15 +37,20 @@ public class Tasks extends SimpleJsonResourceReloadListener {
     public static Rank getRank(Village village, ServerPlayer player) {
         Rank[] ranks = Rank.values();
         for (int i = ranks.length - 1; i >= 0; i--) {
-            if (getInstance().tasks.get(ranks[i]).stream().allMatch(t -> !t.isRequired() || t.isCompleted(village, player))) {
+            if (getInstance().tasks.get(ranks[i]).stream()
+                    .allMatch(t -> !t.isRequired() || t.isCompleted(village, player))) {
                 return ranks[i];
             }
         }
         return Rank.OUTLAW;
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> data, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
         tasks.clear();
         for (Rank r : Rank.values()) {
             tasks.put(r, new LinkedList<>());
@@ -60,4 +65,3 @@ public class Tasks extends SimpleJsonResourceReloadListener {
         });
     }
 }
-

@@ -40,13 +40,18 @@ public class Names extends SimpleJsonResourceReloadListener {
     }
 
     public static String pickCitizenName(@NotNull Gender gender) {
-        return NAMES_MAP.isEmpty() ? "Unnamed" : NAMES_MAP.get(REGION_NAMES.get(random.nextInt(REGION_NAMES.size()))).get(gender.binary()).pickOne();
+        return NAMES_MAP.isEmpty() ? "Unnamed"
+                : NAMES_MAP.get(REGION_NAMES.get(random.nextInt(REGION_NAMES.size()))).get(gender.binary()).pickOne();
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> preparedMap = (Map<Identifier, JsonElement>) prepared;
         NAMES_MAP.clear();
-        for (Map.Entry<Identifier, JsonElement> entry : prepared.entrySet()) {
+        for (Map.Entry<Identifier, JsonElement> entry : preparedMap.entrySet()) {
             String[] split = entry.getKey().getPath().split("/");
             Gender gender = Gender.byName(split[1]);
 
@@ -64,4 +69,3 @@ public class Names extends SimpleJsonResourceReloadListener {
         Arrays.stream(NAMES_MAP.keySet().toArray()).sorted().forEach(n -> REGION_NAMES.add((String) n));
     }
 }
-

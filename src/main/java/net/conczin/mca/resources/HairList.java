@@ -29,8 +29,12 @@ public class HairList extends SimpleJsonResourceReloadListener {
         return INSTANCE;
     }
 
+    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
+    // Object
     @Override
-    protected void apply(Map<Identifier, JsonElement> data, ResourceManager manager, ProfilerFiller profiler) {
+    @SuppressWarnings("unchecked")
+    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
         hair.clear();
 
         data.forEach((id, file) -> {
@@ -67,4 +71,3 @@ public class HairList extends SimpleJsonResourceReloadListener {
                         });
     }
 }
-
