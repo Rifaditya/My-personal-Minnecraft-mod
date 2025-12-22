@@ -207,7 +207,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         }
 
         if (villagerData.contains("FamilyTreeNewFatherName")) {
-            String name = villagerData.getString("FamilyTreeNewFatherName");
+            // TODO: In 1.21.11, getString returns Optional
+            String name = villagerData.getString("FamilyTreeNewFatherName").orElse("");
             if (MCA.isBlankString(name)) {
                 entry.removeFather();
             } else {
@@ -216,7 +217,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         }
 
         if (villagerData.contains("FamilyTreeNewMotherName")) {
-            String name = villagerData.getString("FamilyTreeNewMotherName");
+            // TODO: In 1.21.11, getString returns Optional
+            String name = villagerData.getString("FamilyTreeNewMotherName").orElse("");
             if (MCA.isBlankString(name)) {
                 entry.removeMother();
             } else {
@@ -225,7 +227,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         }
 
         if (villagerData.contains("FamilyTreeNewSpouseName")) {
-            String name = villagerData.getString("FamilyTreeNewSpouseName");
+            // TODO: In 1.21.11, getString returns Optional
+            String name = villagerData.getString("FamilyTreeNewSpouseName").orElse("");
             if (MCA.isBlankString(name)) {
                 // TODO: In 1.21.11, entry.partner() returns Optional
                 entry.partner().flatMap(tree::getOrEmpty)
