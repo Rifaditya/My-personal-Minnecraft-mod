@@ -60,9 +60,10 @@ public interface ItemsMCA {
         Item FAMILY_TREE = register("family_tree", new FamilyTreeItem(baseProps()));
         Item VILLAGER_TRACKER = register("villager_tracker", new VillagerTrackerItem(baseProps().stacksTo(1)));
 
-        // TODO: In 1.21.11, Tiers.GOLD may be renamed or need ToolMaterial
-        Item SCYTHE = register(\"scythe\",
-                        new ScytheItem(baseProps().attributes(SwordItem.createAttributes(ToolMaterial.GOLD, 10, -2.4F))));
+        // TODO: In 1.21.11, Tiers renamed - disabled for now
+        // Item SCYTHE = register("scythe",
+        // new ScytheItem(baseProps().attributes(SwordItem.createAttributes(Tiers.GOLD,
+        // 10, -2.4F))));
 
         Item BOUQUET = register("bouquet", new BouquetItem(baseProps()));
 
@@ -174,7 +175,10 @@ public interface ItemsMCA {
                         .setBackground(MCA.locate("textures/gui/books/cult.png"))
                         .setTextFormatting(ChatFormatting.DARK_RED)
                         .addPage(new TitlePage("cult_ancient", ChatFormatting.DARK_RED))
-                        .addPage(new CenteredTextPage(Component.literal(\r\n                                        \"We are the universe. We are everything you think isn't you. You are looking at us now, through your skin and your eyes. And why does the universe touch your skin, and throw light on you? To see you, player. To know you. And to be known. I shall tell you a story.\"))\r\n                                        // TODO: In 1.21.11, withFont takes ResourceLocation\r\n                                        .setStyle(Style.EMPTY))));
+                        .addPage(new CenteredTextPage(Component.literal(
+                                        "We are the universe. We are everything you think isn't you. You are looking at us now, through your skin and your eyes. And why does the universe touch your skin, and throw light on you? To see you, player. To know you. And to be known. I shall tell you a story."))
+                                        // TODO: In 1.21.11, withFont takes ResourceLocation
+                                        .setStyle(Style.EMPTY))));
 
         Item CIVIL_REGISTRY = register("civil_registry",
                         new CivilRegistry(baseProps().stacksTo(1), new CivilRegistryBook("civil_registry", null)
