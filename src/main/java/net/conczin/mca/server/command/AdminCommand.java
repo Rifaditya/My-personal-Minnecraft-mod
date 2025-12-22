@@ -15,6 +15,7 @@ import net.conczin.mca.registry.EntitiesMCA;
 import net.conczin.mca.server.SpawnQueue;
 import net.conczin.mca.server.world.data.*;
 import net.minecraft.ChatFormatting;
+import net.minecraft.server.permissions.Permissions;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -72,7 +73,9 @@ public class AdminCommand {
                 .then(register("buildingProcessingRate")
                         .then(Commands.argument("cooldown", IntegerArgumentType.integer())
                                 .executes(AdminCommand::buildingProcessingRate)))
-                .requires((serverCommandSource) -> serverCommandSource.hasPermission(2)));
+                // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+                .requires((serverCommandSource) -> serverCommandSource.permissions()
+                        .hasPermission(Permissions.COMMANDS_ADMIN)));
     }
 
     private static int listVillages(CommandContext<CommandSourceStack> ctx) {
