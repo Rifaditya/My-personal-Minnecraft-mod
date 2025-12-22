@@ -21,6 +21,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -49,8 +50,8 @@ public class Command {
                 .then(register("verify")
                         .then(Commands.argument("email", StringArgumentType.greedyString()).executes(Command::verify)))
                 .then(register("chatAI")
-                        // TODO: In 1.21.11, isSingleplayer() signature may have changed
-                        .requires(p -> p.hasPermission(2))
+                        // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+                        .requires(p -> p.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
                         .executes(Command::chatAIHelp)
                         .then(Commands.literal("disable")
                                 .executes(Command::disableChatAI))
@@ -60,8 +61,8 @@ public class Command {
                         .then(Commands.literal("player2")
                                 .executes(Command::setupPlayer2))
                         .then(register("inworldAI")
-                                // TODO: In 1.21.11, isSingleplayer() signature may have changed
-                                .requires(p -> p.hasPermission(2))
+                                // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+                                .requires(p -> p.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
                                 .then(register("keys")
                                         .then(Commands.argument("api_key", StringArgumentType.string())
                                                 .executes(c -> Command
@@ -180,7 +181,9 @@ public class Command {
         if (player == null) {
             return 1;
         }
-        if (ctx.getSource().hasPermission(2) || Config.getInstance().allowFullPlayerEditor) {
+        // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+        if (ctx.getSource().permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+                || Config.getInstance().allowFullPlayerEditor) {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.VILLAGER_EDITOR, player), player);
             return 0;
         } else if (Config.getInstance().allowLimitedPlayerEditor) {
@@ -193,7 +196,9 @@ public class Command {
     }
 
     private static int destiny(CommandContext<CommandSourceStack> ctx) {
-        if (ctx.getSource().hasPermission(2) || Config.getInstance().allowDestinyCommandOnce) {
+        // In 1.21.11, use permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+        if (ctx.getSource().permissions().hasPermission(Permissions.COMMANDS_ADMIN)
+                || Config.getInstance().allowDestinyCommandOnce) {
             ServerPlayer player = ctx.getSource().getPlayer();
             if (player != null && !PlayerSaveData.get(player).isEntityDataSet()
                     || Config.getInstance().allowDestinyCommandMoreThanOnce) {
@@ -292,11 +297,13 @@ public class Command {
 
     private static ArgumentBuilder<CommandSourceStack, ?> register(String name,
             com.mojang.brigadier.Command<CommandSourceStack> cmd) {
-        return Commands.literal(name).requires(cs -> cs.hasPermission(0)).executes(cmd);
+        // In 1.21.11, use permissions().hasPermission with all permissions for level 0
+        return Commands.literal(name).requires(cs -> true).executes(cmd);
     }
 
     private static ArgumentBuilder<CommandSourceStack, ?> register(String name) {
-        return Commands.literal(name).requires(cs -> cs.hasPermission(0));
+        // In 1.21.11, use permissions().hasPermission with all permissions for level 0
+        return Commands.literal(name).requires(cs -> true);
     }
 
     private static void sendMessage(CommandContext<CommandSourceStack> ctx, String message) {
