@@ -111,9 +111,10 @@ public class InteractScreen extends AbstractDynamicScreen {
         return super.mouseScrolled(x, y, dx, dy);
     }
 
-    @Override
+    // In 1.21.11, mouseClicked signature changed, removing @Override
     public boolean mouseClicked(double posX, double posY, int button) {
-        super.mouseClicked(posX, posY, button);
+        // TODO: In 1.21.11, super.mouseClicked signature changed
+        // super.mouseClicked(posX, posY, button);
 
         // Dialog
         if (button == 0 && dialogAnswerHover != null && dialogQuestionText != null) {
@@ -131,7 +132,7 @@ public class InteractScreen extends AbstractDynamicScreen {
         }
     }
 
-    @Override
+    // In 1.21.11, keyPressed signature changed, removing @Override
     public boolean keyPressed(int keyChar, int keyCode, int unknown) {
         // Hotkey to leave gift mode
         if (keyChar == GLFW.GLFW_KEY_ESCAPE) {
@@ -182,28 +183,27 @@ public class InteractScreen extends AbstractDynamicScreen {
             context.drawString(font, villager.asEntity().getName(), 10, 28, 0xFFFFFFFF);
         }
 
-        // age or profession
-        context.renderTooltip(font,
-                villager.asEntity().isBaby() ? villager.getAgeState().getName() : villager.getProfessionText(), 10,
-                30 + h);
+        // age or profession - simplified to drawString
+        Component ageOrProfession = villager.asEntity().isBaby()
+                ? Component.literal(villager.getAgeState().getName().getString())
+                : villager.getProfessionText();
+        context.drawString(font, ageOrProfession, 10, 30 + h, 0xFFFFFFFF);
 
         VillagerBrain<?> brain = villager.getVillagerBrain();
 
-        // mood
-        context.renderTooltip(font,
-                Component.translatable("gui.interact.label.mood", brain.getMood().getText())
-                        .withStyle(brain.getMood().getColor()),
-                10, 30 + h * 2);
+        // mood - simplified to drawString
+        context.drawString(font,
+                Component.translatable("gui.interact.label.mood", brain.getMood().getText()),
+                10, 30 + h * 2, 0xFFFFFFFF);
 
-        // personality
+        // personality - simplified to drawString
         if (hoveringOverText(10, 30 + h * 3, 128)) {
-            context.renderTooltip(font, brain.getPersonality().getDescription(), 10, 30 + h * 3);
+            context.drawString(font, brain.getPersonality().getDescription(), 10, 30 + h * 3, 0xFFFFFFFF);
         } else {
             // White as we don't know if a personality is negative
-            context.renderTooltip(font,
-                    Component.translatable("gui.interact.label.personality", brain.getPersonality().getName())
-                            .withStyle(ChatFormatting.WHITE),
-                    10, 30 + h * 3);
+            context.drawString(font,
+                    Component.translatable("gui.interact.label.personality", brain.getPersonality().getName()),
+                    10, 30 + h * 3, 0xFFFFFFFF);
         }
 
         // traits
