@@ -20,7 +20,8 @@ public class LimitedVillagerEditorScreen extends VillagerEditorScreen {
 
     @Override
     protected boolean shouldUsePlayerModel() {
-        return villagerData.getInt("PlayerModel") != VillagerLike.PlayerModel.VILLAGER.ordinal();
+        // TODO: In 1.21.11, CompoundTag.getInt() returns Optional
+        return villagerData.getInt("PlayerModel").orElse(0) != VillagerLike.PlayerModel.VILLAGER.ordinal();
     }
 
     @Override
@@ -35,11 +36,11 @@ public class LimitedVillagerEditorScreen extends VillagerEditorScreen {
         if (page.equals("general")) {
             int y = height / 2 - 40;
 
-            //name
+            // name
             drawName(width / 2, y);
             y += 24;
 
-            //which model to use
+            // which model to use
             if (villagerUUID.equals(playerUUID)) {
                 addModelSelectionWidgets(width / 2, y);
             }
@@ -51,11 +52,11 @@ public class LimitedVillagerEditorScreen extends VillagerEditorScreen {
         super.render(context, mouseX, mouseY, delta);
 
         int y = height / 2 + 20;
-        List<Component> wrap = FlowingText.wrap(Component.translatable("gui.villager_editor.customization_hint"), DATA_WIDTH);
+        List<Component> wrap = FlowingText.wrap(Component.translatable("gui.villager_editor.customization_hint"),
+                DATA_WIDTH);
         for (Component text : wrap) {
             context.drawCenteredString(font, text, width / 2 + DATA_WIDTH / 2, y, 0xFFFFFFFF);
             y += 10;
         }
     }
 }
-
