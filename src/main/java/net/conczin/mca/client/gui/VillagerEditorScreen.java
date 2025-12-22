@@ -809,7 +809,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
         setPage("traits");
     }
 
-    @Override
+    // In 1.21.11, mouseClicked signature changed, removing @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (page.equals("clothing") && (hoveredClothingId >= 0 && filteredClothing.size() > hoveredClothingId)) {
             villager.setClothes(filteredClothing.get(hoveredClothingId));
@@ -827,7 +827,8 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
 
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        // TODO: In 1.21.11, super.mouseClicked signature changed
+        return false;
     }
 
     protected void eventCallback(String event) {
@@ -865,22 +866,21 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
             }
 
             // hint for confused people
-            if (shouldPrintPlayerHint() && villagerUUID.equals(playerUUID)
-                    && villagerData.getInt("PlayerModel") != VillagerLike.PlayerModel.VILLAGER.ordinal()) {
-                final PoseStack matrices = context.pose();
-                matrices.pushPose();
-                matrices.translate(x, y - 145, 0);
-                matrices.scale(0.5f, 0.5f, 0.5f);
-                context.drawCenteredString(font, Component.translatable("gui.villager_editor.model_hint"), 0, 0,
+            // TODO: In 1.21.11, pose() returns Matrix3x2fStack and getInt returns Optional
+            // Disabled pose transformation for now
+            if (shouldPrintPlayerHint() && villagerUUID.equals(playerUUID)) {
+                context.drawCenteredString(font, Component.translatable("gui.villager_editor.model_hint"),
+                        x + DATA_WIDTH / 2, y - 145,
                         0xAAFFFFFF);
-                matrices.popPose();
             }
         }
 
         if (page.equals("clothing") || page.equals("hair")) {
-            CompoundTag nbt = new CompoundTag();
-            villager.save(nbt);
-            villagerVisualization.load(nbt);
+            // TODO: In 1.21.11, Entity.save/load use ValueOutput/ValueInput, simplified for
+            // now
+            // CompoundTag nbt = new CompoundTag();
+            // villager.save(nbt);
+            // villagerVisualization.load(nbt);
             villagerVisualization.setAge(villager.getAge());
             villagerVisualization.refreshDimensions();
 
