@@ -19,39 +19,10 @@ import net.minecraft.world.level.ItemLike;
  */
 public class TradeOffersMCA {
     public static void bootstrap() {
-        // Register trades for ADVENTURER profession using Fabric API
-        // In 1.21.11, registerVillagerOffers takes ResourceKey<VillagerProfession>
-        // Use BuiltInRegistries to get the ResourceKey from the profession
-        net.minecraft.resources.ResourceKey<net.minecraft.world.entity.npc.villager.VillagerProfession> adventurerKey = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
-                .getResourceKey(ProfessionsMCA.ADVENTURER).orElseThrow();
-        TradeOfferHelper.registerVillagerOffers(adventurerKey, 1, trades -> {
-            trades.add(new SellItemFactory(Items.SLIME_BALL, 1, 1, 16, 1));
-            trades.add(new SellItemFactory(Items.LEATHER_HORSE_ARMOR, 3, 1, 4, 10));
-            trades.add(new SellItemFactory(Items.SADDLE, 4, 1, 3, 5));
-            trades.add(new SellItemFactory(Items.IRON_HORSE_ARMOR, 5, 1, 2, 20));
-            trades.add(new SellItemFactory(Items.DIAMOND, 10, 1, 8, 20));
-            trades.add(new SellItemFactory(Items.GOLDEN_HORSE_ARMOR, 10, 1, 3, 30));
-            trades.add(new SellItemFactory(Items.GOLDEN_APPLE, 5, 1, 8, 30));
-            trades.add(new SellItemFactory(Items.DIAMOND_HORSE_ARMOR, 15, 1, 1, 30));
-            trades.add(new SellItemFactory(Items.ENCHANTED_GOLDEN_APPLE, 32, 1, 3, 50));
-            trades.add(new BuyForOneEmeraldFactory(Items.BREAD, 10, 10, 30));
-        });
-
-        // Register trades for CULTIST profession using Fabric API
-        net.minecraft.resources.ResourceKey<net.minecraft.world.entity.npc.villager.VillagerProfession> cultistKey = net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION
-                .getResourceKey(ProfessionsMCA.CULTIST).orElseThrow();
-        TradeOfferHelper.registerVillagerOffers(cultistKey, 1, trades -> {
-            trades.add(new SellItemFactory(ItemsMCA.SIRBEN_BABY_BOY, 5, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.SIRBEN_BABY_GIRL, 5, 1, 1, 1));
-            trades.add(new BuyForOneEmeraldFactory(ItemsMCA.BABY_BOY, 1, 1, 1));
-            trades.add(new BuyForOneEmeraldFactory(ItemsMCA.BABY_GIRL, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.BOOK_CULT_0, 1, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.BOOK_CULT_1, 1, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.BOOK_CULT_2, 1, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.BOOK_DEATH, 1, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.BOOK_INFECTION, 1, 1, 1, 1));
-            trades.add(new SellItemFactory(ItemsMCA.BOOK_SUPPORTERS, 1, 1, 1, 1));
-        });
+        // TODO: In 1.21.11, custom professions are disabled (null)
+        // Cannot register trades until professions are fixed
+        // Disabled trade registration for ADVENTURER and CULTIST
+        // since ProfessionsMCA.ADVENTURER and ProfessionsMCA.CULTIST are currently null
     }
 
     // Custom factory that buys items for emeralds
