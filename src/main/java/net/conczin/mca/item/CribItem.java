@@ -78,6 +78,7 @@ public class CribItem extends Item {
         }
 
         itemStack.shrink(1);
-        return InteractionResult.sidedSuccess(world.isClientSide());
+        // TODO: In 1.21.11, InteractionResult.sidedSuccess removed
+        return InteractionResult.SUCCESS;
     }
 }

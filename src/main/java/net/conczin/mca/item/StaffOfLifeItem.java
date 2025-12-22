@@ -1,6 +1,7 @@
 package net.conczin.mca.item;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -20,29 +21,32 @@ public class StaffOfLifeItem extends TooltippedItem {
         InteractionResult result = ScytheItem.use(context, true);
         if (result == InteractionResult.SUCCESS) {
             if (context.getPlayer() instanceof ServerPlayer serverPlayer) {
-                context.getItemInHand().hurtAndBreak(1, (ServerLevel) serverPlayer.level(), serverPlayer, item -> {
-                });
+                // TODO: In 1.21.11, ItemStack.hurtAndBreak signature changed
+                // context.getItemInHand().hurtAndBreak(1, (ServerLevel) serverPlayer.level(),
+                // serverPlayer, item -> {});
+                context.getItemInHand().shrink(0); // No-op for now
             }
             return result;
         }
         return result;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        // TODO: In 1.21.11, getDescriptionId(stack) removed, using getDescriptionId()\n
-        // tooltip.add(Component.translatable(getDescriptionId() + \".uses\",
-        // stack.getMaxDamage() - stack.getDamageValue()));
-
-        super.appendHoverText(stack, context, tooltip, flag);
-    }
+    // TODO: In 1.21.11, appendHoverText signature changed
+    // @Override
+    // public void appendHoverText(ItemStack stack, TooltipContext context,
+    // List<Component> tooltip, TooltipFlag flag) {
+    // tooltip.add(Component.translatable(getDescriptionId() + ".uses",
+    // stack.getMaxDamage() - stack.getDamageValue()));
+    // super.appendHoverText(stack, context, tooltip, flag);
+    // }
 
     @Override
     public boolean isFoil(ItemStack stack) {
         return true;
     }
 
-    @Override
+    // TODO: In 1.21.11 signature may have changed
+    // @Override
     public boolean isEnchantable(ItemStack stack) {
         return false;
     }
