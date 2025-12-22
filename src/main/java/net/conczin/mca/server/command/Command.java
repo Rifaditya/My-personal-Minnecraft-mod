@@ -22,6 +22,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -120,10 +121,10 @@ public class Command {
         Config.getInstance().save();
 
         if (model.equals("default")) {
-            // TODO: In 1.21.11, ClickEvent is abstract - use factory methods
+            // In 1.21.11, ClickEvent uses subclass pattern
             sendMessage(ctx, Component.translatable("mca.ai_help").withStyle(s -> s
-                    .withClickEvent(ClickEvent.openUrl(
-                            "https://github.com/Luke100000/minecraft-comes-alive/wiki/GPT3-based-conversations"))));
+                    .withClickEvent(new ClickEvent.OpenUrl(URI.create(
+                            "https://github.com/Luke100000/minecraft-comes-alive/wiki/GPT3-based-conversations")))));
         } else {
             sendMessage(ctx, "command.chat_ai.enabled");
         }
@@ -151,9 +152,9 @@ public class Command {
 
         Config.getInstance().save();
 
-        // TODO: In 1.21.11, ClickEvent is abstract - use factory methods
+        // In 1.21.11, ClickEvent uses subclass pattern
         sendMessage(ctx, Component.translatable("command.chat_ai.player2").withStyle(s -> s
-                .withClickEvent(ClickEvent.openUrl("https://player2.game/"))));
+                .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://player2.game/")))));
         return 0;
     }
 

@@ -24,20 +24,17 @@ import java.util.stream.Collectors;
 public interface ItemsMCA {
         Map<Identifier, Item> ITEMS = new LinkedHashMap<>();
 
-        // TODO: In 1.21.11, SpawnEggItem constructor changed
-        // Disabled spawn eggs temporarily until proper implementation
-        // Item MALE_VILLAGER_SPAWN_EGG = register("male_villager_spawn_egg", new
-        // SpawnEggItem(EntitiesMCA.MALE_VILLAGER, 0x5e9aff, 0x3366bc, baseProps()));
-        // Item FEMALE_VILLAGER_SPAWN_EGG = register("female_villager_spawn_egg", new
-        // SpawnEggItem(EntitiesMCA.FEMALE_VILLAGER, 0xe85ca1, 0xe3368c, baseProps()));
-        // Item MALE_ZOMBIE_VILLAGER_SPAWN_EGG =
-        // register("male_zombie_villager_spawn_egg", new
-        // SpawnEggItem(EntitiesMCA.MALE_ZOMBIE_VILLAGER, 0x5ebaff, 0x33a6bc,
-        // baseProps()));
-        // Item FEMALE_ZOMBIE_VILLAGER_SPAWN_EGG =
-        // register("female_zombie_villager_spawn_egg", new
-        // SpawnEggItem(EntitiesMCA.FEMALE_ZOMBIE_VILLAGER, 0xe8aca1, 0xe3a68c,
-        // baseProps()));
+        // In 1.21.11, SpawnEggItem uses Item.Properties().spawnEgg(entityType) pattern
+        Item MALE_VILLAGER_SPAWN_EGG = register("male_villager_spawn_egg",
+                        new SpawnEggItem(new Item.Properties().spawnEgg(EntitiesMCA.MALE_VILLAGER)));
+        Item FEMALE_VILLAGER_SPAWN_EGG = register("female_villager_spawn_egg",
+                        new SpawnEggItem(new Item.Properties().spawnEgg(EntitiesMCA.FEMALE_VILLAGER)));
+        Item MALE_ZOMBIE_VILLAGER_SPAWN_EGG = register("male_zombie_villager_spawn_egg",
+                        new SpawnEggItem(new Item.Properties().spawnEgg(EntitiesMCA.MALE_ZOMBIE_VILLAGER)));
+        Item FEMALE_ZOMBIE_VILLAGER_SPAWN_EGG = register("female_zombie_villager_spawn_egg",
+                        new SpawnEggItem(new Item.Properties().spawnEgg(EntitiesMCA.FEMALE_ZOMBIE_VILLAGER)));
+        Item GRIM_REAPER_SPAWN_EGG = register("grim_reaper_spawn_egg",
+                        new SpawnEggItem(new Item.Properties().spawnEgg(EntitiesMCA.GRIM_REAPER)));
         // Item GRIM_REAPER_SPAWN_EGG = register("grim_reaper_spawn_egg", new
         // SpawnEggItem(EntitiesMCA.GRIM_REAPER, 0x301515, 0x2A1C34, baseProps()));
 
