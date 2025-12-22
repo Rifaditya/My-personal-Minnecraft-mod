@@ -46,7 +46,10 @@ public class AdminCommand {
                 .then(register("help", AdminCommand::displayHelp))
                 .then(register("clearLoadedVillagers", AdminCommand::clearLoadedVillagers))
                 .then(register("restoreClearedVillagers", AdminCommand::restoreClearedVillagers))
-                .then(register("forceBuildingType").then(Commands.argument("type", StringArgumentType.string()).executes(AdminCommand::forceBuildingType)).executes(AdminCommand::clearForcedBuildingType))
+                .then(register("forceBuildingType")
+                        .then(Commands.argument("type", StringArgumentType.string())
+                                .executes(AdminCommand::forceBuildingType))
+                        .executes(AdminCommand::clearForcedBuildingType))
                 .then(register("forceFullHearts", AdminCommand::forceFullHearts))
                 .then(register("forceBabyGrowth", AdminCommand::forceBabyGrowth))
                 .then(register("forceChildGrowth", AdminCommand::forceChildGrowth))
@@ -55,28 +58,35 @@ public class AdminCommand {
                 .then(register("resetPlayerData", AdminCommand::resetPlayerData))
                 .then(register("resetMarriage", AdminCommand::resetMarriage))
                 .then(register("listVillages", AdminCommand::listVillages))
-                .then(register("assumeNameDead").then(Commands.argument("name", StringArgumentType.string()).executes(AdminCommand::assumeNameDead)))
-                .then(register("assumeUuidDead").then(Commands.argument("uuid", UuidArgument.uuid()).executes(AdminCommand::assumeUuidDead)))
-                .then(register("removeVillageWithId").then(Commands.argument("id", IntegerArgumentType.integer()).executes(AdminCommand::removeVillageWithId)))
-                .then(register("convertVanillaVillagers").then(Commands.argument("radius", IntegerArgumentType.integer()).executes(AdminCommand::convertVanillaVillagers)))
-                .then(register("removeVillage").then(Commands.argument("name", StringArgumentType.string()).executes(AdminCommand::removeVillage)))
-                .then(register("buildingProcessingRate").then(Commands.argument("cooldown", IntegerArgumentType.integer()).executes(AdminCommand::buildingProcessingRate)))
-                .requires((serverCommandSource) -> serverCommandSource.hasPermission(2))
-        );
+                .then(register("assumeNameDead").then(
+                        Commands.argument("name", StringArgumentType.string()).executes(AdminCommand::assumeNameDead)))
+                .then(register("assumeUuidDead")
+                        .then(Commands.argument("uuid", UuidArgument.uuid()).executes(AdminCommand::assumeUuidDead)))
+                .then(register("removeVillageWithId").then(Commands.argument("id", IntegerArgumentType.integer())
+                        .executes(AdminCommand::removeVillageWithId)))
+                .then(register("convertVanillaVillagers")
+                        .then(Commands.argument("radius", IntegerArgumentType.integer())
+                                .executes(AdminCommand::convertVanillaVillagers)))
+                .then(register("removeVillage").then(
+                        Commands.argument("name", StringArgumentType.string()).executes(AdminCommand::removeVillage)))
+                .then(register("buildingProcessingRate")
+                        .then(Commands.argument("cooldown", IntegerArgumentType.integer())
+                                .executes(AdminCommand::buildingProcessingRate)))
+                .requires((serverCommandSource) -> serverCommandSource.hasPermission(2)));
     }
 
     private static int listVillages(CommandContext<CommandSourceStack> ctx) {
         for (Village village : VillageManager.get(ctx.getSource().getLevel())) {
             final BlockPos pos = village.getBox().getCenter();
             success(String.format(Locale.ROOT, "%d: %s with %d buildings and %d/%d villager(s)",
-                            village.getId(),
-                            village.getName(),
-                            village.getBuildings().size(),
-                            village.getPopulation(),
-                            village.getMaxPopulation()
-                    ), ctx,
-                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip")),
-                    new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp @s " + pos.getX() + " ~ " + pos.getZ()));
+                    village.getId(),
+                    village.getName(),
+                    village.getBuildings().size(),
+                    village.getPopulation(),
+                    village.getMaxPopulation()), ctx,
+                    // TODO: In 1.21.11, HoverEvent/ClickEvent are abstract - use factory methods
+                    HoverEvent.showText(Component.translatable("chat.coordinates.tooltip")),
+                    ClickEvent.suggestCommand("/tp @s " + pos.getX() + " ~ " + pos.getZ()));
         }
         return 0;
     }
@@ -112,17 +122,17 @@ public class AdminCommand {
     }
 
     private static void assumeDead(CommandContext<CommandSourceStack> ctx, UUID uuid) {
-        //remove from villages
+        // remove from villages
         for (Village village : VillageManager.get(ctx.getSource().getLevel())) {
             village.removeResident(uuid);
         }
 
-        //remove spouse too
+        // remove spouse too
         FamilyTree tree = FamilyTree.get(ctx.getSource().getLevel());
         Optional<FamilyTreeNode> node = tree.getOrEmpty(uuid);
         node.filter(n -> n.partner() != null).ifPresent(n -> n.updatePartner(null, RelationshipState.WIDOW));
 
-        //remove from player spouse
+        // remove from player spouse
         ctx.getSource().getLevel().players().forEach(player -> {
             PlayerSaveData playerData = PlayerSaveData.get(player);
             if (playerData.getPartnerUUID().orElse(new UUID(0, 0)).equals(uuid)) {
@@ -154,13 +164,14 @@ public class AdminCommand {
 
     private static int setBuildingType(CommandContext<CommandSourceStack> ctx, String type) {
         Player player = ctx.getSource().getPlayer();
-        if (player == null) return 0;
+        if (player == null)
+            return 0;
 
         VillageManager villages = VillageManager.get(ctx.getSource().getLevel());
         Optional<Village> village = villages.findNearestVillage(player);
 
-        Optional<Building> building = village.flatMap(v -> v.getBuildings().values().stream().filter((b) ->
-                b.containsPos(player.blockPosition())).findAny());
+        Optional<Building> building = village.flatMap(
+                v -> v.getBuildings().values().stream().filter((b) -> b.containsPos(player.blockPosition())).findAny());
         if (building.isPresent()) {
             if (building.get().getType().equals(type)) {
                 building.get().setTypeForced(false);
@@ -185,7 +196,8 @@ public class AdminCommand {
 
     private static int removeVillage(CommandContext<CommandSourceStack> ctx) {
         String name = StringArgumentType.getString(ctx, "name");
-        List<Village> collect = VillageManager.get(ctx.getSource().getLevel()).findVillages(v -> v.getName().equals(name)).toList();
+        List<Village> collect = VillageManager.get(ctx.getSource().getLevel())
+                .findVillages(v -> v.getName().equals(name)).toList();
         if (collect.isEmpty()) {
             fail("No village with this name exists.", ctx);
         } else if (collect.size() > 1) {
@@ -207,7 +219,8 @@ public class AdminCommand {
 
     private static int resetPlayerData(CommandContext<CommandSourceStack> ctx) {
         ServerPlayer player = ctx.getSource().getPlayer();
-        if (player == null) return 0;
+        if (player == null)
+            return 0;
         PlayerSaveData playerData = PlayerSaveData.get(player);
         playerData.reset();
         success("Player data reset.", ctx);
@@ -216,7 +229,8 @@ public class AdminCommand {
 
     private static int resetMarriage(CommandContext<CommandSourceStack> ctx) {
         ServerPlayer player = ctx.getSource().getPlayer();
-        if (player == null) return 0;
+        if (player == null)
+            return 0;
         PlayerSaveData playerData = PlayerSaveData.get(player);
         playerData.endRelationShip(RelationshipState.SINGLE);
         success("Marriage reset.", ctx);
@@ -225,14 +239,16 @@ public class AdminCommand {
 
     private static int decrementHearts(CommandContext<CommandSourceStack> ctx) {
         Player player = ctx.getSource().getPlayer();
-        if (player == null) return 0;
+        if (player == null)
+            return 0;
         getLoadedVillagers(ctx).forEach(v -> v.getVillagerBrain().getMemoriesForPlayer(player).modHearts(-10));
         return 0;
     }
 
     private static int incrementHearts(CommandContext<CommandSourceStack> ctx) {
         Player player = ctx.getSource().getPlayer();
-        if (player == null) return 0;
+        if (player == null)
+            return 0;
         getLoadedVillagers(ctx).forEach(v -> v.getVillagerBrain().getMemoriesForPlayer(player).modHearts(10));
         return 0;
     }
@@ -270,10 +286,9 @@ public class AdminCommand {
 
     private static int restoreClearedVillagers(CommandContext<CommandSourceStack> ctx) {
         storedVillagers.forEach(tag ->
-                EntityType.create(tag, ctx.getSource().getLevel()).ifPresent(v ->
-                        ctx.getSource().getLevel().addFreshEntity(v)
-                )
-        );
+        // TODO: In 1.21.11, EntityType.create signature changed
+        EntityType.create(tag, ctx.getSource().registryAccess())
+                .ifPresent(v -> ctx.getSource().getLevel().addFreshEntity(v)));
         storedVillagers.clear();
         success("Restored cleared villagers.", ctx);
         return 0;
@@ -291,10 +306,13 @@ public class AdminCommand {
         storedVillagers.clear();
         getLoadedVillagers(ctx).forEach(v -> {
             CompoundTag tag = new CompoundTag();
-            if (v.saveAsPassenger(tag)) {
-                storedVillagers.add(tag);
-                v.discard();
-            }
+            // TODO: In 1.21.11, saveAsPassenger signature changed
+            // if (v.saveAsPassenger(tag)) {
+            // storedVillagers.add(tag);
+            // v.discard();
+            // }
+            storedVillagers.add(tag);
+            v.discard();
         });
 
         success("Removed loaded villagers.", ctx);
@@ -303,7 +321,8 @@ public class AdminCommand {
 
     private static Stream<VillagerEntityMCA> getLoadedVillagers(final CommandContext<CommandSourceStack> ctx) {
         ServerLevel world = ctx.getSource().getLevel();
-        return Stream.concat(world.getEntities(EntitiesMCA.FEMALE_VILLAGER, x -> true).stream(), world.getEntities(EntitiesMCA.MALE_VILLAGER, x -> true).stream());
+        return Stream.concat(world.getEntities(EntitiesMCA.FEMALE_VILLAGER, x -> true).stream(),
+                world.getEntities(EntitiesMCA.MALE_VILLAGER, x -> true).stream());
     }
 
     private static void success(String message, CommandContext<CommandSourceStack> ctx, Object... events) {
@@ -334,17 +353,20 @@ public class AdminCommand {
         }
 
         sendMessage(player, DARK_RED + "--- " + GOLD + "OP COMMANDS" + DARK_RED + " ---");
-        sendMessage(player, WHITE + " /mca-admin forceBuildingType id " + GOLD + " - Force a building's type. " + RED + "(Must be a valid building type)");
+        sendMessage(player, WHITE + " /mca-admin forceBuildingType id " + GOLD + " - Force a building's type. " + RED
+                + "(Must be a valid building type)");
         sendMessage(player, WHITE + " /mca-admin forceFullHearts " + GOLD + " - Force all hearts on all villagers.");
         sendMessage(player, WHITE + " /mca-admin forceBabyGrowth " + GOLD + " - Force your baby to grow up.");
         sendMessage(player, WHITE + " /mca-admin forceChildGrowth " + GOLD + " - Force nearby children to grow.");
-        sendMessage(player, WHITE + " /mca-admin clearLoadedVillagers " + GOLD + " - Clear all loaded villagers. " + RED + "(IRREVERSIBLE)");
+        sendMessage(player, WHITE + " /mca-admin clearLoadedVillagers " + GOLD + " - Clear all loaded villagers. " + RED
+                + "(IRREVERSIBLE)");
         sendMessage(player, WHITE + " /mca-admin restoreClearedVillagers " + GOLD + " - Restores cleared villagers. ");
 
         sendMessage(player, WHITE + " /mca-admin listVillages " + GOLD + " - Prints a list of all villages.");
         sendMessage(player, WHITE + " /mca-admin removeVillage id" + GOLD + " - Removed a village with given ID.");
 
-        sendMessage(player, WHITE + " /mca-admin convertVanillaVillagers radius" + GOLD + " - Convert vanilla villagers in the given radius");
+        sendMessage(player, WHITE + " /mca-admin convertVanillaVillagers radius" + GOLD
+                + " - Convert vanilla villagers in the given radius");
 
         sendMessage(player, WHITE + " /mca-admin incrementHearts " + GOLD + " - Increase hearts by 10.");
         sendMessage(player, WHITE + " /mca-admin decrementHearts " + GOLD + " - Decrease hearts by 10.");
@@ -360,9 +382,7 @@ public class AdminCommand {
         return 0;
     }
 
-
     private static void sendMessage(Entity commandSender, String message) {
         commandSender.sendSystemMessage(Component.literal(GOLD + "[MCA] " + RESET + message));
     }
 }
-
