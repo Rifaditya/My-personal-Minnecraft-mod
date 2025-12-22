@@ -2,28 +2,28 @@ package net.conczin.mca.resources;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.conczin.mca.MCA;
 import net.conczin.mca.entity.ai.relationship.Gender;
 import net.conczin.mca.resources.data.skin.Hair;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class HairList extends SimpleJsonResourceReloadListener {
+// Changed from SimpleJsonResourceReloadListener to SimplePreparableReloadListener for 1.21.11 compatibility
+public class HairList extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     protected static final Identifier ID = MCA.locate("skins/hair");
     private static HairList INSTANCE;
     public final HashMap<String, Hair> hair = new HashMap<>();
 
     public HairList() {
-        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
-        // super(Resources.GSON, "skins/hair");
-        super("skins/hair");
         INSTANCE = this;
     }
 
@@ -31,15 +31,25 @@ public class HairList extends SimpleJsonResourceReloadListener {
         return INSTANCE;
     }
 
-    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
-    // Object
     @Override
-    @SuppressWarnings("unchecked")
-    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
-        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
+    protected Map<Identifier, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> result = new HashMap<>();
+        String directory = "skins/hair";
+        for (Identifier id : manager.listResources(directory, path -> path.getPath().endsWith(".json")).keySet()) {
+            try (var reader = new InputStreamReader(manager.getResource(id).orElseThrow().open())) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                MCA.LOGGER.error("Failed to load JSON resource {}", id, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         hair.clear();
 
-        data.forEach((id, file) -> {
+        prepared.forEach((id, file) -> {
             Gender gender = Gender.byName(id.getPath().split("\\.")[0]);
 
             if (gender == Gender.UNASSIGNED) {

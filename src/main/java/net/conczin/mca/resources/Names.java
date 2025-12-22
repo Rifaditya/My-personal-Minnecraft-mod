@@ -1,6 +1,7 @@
 package net.conczin.mca.resources;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import net.conczin.mca.Config;
 import net.conczin.mca.MCA;
 import net.conczin.mca.entity.ai.relationship.Gender;
@@ -8,24 +9,23 @@ import net.conczin.mca.server.world.data.Nationality;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InputStreamReader;
 import java.util.*;
 
-public class Names extends SimpleJsonResourceReloadListener {
+// Changed from SimpleJsonResourceReloadListener to SimplePreparableReloadListener for 1.21.11 compatibility
+public class Names extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     public static final Map<String, Map<Gender, WeightedPool<String>>> NAMES_MAP = new HashMap<>();
     public static final List<String> REGION_NAMES = new LinkedList<>();
     protected static final Identifier ID = MCA.locate("mca_names");
     static final RandomSource random = RandomSource.create();
 
     public Names() {
-        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
-        // super(Resources.GSON, ID.getPath());
-        super(ID.getPath());
     }
 
     public static String getCitizenNation(Entity entity) {
@@ -46,15 +46,36 @@ public class Names extends SimpleJsonResourceReloadListener {
                 : NAMES_MAP.get(REGION_NAMES.get(random.nextInt(REGION_NAMES.size()))).get(gender.binary()).pickOne();
     }
 
-    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
-    // Object
     @Override
-    @SuppressWarnings("unchecked")
-    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
-        Map<Identifier, JsonElement> preparedMap = (Map<Identifier, JsonElement>) prepared;
+    protected Map<Identifier, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> result = new HashMap<>();
+        String directory = ID.getPath();
+        for (Identifier id : manager.listResources(directory, path -> path.getPath().endsWith(".json")).keySet()) {
+            try (var reader = new InputStreamReader(manager.getResource(id).orElseThrow().open())) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                MCA.LOGGER.error("Failed to load JSON resource {}", id, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         NAMES_MAP.clear();
-        for (Map.Entry<Identifier, JsonElement> entry : preparedMap.entrySet()) {
-            String[] split = entry.getKey().getPath().split("/");
+        for (Map.Entry<Identifier, JsonElement> entry : prepared.entrySet()) {
+            String path = entry.getKey().getPath();
+            // Remove directory and .json extension
+            if (path.contains("/")) {
+                path = path.substring(path.indexOf('/') + 1);
+            }
+            if (path.endsWith(".json")) {
+                path = path.substring(0, path.length() - 5);
+            }
+            String[] split = path.split("/");
+            if (split.length < 2)
+                continue;
+
             Gender gender = Gender.byName(split[1]);
 
             Map<Gender, WeightedPool<String>> map = NAMES_MAP.computeIfAbsent(split[0], a -> new HashMap<>());

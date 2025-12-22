@@ -2,33 +2,43 @@ package net.conczin.mca.entity.interaction.gifts;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import net.conczin.mca.MCA;
-import net.conczin.mca.resources.Resources;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
-public class GiftLoader extends SimpleJsonResourceReloadListener {
+// Changed from SimpleJsonResourceReloadListener to SimplePreparableReloadListener for 1.21.11 compatibility
+public class GiftLoader extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     protected static final Identifier ID = MCA.locate("gifts");
 
     public GiftLoader() {
-        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
-        // super(Resources.GSON, "gifts");
-        super("gifts");
     }
 
-    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
-    // Object
     @Override
-    @SuppressWarnings("unchecked")
-    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
-        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
+    protected Map<Identifier, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> result = new HashMap<>();
+        String directory = "gifts";
+        for (Identifier id : manager.listResources(directory, path -> path.getPath().endsWith(".json")).keySet()) {
+            try (var reader = new InputStreamReader(manager.getResource(id).orElseThrow().open())) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                MCA.LOGGER.error("Failed to load JSON resource {}", id, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         GiftType.REGISTRY.clear();
-        data.forEach((id, json) -> {
+        prepared.forEach((id, json) -> {
             try {
                 GiftType.REGISTRY.add(GiftType.fromJson(id, GsonHelper.convertToJsonObject(json, "root")));
             } catch (JsonParseException e) {

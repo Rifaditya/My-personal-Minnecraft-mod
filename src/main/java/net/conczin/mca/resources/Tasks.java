@@ -1,6 +1,7 @@
 package net.conczin.mca.resources;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import net.conczin.mca.MCA;
 import net.conczin.mca.resources.data.tasks.Task;
 import net.conczin.mca.resources.data.tasks.TaskRegistry;
@@ -8,22 +9,21 @@ import net.conczin.mca.server.world.data.Village;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Tasks extends SimpleJsonResourceReloadListener {
+// Changed from SimpleJsonResourceReloadListener to SimplePreparableReloadListener for 1.21.11 compatibility
+public class Tasks extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     protected static final Identifier ID = MCA.locate("tasks");
 
     private static Tasks INSTANCE;
     public final Map<Rank, List<Task>> tasks = new HashMap<>();
 
     public Tasks() {
-        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
-        // super(Resources.GSON, ID.getPath());
-        super(ID.getPath());
         INSTANCE = this;
     }
 
@@ -47,19 +47,36 @@ public class Tasks extends SimpleJsonResourceReloadListener {
         return Rank.OUTLAW;
     }
 
-    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
-    // Object
     @Override
-    @SuppressWarnings("unchecked")
-    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
-        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
+    protected Map<Identifier, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> result = new HashMap<>();
+        String directory = ID.getPath();
+        for (Identifier id : manager.listResources(directory, path -> path.getPath().endsWith(".json")).keySet()) {
+            try (var reader = new InputStreamReader(manager.getResource(id).orElseThrow().open())) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                MCA.LOGGER.error("Failed to load JSON resource {}", id, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         tasks.clear();
         for (Rank r : Rank.values()) {
             tasks.put(r, new LinkedList<>());
         }
 
-        data.forEach((id, file) -> {
-            Rank rank = Rank.fromName(id.getPath().split("\\.")[0]);
+        prepared.forEach((id, file) -> {
+            String path = id.getPath();
+            if (path.contains("/")) {
+                path = path.substring(path.lastIndexOf('/') + 1);
+            }
+            if (path.endsWith(".json")) {
+                path = path.substring(0, path.length() - 5);
+            }
+            Rank rank = Rank.fromName(path.split("\\.")[0]);
             file.getAsJsonArray().forEach(entry -> {
                 Task task = TaskRegistry.fromJson(entry.getAsJsonObject());
                 tasks.get(rank).add(task);
