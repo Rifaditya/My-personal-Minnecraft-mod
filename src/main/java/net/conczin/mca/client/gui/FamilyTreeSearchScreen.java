@@ -41,28 +41,32 @@ public class FamilyTreeSearchScreen extends Screen {
 
     @Override
     public void init() {
-        EditBox field = addRenderableWidget(new EditBox(this.font, width / 2 - DATA_WIDTH / 2, height / 2 - 80, DATA_WIDTH, 18, Component.translatable("structure_block.structure_name")));
+        EditBox field = addRenderableWidget(new EditBox(this.font, width / 2 - DATA_WIDTH / 2, height / 2 - 80,
+                DATA_WIDTH, 18, Component.translatable("structure_block.structure_name")));
         field.setMaxLength(32);
         field.setResponder(this::searchVillager);
         field.setFocused(true);
         setFocused(field);
 
-        addRenderableWidget(new ButtonWidget(width / 2 - 44, height / 2 + 82, 88, 20, Component.translatable("gui.done"), sender -> {
-            onClose();
-        }));
+        addRenderableWidget(new ButtonWidget(width / 2 - 44, height / 2 + 82, 88, 20,
+                Component.translatable("gui.done"), sender -> {
+                    onClose();
+                }));
 
-        addRenderableWidget(new ButtonWidget(width / 2 - 24 - 20, height / 2 + 60, 20, 20, Component.literal("<"), (b) -> {
-            if (pageNumber > 0) {
-                pageNumber--;
-            }
-        }));
+        addRenderableWidget(
+                new ButtonWidget(width / 2 - 24 - 20, height / 2 + 60, 20, 20, Component.literal("<"), (b) -> {
+                    if (pageNumber > 0) {
+                        pageNumber--;
+                    }
+                }));
         addRenderableWidget(new ButtonWidget(width / 2 + 24, height / 2 + 60, 20, 20, Component.literal(">"), (b) -> {
             if (pageNumber < Math.ceil(list.size() / 9.0) - 1) {
                 pageNumber++;
             }
         }));
-        buttonPage = addRenderableWidget(new ButtonWidget(width / 2 - 24, height / 2 + 60, 48, 20, Component.literal("0/0)"), (b) -> {
-        }));
+        buttonPage = addRenderableWidget(
+                new ButtonWidget(width / 2 - 24, height / 2 + 60, 48, 20, Component.literal("0/0)"), (b) -> {
+                }));
     }
 
     @Override
@@ -73,11 +77,13 @@ public class FamilyTreeSearchScreen extends Screen {
         this.mouseX = (int) (minecraft.mouseHandler.xpos() * width / minecraft.getWindow().getWidth());
         this.mouseY = (int) (minecraft.mouseHandler.ypos() * height / minecraft.getWindow().getHeight());
 
-        context.fill(width / 2 - DATA_WIDTH / 2 - 10, height / 2 - 110, width / 2 + DATA_WIDTH / 2 + 10, height / 2 + 110, 0x66000000);
+        context.fill(width / 2 - DATA_WIDTH / 2 - 10, height / 2 - 110, width / 2 + DATA_WIDTH / 2 + 10,
+                height / 2 + 110, 0x66000000);
 
         renderVillagers(context);
 
-        context.drawCenteredString(font, Component.translatable("gui.title.family_tree"), width / 2, height / 2 - 100, 16777215);
+        context.drawCenteredString(font, Component.translatable("gui.title.family_tree"), width / 2, height / 2 - 100,
+                16777215);
     }
 
     private void renderVillagers(GuiGraphics context) {
@@ -128,13 +134,14 @@ public class FamilyTreeSearchScreen extends Screen {
         return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h;
     }
 
-    @Override
+    // In 1.21.11, mouseClicked signature changed, removing @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (selectedVillager != null) {
             selectVillager(currentVillagerName, selectedVillager);
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        // TODO: In 1.21.11, super.mouseClicked signature changed
+        return false;
     }
 
     void selectVillager(String name, UUID villager) {
@@ -147,8 +154,6 @@ public class FamilyTreeSearchScreen extends Screen {
                 UUIDUtil.STREAM_CODEC, Entry::uuid,
                 ByteBufCodecs.STRING_UTF8, Entry::father,
                 ByteBufCodecs.STRING_UTF8, Entry::mother,
-                Entry::new
-        );
+                Entry::new);
     }
 }
-

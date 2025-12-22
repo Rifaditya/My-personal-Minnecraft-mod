@@ -333,16 +333,20 @@ public class FamilyTreeScreen extends Screen {
 
             if (deceased) {
                 Icon icon = MCAScreens.getInstance().getIcon("deceased");
-                context.blit(InteractScreen.ICON_TEXTURES, bounds.left + 6, bounds.top + 6, 0, icon.u(), icon.v(), 16,
-                        16, 256, 256);
+                // TODO: In 1.21.11, blit requires RenderType - disabled for now
+                // context.blit(InteractScreen.ICON_TEXTURES, bounds.left + 6, bounds.top + 6,
+                // 0, icon.u(), icon.v(), 16,
+                // 16, 256, 256);
 
-                if (isFocused && mouseX <= bounds.left + 20) {
-                    matrices.pushPose();
-                    matrices.translate(0, 0, 20);
-                    context.renderTooltip(font, Component.translatable("gui.family_tree.label.deceased"), mouseX,
-                            mouseY);
-                    matrices.popPose();
-                }
+                // TODO: In 1.21.11, renderTooltip signature changed
+                // if (isFocused && mouseX <= bounds.left + 20) {
+                // matrices.pushPose();
+                // matrices.translate(0, 0, 20);
+                // context.renderTooltip(font,
+                // Component.translatable("gui.family_tree.label.deceased"), mouseX,
+                // mouseY);
+                // matrices.popPose();
+                // }
             }
 
             if (spouse != null) {
@@ -356,9 +360,11 @@ public class FamilyTreeScreen extends Screen {
                         relationship == RelationshipState.ENGAGED ||
                         relationship == RelationshipState.PROMISED ||
                         relationship == RelationshipState.WIDOW) {
-                    Icon icon = MCAScreens.getInstance().getIcon(relationship.getIcon());
-                    context.blit(InteractScreen.ICON_TEXTURES, bounds.left - SPOUSE_HORIZONTAL_SPACING / 2 - 8, y - 8,
-                            0, icon.u(), icon.v(), 16, 16, 256, 256);
+                    // TODO: In 1.21.11, blit requires RenderType - disabled for now
+                    // Icon icon = MCAScreens.getInstance().getIcon(relationship.getIcon());
+                    // context.blit(InteractScreen.ICON_TEXTURES, bounds.left -
+                    // SPOUSE_HORIZONTAL_SPACING / 2 - 8, y - 8,
+                    // 0, icon.u(), icon.v(), 16, 16, 256, 256);
                 }
 
                 y -= spouse.label.size() * font.lineHeight / 2;
