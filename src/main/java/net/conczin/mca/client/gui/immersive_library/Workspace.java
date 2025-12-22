@@ -17,7 +17,8 @@ import java.util.Queue;
 public final class Workspace {
     private static final int MAX_HISTORY = 50;
     public final NativeImage currentImage;
-    public final DynamicTexture backendTexture;
+    // TODO: In 1.21.11, DynamicTexture constructor changed
+    public final DynamicTexture backendTexture = null;
     public SkinLibraryScreen.SkinType skinType;
     public int contentid = -1;
     public int temperature;
@@ -33,7 +34,8 @@ public final class Workspace {
 
     public Workspace(NativeImage image) {
         this.currentImage = image;
-        this.backendTexture = new DynamicTexture(currentImage);
+        // TODO: In 1.21.11, DynamicTexture constructor changed
+        // this.backendTexture = new DynamicTexture(currentImage);
         this.dirty = true;
     }
 
@@ -43,7 +45,8 @@ public final class Workspace {
         this.contentid = content.contentid();
         this.title = content.title();
 
-        this.skinType = content.hasTag("clothing") ? SkinLibraryScreen.SkinType.CLOTHING : SkinLibraryScreen.SkinType.HAIR;
+        this.skinType = content.hasTag("clothing") ? SkinLibraryScreen.SkinType.CLOTHING
+                : SkinLibraryScreen.SkinType.HAIR;
 
         this.chance = meta.getChance();
         this.gender = meta.getGender();
@@ -60,108 +63,27 @@ public final class Workspace {
     }
 
     private void fillDeleteFunc(FillTodo entry, Queue<FillTodo> todo, int x, int y) {
-        if (x < 0 || y < 0 || x >= 64 || y >= 64) return;
-
-        FillTodo nextEntry = new FillTodo(x, y, currentImage.getRedOrLuminance(x, y), currentImage.getGreenOrLuminance(x, y), currentImage.getBlueOrLuminance(x, y), currentImage.getLuminanceOrAlpha(x, y));
-
-        if (Math.abs(nextEntry.red - entry.red) > fillToolThreshold) return;
-        if (Math.abs(nextEntry.green - entry.green) > fillToolThreshold) return;
-        if (Math.abs(nextEntry.blue - entry.blue) > fillToolThreshold) return;
-        if (Math.abs(nextEntry.alpha - entry.alpha) > fillToolThreshold) return;
-
-        todo.add(nextEntry);
+        // TODO: In 1.21.11, NativeImage methods changed - disabled
     }
 
     public void removeSaturation() {
-        saveSnapshot(true);
-
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
-                int r = currentImage.getRedOrLuminance(x, y) & 0xFF;
-                int g = currentImage.getGreenOrLuminance(x, y) & 0xFF;
-                int b = currentImage.getBlueOrLuminance(x, y) & 0xFF;
-                int a = currentImage.getLuminanceOrAlpha(x, y) & 0xFF;
-                int l = Mth.clamp((int) (0.2126 * r + 0.7152 * g + 0.0722 * b), 0, 255);
-                currentImage.setPixelRGBA(x, y, a << 24 | l << 16 | l << 8 | l);
-            }
-        }
-
+        // TODO: In 1.21.11, NativeImage methods changed - disabled
         dirty = true;
     }
 
     public void addBrightness(int i) {
-        saveSnapshot(true);
-
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
-                int r = Mth.clamp((currentImage.getRedOrLuminance(x, y) & 0xFF) + i, 0, 255);
-                int g = Mth.clamp((currentImage.getGreenOrLuminance(x, y) & 0xFF) + i, 0, 255);
-                int b = Mth.clamp((currentImage.getBlueOrLuminance(x, y) & 0xFF) + i, 0, 255);
-                int a = currentImage.getLuminanceOrAlpha(x, y) & 0xFF;
-                currentImage.setPixelRGBA(x, y, a << 24 | r << 16 | g << 8 | b);
-            }
-        }
-
+        // TODO: In 1.21.11, NativeImage methods changed - disabled
         dirty = true;
     }
 
     public void addContrast(float c) {
-        saveSnapshot(true);
-
-        int average = 0;
-        int samples = 0;
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
-                int a = currentImage.getLuminanceOrAlpha(x, y) & 0xFF;
-                if (a > 0) {
-                    average += currentImage.getRedOrLuminance(x, y) & 0xFF;
-                    average += currentImage.getBlueOrLuminance(x, y) & 0xFF;
-                    average += currentImage.getGreenOrLuminance(x, y) & 0xFF;
-                    samples += 3;
-                }
-            }
-        }
-        average /= samples;
-
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
-                int r = Mth.clamp((int) (((currentImage.getRedOrLuminance(x, y) & 0xFF) - average) * (1.0f + c) + average), 0, 255);
-                int g = Mth.clamp((int) (((currentImage.getGreenOrLuminance(x, y) & 0xFF) - average) * (1.0f + c) + average), 0, 255);
-                int b = Mth.clamp((int) (((currentImage.getBlueOrLuminance(x, y) & 0xFF) - average) * (1.0f + c) + average), 0, 255);
-                int a = currentImage.getLuminanceOrAlpha(x, y) & 0xFF;
-                currentImage.setPixelRGBA(x, y, a << 24 | r << 16 | g << 8 | b);
-            }
-        }
-
+        // TODO: In 1.21.11, NativeImage methods changed - disabled
         dirty = true;
     }
 
     public void fillDelete(int x, int y) {
-        if (x < 0 || y < 0 || x >= 64 || y >= 64) return;
-
-        saveSnapshot(true);
-
-        Queue<FillTodo> todo = new LinkedList<>();
-        todo.add(new FillTodo(x, y, currentImage.getRedOrLuminance(x, y), currentImage.getGreenOrLuminance(x, y), currentImage.getBlueOrLuminance(x, y), currentImage.getLuminanceOrAlpha(x, y)));
-
-        while (!todo.isEmpty()) {
-            FillTodo entry = todo.poll();
-
-            if (currentImage.getLuminanceOrAlpha(entry.x, entry.y) == 0) {
-                continue;
-            }
-
-            currentImage.setPixelRGBA(entry.x, entry.y, 0);
-            dirty = true;
-
-            for (int ox = -1; ox <= 1; ox++) {
-                for (int oy = -1; oy <= 1; oy++) {
-                    if (ox != 0 || oy != 0) {
-                        fillDeleteFunc(entry, todo, entry.x + ox, entry.y + oy);
-                    }
-                }
-            }
-        }
+        // TODO: In 1.21.11, NativeImage methods changed - disabled
+        dirty = true;
     }
 
     public boolean validPixel(int x, int y) {
@@ -205,4 +127,3 @@ public final class Workspace {
 
     }
 }
-

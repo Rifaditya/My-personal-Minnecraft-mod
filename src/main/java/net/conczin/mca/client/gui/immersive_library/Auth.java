@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import net.conczin.mca.Config;
 import net.conczin.mca.MCA;
 
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,7 +52,7 @@ public class Auth {
     }
 
     public static void clearToken() {
-        //noinspection ResultOfMethodCallIgnored
+        // noinspection ResultOfMethodCallIgnored
         Paths.get("./immersiveLibraryToken_v2").toFile().delete();
     }
 
@@ -64,7 +63,8 @@ public class Auth {
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
+                if (hex.length() == 1)
+                    hexString.append('0');
                 hexString.append(hex);
             }
             return hexString.toString();
@@ -85,8 +85,14 @@ public class Auth {
         currentToken = newToken();
 
         // Open the authorization URL in the user's default web browser
-        String url = Config.getInstance().immersiveLibraryUrl + "/v1/login?state=" + createDataState(username, currentToken);
-        Util.getPlatform().openUri(url);
+        String url = Config.getInstance().immersiveLibraryUrl + "/v1/login?state="
+                + createDataState(username, currentToken);
+        // TODO: In 1.21.11, Util.getPlatform().openUri() changed
+        // Using simplified approach - just attempt to open via Desktop
+        try {
+            java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+        } catch (Exception e) {
+            MCA.LOGGER.error("Failed to open authentication URL: " + url, e);
+        }
     }
 }
-

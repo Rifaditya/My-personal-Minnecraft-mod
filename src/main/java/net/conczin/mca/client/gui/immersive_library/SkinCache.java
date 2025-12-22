@@ -37,7 +37,7 @@ public class SkinCache {
     private static final Gson gson = new Gson();
 
     private static File getFile(String key) {
-        //noinspection ResultOfMethodCallIgnored
+        // noinspection ResultOfMethodCallIgnored
         new File("./immersive_library/").mkdirs();
 
         return new File("./immersive_library/" + key);
@@ -65,7 +65,8 @@ public class SkinCache {
 
     /**
      * @param contentid The content id
-     *                  Enforces re downloading the assets, mostly when local files appear to be corrupted
+     *                  Enforces re downloading the assets, mostly when local files
+     *                  appear to be corrupted
      */
     public static void enforceSync(int contentid) {
         try {
@@ -106,17 +107,21 @@ public class SkinCache {
                 loadResources(contentid);
             }
         } else {
-            // Outdated, but we have a cached version, lets use that while we wait for the result
+            // Outdated, but we have a cached version, lets use that while we wait for the
+            // result
             if (version >= 0 && !textureIdentifiers.containsKey(contentid)) {
                 loadResources(contentid);
             }
 
             // Download assets when versions mismatch
-            if (!requested.containsKey(contentid) && (currentVersion > version || !textureIdentifiers.containsKey(contentid))) {
+            if (!requested.containsKey(contentid)
+                    && (currentVersion > version || !textureIdentifiers.containsKey(contentid))) {
                 requested.put(contentid, true);
                 CompletableFuture.runAsync(() -> {
-                    logger("Requested asset " + contentid + " with version " + version + " and current version " + currentVersion);
-                    Response response = request(Api.HttpMethod.GET, ContentResponse.class, "content/mca/" + contentid, Map.of("version", String.valueOf(version)));
+                    logger("Requested asset " + contentid + " with version " + version + " and current version "
+                            + currentVersion);
+                    Response response = request(Api.HttpMethod.GET, ContentResponse.class, "content/mca/" + contentid,
+                            Map.of("version", String.valueOf(version)));
                     if (response instanceof ContentResponse(Content content)) {
                         int newVersion = content.version();
                         write(contentid + ".png", Base64.getDecoder().decode(content.data()));
@@ -134,7 +139,8 @@ public class SkinCache {
 
     /**
      * @param contentid The content id
-     *                  Loads the resources from the disk and creates the texture identifier
+     *                  Loads the resources from the disk and creates the texture
+     *                  identifier
      */
     private static void loadResources(int contentid) {
         logger("Loaded asset " + contentid);
@@ -157,7 +163,9 @@ public class SkinCache {
             Identifier identifier = Identifier.fromNamespaceAndPath("immersive_library", String.valueOf(contentid));
 
             TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-            textureManager.register(identifier, new DynamicTexture(image));
+            // TODO: In 1.21.11, DynamicTexture constructor changed
+            // textureManager.register(identifier, new DynamicTexture(image));
+            // Texture registration disabled for now
 
             textureIdentifiers.put(contentid, identifier);
             images.put(contentid, image);
@@ -168,7 +176,7 @@ public class SkinCache {
     }
 
     private static void logger(String s) {
-        //noinspection ConstantConditions
+        // noinspection ConstantConditions
         if (false) {
             MCA.LOGGER.info(s);
         }
@@ -192,11 +200,11 @@ public class SkinCache {
     /**
      * @param contentid The content id
      * @return The texture identifier
-     * Unlike the other getters this function will sync at least once no matter the local state of the cache, as it lacks the current version
+     *         Unlike the other getters this function will sync at least once no
+     *         matter the local state of the cache, as it lacks the current version
      */
     public static Identifier getTextureIdentifier(int contentid) {
         sync(contentid, -2);
         return textureIdentifiers.getOrDefault(contentid, DEFAULT_SKIN);
     }
 }
-
