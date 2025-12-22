@@ -12,7 +12,9 @@ public class HorizontalGradientWidget extends HorizontalColorPickerWidget {
     private final Supplier<float[]> startColorSupplier;
     private final Supplier<float[]> endColorSupplier;
 
-    public HorizontalGradientWidget(int x, int y, int width, int height, double valueX, Supplier<float[]> startColorSupplier, Supplier<float[]> endColorSupplier, DualConsumer<Double, Double> consumer) {
+    public HorizontalGradientWidget(int x, int y, int width, int height, double valueX,
+            Supplier<float[]> startColorSupplier, Supplier<float[]> endColorSupplier,
+            DualConsumer<Double, Double> consumer) {
         super(x, y, width, height, valueX, null, consumer);
 
         this.startColorSupplier = startColorSupplier;
@@ -21,30 +23,17 @@ public class HorizontalGradientWidget extends HorizontalColorPickerWidget {
 
     @Override
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        // TODO: In 1.21.11, RenderSystem.enableBlend/defaultBlendFunc/setShader removed
+        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
+        // Gradient rendering disabled for now
 
-        float[] startColor = startColorSupplier.get();
-        float[] endColor = endColorSupplier.get();
-
-        float z = 0.0f;
-        final PoseStack matrices = context.pose();
-        Matrix4f matrix = matrices.last().pose();
-        builder.addVertex(matrix, (float) getX() + width, (float) getY(), z).setColor(endColor[0], endColor[1], endColor[2], endColor[3]);
-        builder.addVertex(matrix, (float) getX(), (float) getY(), z).setColor(startColor[0], startColor[1], startColor[2], startColor[3]);
-        builder.addVertex(matrix, (float) getX(), (float) getY() + height, z).setColor(startColor[0], startColor[1], startColor[2], startColor[3]);
-        builder.addVertex(matrix, (float) getX() + width, (float) getY() + height, z).setColor(endColor[0], endColor[1], endColor[2], endColor[3]);
-
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-
-        RenderSystem.disableBlend();
+        // Draw simple fallback
+        context.fill(getX(), getY(), getX() + width, getY() + height, 0xFF808080);
 
         WidgetUtils.drawRectangle(context, getX(), getY(), getX() + width, getY() + height, 0xaaffffff);
 
-        context.blit(MCA_GUI_ICONS_TEXTURE, (int) (getX() + valueX * width) - 8, (int) (getY() + valueY * height) - 8, 240, 0, 16, 16, 256, 256);
+        // TODO: In 1.21.11, blit requires RenderType
+        // context.blit(MCA_GUI_ICONS_TEXTURE, (int) (getX() + valueX * width) - 8,
+        // (int) (getY() + valueY * height) - 8, 240, 0, 16, 16, 256, 256);
     }
 }
-

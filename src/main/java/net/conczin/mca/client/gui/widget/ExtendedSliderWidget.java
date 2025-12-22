@@ -14,7 +14,8 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
     final Consumer<T> onApplyValue;
     private T oldValue;
 
-    public ExtendedSliderWidget(int x, int y, int width, int height, Component text, double value, Consumer<T> onApplyValue, Supplier<Component> tooltipSupplier) {
+    public ExtendedSliderWidget(int x, int y, int width, int height, Component text, double value,
+            Consumer<T> onApplyValue, Supplier<Component> tooltipSupplier) {
         super(x, y, width, height, text, value);
         this.onApplyValue = onApplyValue;
         this.tooltipSupplier = tooltipSupplier;
@@ -31,8 +32,10 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
         int i = (this.isHovered() ? 2 : 1) * 20;
 
         // TODO
-        //context.blit(WIDGETS_LOCATION, this.getX() + (int) (getOpticalValue() * (double) (this.width - 8)), this.getY(), 0, 46 + i, 4, 20);
-        //context.blit(WIDGETS_LOCATION, this.getX() + (int) (getOpticalValue() * (double) (this.width - 8)) + 4, this.getY(), 196, 46 + i, 4, 20);
+        // context.blit(WIDGETS_LOCATION, this.getX() + (int) (getOpticalValue() *
+        // (double) (this.width - 8)), this.getY(), 0, 46 + i, 4, 20);
+        // context.blit(WIDGETS_LOCATION, this.getX() + (int) (getOpticalValue() *
+        // (double) (this.width - 8)) + 4, this.getY(), 196, 46 + i, 4, 20);
 
         super.renderWidget(context, mouseX, mouseY, delta);
 
@@ -51,7 +54,8 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
     }
 
     public void renderTooltip(GuiGraphics context, int mouseX, int mouseY) {
-        context.renderComponentTooltip(Minecraft.getInstance().font, FlowingText.wrap(tooltipSupplier.get(), 160), mouseX, mouseY);
+        // TODO: In 1.21.11, renderComponentTooltip doesn't exist
+        // context.renderComponentTooltip(Minecraft.getInstance().font,
+        // FlowingText.wrap(tooltipSupplier.get(), 160), mouseX, mouseY);
     }
 }
-

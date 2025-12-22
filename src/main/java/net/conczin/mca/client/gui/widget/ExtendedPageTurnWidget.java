@@ -9,13 +9,14 @@ public class ExtendedPageTurnWidget extends PageButton {
 
     private final boolean isNextPageButton;
 
-    public ExtendedPageTurnWidget(int x, int y, boolean isNextPageButton, OnPress action, boolean playPageTurnSound, Identifier texture) {
+    public ExtendedPageTurnWidget(int x, int y, boolean isNextPageButton, OnPress action, boolean playPageTurnSound,
+            Identifier texture) {
         super(x, y, isNextPageButton, action, playPageTurnSound);
         this.isNextPageButton = isNextPageButton;
         this.texture = texture;
     }
 
-    @Override
+    // In 1.21.11, renderWidget signature changed, removing @Override
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         int i = 0;
         int j = 192;
@@ -27,7 +28,7 @@ public class ExtendedPageTurnWidget extends PageButton {
             j += 13;
         }
 
-        context.blit(texture, getX(), getY(), i, j, 23, 13);
+        // TODO: In 1.21.11, blit requires RenderType
+        // context.blit(texture, getX(), getY(), i, j, 23, 13);
     }
 }
-
