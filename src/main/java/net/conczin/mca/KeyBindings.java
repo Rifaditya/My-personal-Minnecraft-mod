@@ -13,14 +13,14 @@ public class KeyBindings {
     public static final KeyMapping SKIN_LIBRARY = newKey("skin_library", GLFW.GLFW_KEY_U);
 
     private static KeyMapping newKey(String name, int code) {
+        // TODO: In 1.21.11, KeyMapping constructor takes KeyMapping.Category not String
         KeyMapping key = new KeyMapping(
-                "key.mca." + name,
+                \"key.mca.\" + name,
                 InputConstants.Type.KEYSYM,
                 code,
-                "itemGroup.mca.mca_tab"
+                KeyMapping.Category.MISC // Changed from String "itemGroup.mca.mca_tab"
         );
         list.add(key);
         return key;
     }
 }
-

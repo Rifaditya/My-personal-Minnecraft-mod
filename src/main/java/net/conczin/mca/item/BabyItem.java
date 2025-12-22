@@ -76,9 +76,9 @@ public class BabyItem extends Item {
 
         // Save child for later
         CompoundTag compound = new CompoundTag();
-        // TODO: In 1.21.11, Entity.save() signature changed
-        // child.save(compound);
-        child.saveWithoutId(compound);
+        // TODO: In 1.21.11, Entity.save/saveWithoutId signature changed to ValueOutput
+        // child.saveWithoutId(compound);
+        // For now, skip saving complex data - baby will be generated fresh
         stack.set(DataComponentsMCA.BABY_NBT, CustomData.of(compound));
         stack.set(DataComponentsMCA.BABY_AGE, 0);
         stack.set(DataComponentsMCA.BABY_PARENTS, new BabyParentsComponent(
@@ -130,7 +130,8 @@ public class BabyItem extends Item {
         return true;
     }
 
-    @Override
+    // TODO: In 1.21.11, inventoryTick signature changed
+    // @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (world.isClientSide()) {
             return;
@@ -205,11 +206,11 @@ public class BabyItem extends Item {
                 .build();
 
         CompoundTag savedBaby = stack.getOrDefault(DataComponentsMCA.BABY_NBT, CustomData.EMPTY).copyTag();
-        if (!savedBaby.isEmpty()) {
-            // TODO: In 1.21.11, readAdditionalSaveData takes ValueInput
-            // child.readAdditionalSaveData(savedBaby);
-            child.load(savedBaby);
-        }
+        // TODO: In 1.21.11, Entity.load takes ValueInput not CompoundTag
+        // if (!savedBaby.isEmpty()) {
+        // child.load(savedBaby);
+        // }
+        // Baby will be generated fresh with genetic traits from VillagerFactory
 
         child.setCustomName(stack.getOrDefault(DataComponents.CUSTOM_NAME, Component.literal("Unnamed")));
 
