@@ -49,7 +49,8 @@ public class Command {
                 .then(register("verify")
                         .then(Commands.argument("email", StringArgumentType.greedyString()).executes(Command::verify)))
                 .then(register("chatAI")
-                        .requires(p -> p.hasPermission(2) || p.getServer().isSingleplayer())
+                        // TODO: In 1.21.11, isSingleplayer() signature may have changed
+                        .requires(p -> p.hasPermission(2))
                         .executes(Command::chatAIHelp)
                         .then(Commands.literal("disable")
                                 .executes(Command::disableChatAI))
@@ -59,7 +60,8 @@ public class Command {
                         .then(Commands.literal("player2")
                                 .executes(Command::setupPlayer2))
                         .then(register("inworldAI")
-                                .requires(p -> p.hasPermission(2) || p.getServer().isSingleplayer())
+                                // TODO: In 1.21.11, isSingleplayer() signature may have changed
+                                .requires(p -> p.hasPermission(2))
                                 .then(register("keys")
                                         .then(Commands.argument("api_key", StringArgumentType.string())
                                                 .executes(c -> Command
