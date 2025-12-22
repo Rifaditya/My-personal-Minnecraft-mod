@@ -1,22 +1,25 @@
 package net.conczin.mca.client.gui;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import net.conczin.mca.MCA;
 import net.conczin.mca.client.resources.Icon;
 import net.conczin.mca.resources.Resources;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class MCAScreens extends SimpleJsonResourceReloadListener {
+// Changed from SimpleJsonResourceReloadListener to SimplePreparableReloadListener for 1.21.11 compatibility
+public class MCAScreens extends SimplePreparableReloadListener<Map<Identifier, JsonElement>> {
     protected static final Identifier ID = MCA.locate("screens");
     private static final Type ICONS_TYPE = new TypeToken<Map<String, Icon>>() {
     }.getType();
@@ -26,9 +29,6 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
     private final Map<String, Icon> icons = new HashMap<>();
 
     public MCAScreens() {
-        // TODO: In 1.21.11, SimpleJsonResourceReloadListener takes Codec not Gson
-        // super(Resources.GSON, "api/gui");
-        super("api/gui");
         INSTANCE = this;
     }
 
@@ -36,15 +36,25 @@ public class MCAScreens extends SimpleJsonResourceReloadListener {
         return INSTANCE;
     }
 
-    // In 1.21.11, SimplePreparableReloadListener.apply() signature changed to
-    // Object
     @Override
-    @SuppressWarnings("unchecked")
-    protected void apply(Object prepared, ResourceManager manager, ProfilerFiller profiler) {
-        Map<Identifier, JsonElement> data = (Map<Identifier, JsonElement>) prepared;
+    protected Map<Identifier, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<Identifier, JsonElement> result = new HashMap<>();
+        String directory = "api/gui";
+        for (Identifier id : manager.listResources(directory, path -> path.getPath().endsWith(".json")).keySet()) {
+            try (var reader = new InputStreamReader(manager.getResource(id).orElseThrow().open())) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                MCA.LOGGER.error("Failed to load JSON resource {}", id, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         buttons.clear();
         icons.clear();
-        data.forEach(this::loadScreen);
+        prepared.forEach(this::loadScreen);
     }
 
     private void loadScreen(Identifier id, JsonElement element) {
