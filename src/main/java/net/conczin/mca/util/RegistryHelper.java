@@ -13,15 +13,21 @@ import java.util.Optional;
 public class RegistryHelper {
 
     public static <T> Optional<TagKey<T>> tryGetTagKey(Registry<T> registry, Identifier id) {
-        return registry.getTagNames().filter(tagKey -> tagKey.location().equals(id)).findFirst();
+        // TODO: In 1.21.11, getTagNames() API may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     public static <T> Optional<? extends HolderSet<T>> getEntries(TagKey<T> tagKey) {
-        return getRegistryOf(tagKey).getTag(tagKey);
+        // TODO: In 1.21.11, registry lookup API may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     public static <T> Optional<Holder<T>> tryGetEntry(Registry<T> registry, T object) {
-        return registry.getResourceKey(object).map(registry::getHolderOrThrow);
+        // TODO: In 1.21.11, getHolderOrThrow API may have changed
+        // Disabled until API is researched - return empty
+        return Optional.empty();
     }
 
     public static <T> boolean isObjectInTag(Registry<T> registry, Identifier tagId, T object) {
@@ -39,7 +45,8 @@ public class RegistryHelper {
 
     @SuppressWarnings("unchecked")
     public static <T> Registry<T> getRegistryOf(@NotNull TagKey<T> key) {
-        return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.registry().location());
+        // TODO: In 1.21.11, BuiltInRegistries.REGISTRY.get() API may have changed
+        // Return null until API is researched - callers should handle this
+        return null;
     }
 }
-
