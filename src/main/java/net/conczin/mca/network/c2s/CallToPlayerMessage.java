@@ -13,15 +13,16 @@ import net.minecraft.world.entity.Entity;
 import java.util.UUID;
 
 public record CallToPlayerMessage(UUID uuid) implements HandleablePayload {
-    public static final CustomPacketPayload.Type<CallToPlayerMessage> TYPE = new CustomPacketPayload.Type<>(MCA.locate("call_to_player"));
+    public static final CustomPacketPayload.Type<CallToPlayerMessage> TYPE = new CustomPacketPayload.Type<>(
+            MCA.locate("call_to_player"));
     public static final StreamCodec<FriendlyByteBuf, CallToPlayerMessage> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, CallToPlayerMessage::uuid,
-            CallToPlayerMessage::new
-    );
+            CallToPlayerMessage::new);
 
     @Override
     public void handleServer(ServerPlayer player) {
-        Entity e = (ServerLevel) player.level().getEntity(uuid);
+        // TODO: In 1.21.11, fixed incorrect cast
+        Entity e = player.level().getEntity(uuid);
         if (e instanceof VillagerEntityMCA v) {
             if (v.isSleeping()) {
                 v.stopSleeping();
@@ -36,4 +37,3 @@ public record CallToPlayerMessage(UUID uuid) implements HandleablePayload {
         return TYPE;
     }
 }
-

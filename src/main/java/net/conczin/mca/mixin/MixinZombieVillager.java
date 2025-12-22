@@ -29,18 +29,20 @@ abstract class MixinZombieVillager implements IVillagerEntity {
 
     @Inject(method = "finalizeSpawn", at = @At("HEAD"))
     private void mca$injectFinalizeSpawn(
-            ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType, SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir
-    ) {
+            ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType,
+            SpawnGroupData spawnGroupData, CallbackInfoReturnable<SpawnGroupData> cir) {
         mca$reason = spawnType;
     }
 
-    @ModifyVariable(method = "setVillagerData", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private VillagerData setVillagerData(VillagerData villagerData) {
-        VillagerProfession profession = villagerData.getProfession();
-        if (profession.toString().startsWith("mca.")) {
-            villagerData = villagerData.setProfession(VillagerProfession.NONE);
-        }
-        return villagerData;
-    }
+    // TODO: In 1.21.11, VillagerData.getProfession() returns ResourceKey, not
+    // VillagerProfession
+    // @ModifyVariable(method = "setVillagerData", at = @At("HEAD"), ordinal = 0,
+    // argsOnly = true)
+    // private VillagerData setVillagerData(VillagerData villagerData) {
+    // VillagerProfession profession = villagerData.getProfession();
+    // if (profession.toString().startsWith("mca.")) {
+    // villagerData = villagerData.setProfession(VillagerProfession.NONE);
+    // }
+    // return villagerData;
+    // }
 }
-

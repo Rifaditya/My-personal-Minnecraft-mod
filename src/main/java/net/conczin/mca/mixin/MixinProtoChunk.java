@@ -17,22 +17,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// TODO: In 1.21.11, ChunkAccess constructor signature changed significantly
+// This mixin is disabled until proper constructor signature is determined
 @Mixin(ProtoChunk.class)
-abstract class MixinProtoChunk extends ChunkAccess {
-    // TODO: In 1.21.11, ChunkAccess constructor signature changed
-    // public MixinProtoChunk(ChunkPos chunkPos, UpgradeData upgradeData,
-    // LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l,
-    // @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData
-    // blendingData) {
-    // super(chunkPos, upgradeData, levelHeightAccessor, registry, l,
-    // levelChunkSections, blendingData);
-    // }
-    public MixinProtoChunk(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, long l,
-            @Nullable LevelChunkSection[] levelChunkSections, @Nullable BlendingData blendingData) {
-        super(chunkPos, upgradeData, levelHeightAccessor, l, levelChunkSections, blendingData);
-    }
-
-    // TODO: addEntity method may have changed
+abstract class MixinProtoChunk {
+    // Mixin body disabled - ChunkAccess constructor incompatible
     // @Inject(method = "addEntity(Lnet/minecraft/world/entity/Entity;)V", at =
     // @At("HEAD"), cancellable = true)
     // private void onAddEntity(Entity entity, CallbackInfo info) {

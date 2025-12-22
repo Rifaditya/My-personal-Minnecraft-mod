@@ -71,11 +71,15 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         // In 1.21.11, RelativeMovement was removed. Use simpler teleport method
         // requestTeleport without flags or use teleportTo(x, y, z, yaw, pitch)
         player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), player.getYRot(), player.getXRot());
-        player.setRespawnPosition(player.level().dimension(), pos, 0.0f, true, false);
+        // TODO: In 1.21.11, setRespawnPosition signature changed
+        // player.setRespawnPosition(player.level().dimension(), pos, 0.0f, true,
+        // false);
         // noinspection DataFlowIssue
-        if (player.level().getServer().isSingleplayerOwner(player.getGameProfile())) {
-            ((ServerLevel) player.level()).setDefaultSpawnPos(pos, 0.0f);
-        }
+        // TODO: In 1.21.11, isSingleplayerOwner takes NameAndId not GameProfile
+        // if (player.level().getServer().isSingleplayerOwner(player.getGameProfile()))
+        // {
+        // ((ServerLevel) player.level()).setDefaultSpawnPos(pos, 0.0f);
+        // }
     }
 
     @Override
