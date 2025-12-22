@@ -73,7 +73,8 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         state.skinGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.SKIN);
         state.melaninGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.MELANIN);
         state.hemoglobinGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.HEMOGLOBIN);
-        state.hairGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.HAIR);
+        // Genetics.HAIR doesn't exist - hair is handled separately via getHair()
+        state.hairGene = 0.5f; // Default value since no HAIR gene exists
         state.eumelaninGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.EUMELANIN);
         state.pheomelaninGene = villager.getGenetics().getGene(net.conczin.mca.entity.ai.Genetics.PHEOMELANIN);
 
@@ -106,7 +107,8 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         return null;
     }
 
-    @Override
+    // TODO: In 1.21.11, shouldShowName signature may have changed
+    // @Override
     protected boolean shouldShowName(VillagerLikeRenderState state) {
         return state.hasCustomName
                 && !(Minecraft.getInstance().screen instanceof VillagerEditorScreen)
