@@ -33,56 +33,65 @@ import java.util.stream.Collectors;
 public class Command {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal(MCA.MOD_ID)
-                .then(register("propose").then(Commands.argument("target", EntityArgument.player()).executes(Command::propose)))
-                .then(register("accept").then(Commands.argument("target", EntityArgument.player()).executes(Command::accept)))
+                .then(register("propose")
+                        .then(Commands.argument("target", EntityArgument.player()).executes(Command::propose)))
+                .then(register("accept")
+                        .then(Commands.argument("target", EntityArgument.player()).executes(Command::accept)))
                 .then(register("proposals", Command::displayProposal))
                 .then(register("procreate", Command::procreate))
                 .then(register("separate", Command::separate))
-                .then(register("reject").then(Commands.argument("target", EntityArgument.player()).executes(Command::reject)))
+                .then(register("reject")
+                        .then(Commands.argument("target", EntityArgument.player()).executes(Command::reject)))
                 .then(register("editor", Command::editor))
                 .then(register("destiny", Command::destiny))
                 .then(register("mail", Command::mail))
-                .then(register("verify").then(Commands.argument("email", StringArgumentType.greedyString()).executes(Command::verify)))
+                .then(register("verify")
+                        .then(Commands.argument("email", StringArgumentType.greedyString()).executes(Command::verify)))
                 .then(register("chatAI")
                         .requires(p -> p.hasPermission(2) || p.getServer().isSingleplayer())
                         .executes(Command::chatAIHelp)
                         .then(Commands.literal("disable")
                                 .executes(Command::disableChatAI))
                         .then(Commands.literal("default")
-                                .executes(c -> Command.enableChatAI(c, "default", (new Config()).villagerChatAIEndpoint, "")))
+                                .executes(c -> Command.enableChatAI(c, "default", (new Config()).villagerChatAIEndpoint,
+                                        "")))
                         .then(Commands.literal("player2")
                                 .executes(Command::setupPlayer2))
                         .then(register("inworldAI")
                                 .requires(p -> p.hasPermission(2) || p.getServer().isSingleplayer())
                                 .then(register("keys")
                                         .then(Commands.argument("api_key", StringArgumentType.string())
-                                                .executes(c -> Command.inworldAIKey(c.getArgument("api_key", String.class)))))
+                                                .executes(c -> Command
+                                                        .inworldAIKey(c.getArgument("api_key", String.class)))))
                                 .then(register("addCharacter")
                                         .then(Commands.argument("villager_name", StringArgumentType.string())
-                                                .then(Commands.argument("character_endpoint", StringArgumentType.string())
-                                                        .executes(c -> Command.inworldAICharacter(c, c.getArgument("villager_name", String.class), c.getArgument("character_endpoint", String.class)))
-                                                )
-                                        )
-                                )
-                        )
+                                                .then(Commands
+                                                        .argument("character_endpoint", StringArgumentType.string())
+                                                        .executes(c -> Command.inworldAICharacter(c,
+                                                                c.getArgument("villager_name", String.class),
+                                                                c.getArgument("character_endpoint", String.class)))))))
                         .then(Commands.argument("model", StringArgumentType.string())
-                                .executes(c -> Command.enableChatAI(c, c.getArgument("model", String.class), (new Config()).villagerChatAIEndpoint, ""))
+                                .executes(c -> Command.enableChatAI(c, c.getArgument("model", String.class),
+                                        (new Config()).villagerChatAIEndpoint, ""))
                                 .then(Commands.argument("endpoint", StringArgumentType.string())
-                                        .executes(c -> Command.enableChatAI(c, c.getArgument("model", String.class), c.getArgument("endpoint", String.class), ""))
+                                        .executes(c -> Command.enableChatAI(c, c.getArgument("model", String.class),
+                                                c.getArgument("endpoint", String.class), ""))
                                         .then(Commands.argument("token", StringArgumentType.string())
-                                                .executes(c -> Command.enableChatAI(c, c.getArgument("model", String.class), c.getArgument("endpoint", String.class), c.getArgument("token", String.class)))))))
+                                                .executes(c -> Command.enableChatAI(c,
+                                                        c.getArgument("model", String.class),
+                                                        c.getArgument("endpoint", String.class),
+                                                        c.getArgument("token", String.class)))))))
                 .then(register("tts")
                         .requires(p -> p.getServer().isSingleplayer())
                         .then(Commands.literal("default").executes(ctx -> ttsEnable(ctx, "default")))
                         .then(Commands.literal("elevenlabs").executes(ctx -> ttsEnable(ctx, "elevenlabs")))
                         .then(Commands.literal("realtime").executes(ctx -> ttsEnable(ctx, "realtime")))
-                        .then(Commands.literal("disable").executes(Command::ttsDisable))
-                )
-        );
+                        .then(Commands.literal("disable").executes(Command::ttsDisable))));
     }
 
     private static int chatAIHelp(CommandContext<CommandSourceStack> ctx) {
-        return enableChatAI(ctx, (new Config()).villagerChatAIModel, (new Config()).villagerChatAIEndpoint, (new Config()).villagerChatAIToken);
+        return enableChatAI(ctx, (new Config()).villagerChatAIModel, (new Config()).villagerChatAIEndpoint,
+                (new Config()).villagerChatAIToken);
     }
 
     private static int inworldAIKey(String apiKey) {
@@ -102,7 +111,8 @@ public class Command {
         return 0;
     }
 
-    private static int enableChatAI(CommandContext<CommandSourceStack> ctx, String model, String endpoint, String token) {
+    private static int enableChatAI(CommandContext<CommandSourceStack> ctx, String model, String endpoint,
+            String token) {
         Config.getInstance().enableVillagerChatAI = true;
         Config.getInstance().villagerChatAIModel = model;
         Config.getInstance().villagerChatAIEndpoint = endpoint;
@@ -110,9 +120,10 @@ public class Command {
         Config.getInstance().save();
 
         if (model.equals("default")) {
+            // TODO: In 1.21.11, ClickEvent is abstract - use factory methods
             sendMessage(ctx, Component.translatable("mca.ai_help").withStyle(s -> s
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Luke100000/minecraft-comes-alive/wiki/GPT3-based-conversations"))
-            ));
+                    .withClickEvent(ClickEvent.openUrl(
+                            "https://github.com/Luke100000/minecraft-comes-alive/wiki/GPT3-based-conversations"))));
         } else {
             sendMessage(ctx, "command.chat_ai.enabled");
         }
@@ -140,8 +151,9 @@ public class Command {
 
         Config.getInstance().save();
 
+        // TODO: In 1.21.11, ClickEvent is abstract - use factory methods
         sendMessage(ctx, Component.translatable("command.chat_ai.player2").withStyle(s -> s
-                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://player2.game/"))));
+                .withClickEvent(ClickEvent.openUrl("https://player2.game/"))));
         return 0;
     }
 
@@ -180,7 +192,8 @@ public class Command {
     private static int destiny(CommandContext<CommandSourceStack> ctx) {
         if (ctx.getSource().hasPermission(2) || Config.getInstance().allowDestinyCommandOnce) {
             ServerPlayer player = ctx.getSource().getPlayer();
-            if (player != null && !PlayerSaveData.get(player).isEntityDataSet() || Config.getInstance().allowDestinyCommandMoreThanOnce) {
+            if (player != null && !PlayerSaveData.get(player).isEntityDataSet()
+                    || Config.getInstance().allowDestinyCommandMoreThanOnce) {
                 ServerInteractionManager.launchDestiny(player);
                 return 0;
             } else {
@@ -222,7 +235,9 @@ public class Command {
             // encode and create url
             String encodedURL = params.keySet().stream()
                     .map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
-                    .collect(Collectors.joining("&", Config.getInstance().villagerChatAIEndpoint.replace("v1/mca/chat", "v1/mca/verify") + "?", ""));
+                    .collect(Collectors.joining("&",
+                            Config.getInstance().villagerChatAIEndpoint.replace("v1/mca/chat", "v1/mca/verify") + "?",
+                            ""));
 
             String request = OpenAIChatAI.verify(encodedURL);
 
@@ -272,8 +287,8 @@ public class Command {
         return 0;
     }
 
-
-    private static ArgumentBuilder<CommandSourceStack, ?> register(String name, com.mojang.brigadier.Command<CommandSourceStack> cmd) {
+    private static ArgumentBuilder<CommandSourceStack, ?> register(String name,
+            com.mojang.brigadier.Command<CommandSourceStack> cmd) {
         return Commands.literal(name).requires(cs -> cs.hasPermission(0)).executes(cmd);
     }
 
@@ -292,4 +307,3 @@ public class Command {
         }
     }
 }
-
