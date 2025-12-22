@@ -43,9 +43,14 @@ public class SpawnQueue {
     }
 
     public void tick() {
-        // After testing with 10k chunk radius with chunky pregen it seems the checks are not needed.
-        // The queue system did not work properly and would build up overtime if villages arnt loaded near the player, and would clear on server stop resulting in empty villages anyways.
-        // The chunk loaded check apparently does not function properly in this context, this is shown by villagers spawning fine without it, but NEVER spawn with it if far away and JUST generated.
+        // After testing with 10k chunk radius with chunky pregen it seems the checks
+        // are not needed.
+        // The queue system did not work properly and would build up overtime if
+        // villages arnt loaded near the player, and would clear on server stop
+        // resulting in empty villages anyways.
+        // The chunk loaded check apparently does not function properly in this context,
+        // this is shown by villagers spawning fine without it, but NEVER spawn with it
+        // if far away and JUST generated.
         Villager ve = villagerSpawnQueue.poll();
         if (ve != null) {
             ve.discard();
@@ -54,8 +59,10 @@ public class SpawnQueue {
                     .withGender(Gender.getRandom())
                     .withAge(ve.getAge())
                     .withPosition(ve)
-                    .withType(ve.getVillagerData().getType())
-                    .withProfession(ve.getVillagerData().getProfession(), ve.getVillagerData().getLevel(), ve.getOffers())
+                    .withType(ve.getVillagerData().getType().value())
+                    // In 1.21.11, getType/getProfession return Holder, unwrap with .value()
+                    .withProfession(ve.getVillagerData().getProfession().value(), ve.getVillagerData().getLevel(),
+                            ve.getOffers())
                     .spawn(((IVillagerEntity) ve).mca$getSpawnReason());
 
             copyPastaIntensifies(villager, ve);
@@ -68,8 +75,9 @@ public class SpawnQueue {
                     .withName(zve.hasCustomName() ? zve.getName().getString() : null)
                     .withGender(Gender.getRandom())
                     .withPosition(zve)
-                    .withType(zve.getVillagerData().getType())
-                    .withProfession(zve.getVillagerData().getProfession(), zve.getVillagerData().getLevel())
+                    // In 1.21.11, getType/getProfession return Holder, unwrap with .value()
+                    .withType(zve.getVillagerData().getType().value())
+                    .withProfession(zve.getVillagerData().getProfession().value(), zve.getVillagerData().getLevel())
                     .spawn(((IVillagerEntity) zve).mca$getSpawnReason());
 
             copyPastaIntensifies(villager, zve);
@@ -83,7 +91,8 @@ public class SpawnQueue {
                     .withGender(Gender.getRandom())
                     .withPosition(ze)
                     .withType(VillagerType.byBiome(ze.level().getBiome(ze.blockPosition())))
-                    .withProfession(BuiltInRegistries.VILLAGER_PROFESSION.getRandom(ze.getRandom()).map(Holder::value).orElse(VillagerProfession.NONE))
+                    .withProfession(BuiltInRegistries.VILLAGER_PROFESSION.getRandom(ze.getRandom()).map(Holder::value)
+                            .orElse(VillagerProfession.NONE))
                     .spawn(EntitySpawnReason.NATURAL);
 
             copyPastaIntensifies(villager, ze);
@@ -107,29 +116,35 @@ public class SpawnQueue {
     }
 
     public boolean addVillager(Entity entity) {
-        if (entity instanceof IVillagerEntity villagerEntity && !handlesSpawnReason(villagerEntity.mca$getSpawnReason())) {
+        if (entity instanceof IVillagerEntity villagerEntity
+                && !handlesSpawnReason(villagerEntity.mca$getSpawnReason())) {
             return false;
         }
-        if (Config.getInstance().villagerDimensionBlacklist.contains(entity.getCommandSenderWorld().dimension().location().toString())) {
+        if (Config.getInstance().villagerDimensionBlacklist
+                .contains(entity.getCommandSenderWorld().dimension().location().toString())) {
             return false;
         }
         if (Config.getInstance().overwriteOriginalVillagers
-            && (entity.getClass().equals(Villager.class) ||
-                Config.getInstance().moddedVillagerWhitelist.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()) && entity instanceof Villager)
-            && shouldGetConverted(entity)
-            && !villagerSpawnQueue.contains(entity)) {
+                && (entity.getClass().equals(Villager.class) ||
+                        Config.getInstance().moddedVillagerWhitelist
+                                .contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())
+                                && entity instanceof Villager)
+                && shouldGetConverted(entity)
+                && !villagerSpawnQueue.contains(entity)) {
             return villagerSpawnQueue.add((Villager) entity);
         }
         if (Config.getInstance().overwriteOriginalZombieVillagers
-            && (entity.getClass().equals(ZombieVillager.class) ||
-                Config.getInstance().moddedZombieVillagerWhitelist.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()) && entity instanceof ZombieVillager)
-            && Config.getInstance().fractionOfVanillaZombies < entity.getRandom().nextFloat()
-            && !zombieVillagerSpawnQueue.contains(entity)) {
+                && (entity.getClass().equals(ZombieVillager.class) ||
+                        Config.getInstance().moddedZombieVillagerWhitelist
+                                .contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())
+                                && entity instanceof ZombieVillager)
+                && Config.getInstance().fractionOfVanillaZombies < entity.getRandom().nextFloat()
+                && !zombieVillagerSpawnQueue.contains(entity)) {
             return zombieVillagerSpawnQueue.add((ZombieVillager) entity);
         }
         if (Config.getInstance().overwriteAllZombiesWithZombieVillagers
-            && entity.getClass().equals(Zombie.class)
-            && !zombieSpawnList.contains(entity)) {
+                && entity.getClass().equals(Zombie.class)
+                && !zombieSpawnList.contains(entity)) {
             return zombieSpawnList.add((Zombie) entity);
         }
         return false;
@@ -143,4 +158,3 @@ public class SpawnQueue {
         villagerSpawnQueue.add(villager);
     }
 }
-
