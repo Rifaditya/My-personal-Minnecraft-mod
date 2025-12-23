@@ -51,7 +51,8 @@ public class CustomClothingManager {
 
         public Storage(CompoundTag nbt, BiFunction<String, JsonObject, T> entryFromNbt) {
             Gson gson = new Gson();
-            for (String identifier : nbt.getAllKeys()) {
+            // In 1.21.11, getAllKeys() renamed to keySet()
+            for (String identifier : nbt.keySet()) {
                 // In 1.21.11, getString returns Optional<String>
                 nbt.getString(identifier).ifPresent(jsonStr -> entries.put(identifier,
                         entryFromNbt.apply(identifier, gson.fromJson(jsonStr, JsonObject.class))));

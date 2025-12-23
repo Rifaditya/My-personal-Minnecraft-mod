@@ -37,7 +37,8 @@ public class GraveyardManager extends SavedData {
         tombstones.putAll(NbtHelper.toMap(nbt, TombstoneState::valueOf, v -> {
             CompoundTag vv = (CompoundTag) v;
             Long2ObjectMap<ChunkBase> map = new Long2ObjectOpenHashMap<>();
-            vv.getAllKeys().forEach(key -> {
+            // In 1.21.11, getAllKeys() renamed to keySet()
+            vv.keySet().forEach(key -> {
                 map.put(Long.parseLong(key), new Chunk((ListTag) vv.get(key)));
             });
             return map;
