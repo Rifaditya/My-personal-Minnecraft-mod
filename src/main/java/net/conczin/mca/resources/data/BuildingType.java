@@ -59,9 +59,9 @@ public final class BuildingType {
                     blocks.put(buf.readUtf(), buf.readVarInt());
                 }
 
-                return new BuildingType(name, margin, color, priority, visible, noBeds, icon, iconU, iconV, grouped, mergeRange, blocks);
-            }
-    );
+                return new BuildingType(name, margin, color, priority, visible, noBeds, icon, iconU, iconV, grouped,
+                        mergeRange, blocks);
+            });
     private final String name;
     private final int margin;
     private final String color;
@@ -79,7 +79,7 @@ public final class BuildingType {
 
     // Private constructor for deserialization
     private BuildingType(String name, int margin, String color, int priority, boolean visible, boolean noBeds,
-                         boolean icon, int iconU, int iconV, boolean grouped, int mergeRange, Map<String, Integer> blocks) {
+            boolean icon, int iconU, int iconV, boolean grouped, int mergeRange, Map<String, Integer> blocks) {
         this.name = name;
         this.margin = margin;
         this.color = color;
@@ -131,8 +131,7 @@ public final class BuildingType {
             for (Map.Entry<String, JsonElement> entry : blocks.entrySet()) {
                 this.blocks.put(
                         entry.getKey(),
-                        entry.getValue().getAsInt()
-                );
+                        entry.getValue().getAsInt());
             }
         }
 
@@ -142,8 +141,7 @@ public final class BuildingType {
             for (Map.Entry<String, JsonElement> entry : blocks.entrySet()) {
                 this.groups.put(
                         Identifier.parse(entry.getKey()),
-                        entry.getValue().getAsInt()
-                );
+                        entry.getValue().getAsInt());
             }
         }
     }
@@ -169,7 +167,8 @@ public final class BuildingType {
     }
 
     /**
-     * @return a mapping between block identifiers and groups (tags or individual blocks)
+     * @return a mapping between block identifiers and groups (tags or individual
+     *         blocks)
      */
     public Map<Identifier, Identifier> getBlockToGroup() {
         if (blockToGroup == null) {
@@ -183,12 +182,12 @@ public final class BuildingType {
                     if (RegistryHelper.isTagEmpty(tag)) {
                         MCA.LOGGER.error("Unknown building type tag {}", identifier);
                     } else {
-                        var entries = RegistryHelper.getEntries(tag);
-                        entries.ifPresent(registryEntries -> {
-                            for (Block b : registryEntries.stream().map(Holder::value).toList()) {
-                                blockToGroup.putIfAbsent(BuiltInRegistries.BLOCK.getKey(b), identifier);
-                            }
-                        });
+                        // 1.21.11: getEntries returns Iterable<Holder<T>> instead of
+                        // Optional<HolderSet>
+                        for (Holder<Block> holder : RegistryHelper.getEntries(tag)) {
+                            Block b = holder.value();
+                            blockToGroup.putIfAbsent(BuiltInRegistries.BLOCK.getKey(b), identifier);
+                        }
                     }
                 } else {
                     identifier = Identifier.parse(requirement.getKey());
@@ -207,14 +206,14 @@ public final class BuildingType {
 
     /**
      * @param blocks the map of block positions per block type of building
-     * @return a filtered and grouped map of block types relevant for this building type
+     * @return a filtered and grouped map of block types relevant for this building
+     *         type
      */
     public Map<Identifier, List<BlockPos>> getGroups(Map<Identifier, List<BlockPos>> blocks) {
         HashMap<Identifier, List<BlockPos>> available = new HashMap<>();
         for (Map.Entry<Identifier, List<BlockPos>> entry : blocks.entrySet()) {
-            Optional.ofNullable(getBlockToGroup().get(entry.getKey())).ifPresent(v ->
-                    available.computeIfAbsent(v, k -> new LinkedList<>()).addAll(entry.getValue())
-            );
+            Optional.ofNullable(getBlockToGroup().get(entry.getKey()))
+                    .ifPresent(v -> available.computeIfAbsent(v, k -> new LinkedList<>()).addAll(entry.getValue()));
         }
         return available;
     }
@@ -251,4 +250,3 @@ public final class BuildingType {
         return blocks.values().stream().mapToInt(v -> v).sum();
     }
 }
-

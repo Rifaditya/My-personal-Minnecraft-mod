@@ -18,10 +18,10 @@ public class RegistryHelper {
         return Optional.empty();
     }
 
-    public static <T> Optional<? extends HolderSet<T>> getEntries(TagKey<T> tagKey) {
-        // TODO: In 1.21.11, registry lookup API may have changed
-        // Disabled until API is researched - return empty
-        return Optional.empty();
+    public static <T> Iterable<Holder<T>> getEntries(TagKey<T> tagKey) {
+        // 1.21.11: getTagOrEmpty() from Create-Fly FluidTagIngredient
+        Registry<T> registry = getRegistryOf(tagKey);
+        return registry != null ? registry.getTagOrEmpty(tagKey) : java.util.Collections.emptyList();
     }
 
     public static <T> Optional<Holder<T>> tryGetEntry(Registry<T> registry, T object) {
@@ -40,13 +40,19 @@ public class RegistryHelper {
     }
 
     public static <T> boolean isTagEmpty(TagKey<T> tag) {
-        return getEntries(tag).map(HolderSet::size).orElse(0) == 0;
+        // 1.21.11: getEntries now returns Iterable, count manually
+        int count = 0;
+        for (Holder<T> ignored : getEntries(tag)) {
+            count++;
+            break; // Just need to know if any exist
+        }
+        return count == 0;
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Registry<T> getRegistryOf(@NotNull TagKey<T> key) {
-        // TODO: In 1.21.11, BuiltInRegistries.REGISTRY.get() API may have changed
-        // Return null until API is researched - callers should handle this
-        return null;
+        // 1.21.11: From Architectury - REGISTRY.getValue(registryKey.identifier())
+        var registryKey = key.registry();
+        return (Registry<T>) BuiltInRegistries.REGISTRY.getValue(registryKey.identifier());
     }
 }

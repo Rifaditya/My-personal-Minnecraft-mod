@@ -94,8 +94,16 @@ public interface InventoryUtils {
     }
 
     static void dropAllItems(Entity entity, Container inv) {
-        // TODO: In 1.21.11, spawnAtLocation signature changed
-        // Disabled item dropping until API is researched
+        // 1.21.11: spawnAtLocation(ServerLevel, stack) from Create-Fly
+        // PotatoProjectileEntity
+        if (entity.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            for (int i = 0; i < inv.getContainerSize(); i++) {
+                ItemStack stack = inv.getItem(i);
+                if (!stack.isEmpty()) {
+                    entity.spawnAtLocation(serverLevel, stack);
+                }
+            }
+        }
         inv.clearContent();
     }
 
