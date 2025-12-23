@@ -2,6 +2,7 @@ package net.conczin.mca.util.network.datasync;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 
 public class NbtCompoundDefaultGetters {
@@ -28,8 +29,9 @@ public class NbtCompoundDefaultGetters {
     }
 
     public static ItemStack getItemStack(CompoundTag nbt, String key, ItemStack def, HolderLookup.Provider provider) {
-        // TODO: In 1.21.11, ItemStack.parse API may have changed
-        // Disabled until API is researched - return default
-        return def;
+        // 1.21.11: Use ItemStack.CODEC.parse pattern from Create-Fly
+        return nbt.getCompound(key)
+                .flatMap(tag -> ItemStack.CODEC.parse(NbtOps.INSTANCE, tag).result())
+                .orElse(def);
     }
 }
