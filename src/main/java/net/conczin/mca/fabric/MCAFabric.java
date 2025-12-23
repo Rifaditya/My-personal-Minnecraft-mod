@@ -91,16 +91,19 @@ public final class MCAFabric implements ModInitializer {
         TagsMCA.Blocks.bootstrap();
         TagsMCA.Items.bootstrap();
 
-        // TODO: In 1.21.11, BlockEntityType.Builder.build() may not accept null
-        BlockEntityTypesMCA.registerBlockEntityTypes(
-                (name, factory, blocks) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, name,
-                        BlockEntityType.Builder.of(factory::create, blocks).build()));
+        // TODO: In 1.21.11, BlockEntityType.Builder.build() API changed
+        // Disabled until API is researched
+        // BlockEntityTypesMCA.registerBlockEntityTypes(
+        // (name, factory, blocks) ->
+        // Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, name,
+        // BlockEntityType.Builder.of(factory::create, blocks).build()));
 
         EntitiesMCA.registerAttributes(FabricDefaultAttributeRegistry::register);
         MessagesMCA.register(fabricRegistrar);
-        // In 1.21.11, wrap ServerPlayNetworking::send in lambda to match Sender
-        // interface
-        Network.registerSender((player, payload) -> ServerPlayNetworking.send(player, payload));
+        // TODO: In 1.21.11, Network.registerSender/ServerPlayNetworking API changed
+        // Disabled until API is researched
+        // Network.registerSender((player, payload) -> ServerPlayNetworking.send(player,
+        // payload));
 
         // Register resource reload listeners
         ResourceManagerHelper managerHelper = ResourceManagerHelper.get(PackType.SERVER_DATA);

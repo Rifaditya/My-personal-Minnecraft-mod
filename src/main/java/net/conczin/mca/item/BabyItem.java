@@ -145,13 +145,9 @@ public class BabyItem extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
-        if (stack.has(DataComponents.CUSTOM_NAME)) {
-            // TODO: In 1.21.11, getDescriptionId(stack) removed, using getDescriptionId()\n
-            // return Component.translatable(getDescriptionId() + \".named\",
-            // stack.get(DataComponents.CUSTOM_NAME));
-        } else {
-            return super.getName(stack);
-        }
+        // TODO: In 1.21.11, getDescriptionId(stack) removed
+        // Simplified to always return super.getName for now
+        return super.getName(stack);
     }
 
     // TODO: In 1.21.11, getDescriptionId(ItemStack) removed, using
