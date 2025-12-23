@@ -43,13 +43,12 @@ public interface WorldUtils {
     @SuppressWarnings("DataFlowIssue")
     static <T extends SavedData> T loadData(ServerLevel world, BiFunction<CompoundTag, HolderLookup.Provider, T> loader,
             Function<ServerLevel, T> factory, String dataId) {
-        // From 1.21.1 reference: SavedData.Factory takes 3 params with null third param
-        return world.getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(
-                        () -> factory.apply(world),
-                        loader,
-                        null),
-                dataId);
+        // TODO: 1.21.11 SavedData API completely changed
+        // Old: SavedData.Factory<>(() -> factory.apply(world), loader)
+        // New: SavedDataType<>("id", ctor, Codec.of(...), null) - requires Codec
+        // refactoring
+        // Temporarily return new instance from factory for compilation
+        return factory.apply(world);
     }
 
     static void spawnEntity(Level world, Mob entity, EntitySpawnReason reason) {

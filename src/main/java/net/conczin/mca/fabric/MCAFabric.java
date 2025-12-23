@@ -91,10 +91,10 @@ public final class MCAFabric implements ModInitializer {
         TagsMCA.Blocks.bootstrap();
         TagsMCA.Items.bootstrap();
 
-        // From 1.21.1 reference: BlockEntityType.Builder.build(null)
+        // 1.21.11 Create-Fly/WilderWild: new BlockEntityType<>(factory, Set.of(blocks))
         BlockEntityTypesMCA.registerBlockEntityTypes(
                 (name, factory, blocks) -> Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, name,
-                        BlockEntityType.Builder.of(factory::create, blocks).build(null)));
+                        new BlockEntityType<>(factory::create, java.util.Set.of(blocks))));
 
         EntitiesMCA.registerAttributes(FabricDefaultAttributeRegistry::register);
         MessagesMCA.register(fabricRegistrar);

@@ -26,6 +26,9 @@ repositories {
 loom {
     // NO split environment - allows original MCA architecture
     // Client code can be in main source set with runtime checks
+    
+    // 1.21.11: Access widener for BlockEntityType constructor access
+    accessWidenerPath = file("src/main/resources/mca.accesswidener")
 
     mixin {
         defaultRefmapName.set("${project.mod_id}.refmap.json")
