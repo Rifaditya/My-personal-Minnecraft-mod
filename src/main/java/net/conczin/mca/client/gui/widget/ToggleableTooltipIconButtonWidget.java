@@ -20,6 +20,11 @@ public class ToggleableTooltipIconButtonWidget extends ToggleableTooltipButtonWi
         this.v = v;
     }
 
-    // In 1.21.11, renderWidget in AbstractButton is final or visibility changed
-    // Rendering disabled - base class renders
+    // 1.21.11: Use renderContents to render the icon
+    @Override
+    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        // Render icon texture using MCAGuiRenderer
+        net.conczin.mca.client.render.gui.MCAGuiRenderer.drawTexture(
+                guiGraphics, ICON_TEXTURES, getX(), getY(), u, v, 16, 16, 256, 256);
+    }
 }

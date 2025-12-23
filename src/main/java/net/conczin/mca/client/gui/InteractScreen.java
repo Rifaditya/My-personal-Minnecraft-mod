@@ -98,16 +98,8 @@ public class InteractScreen extends AbstractDynamicScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double dx, double dy) {
-        // TODO: In 1.21.11, Inventory.selected is private
-        // Hot bar scrolling disabled
-        // if (dy < 0) {
-        // player.getInventory().selected = player.getInventory().selected == 8 ? 0 :
-        // player.getInventory().selected + 1;
-        // } else if (dy > 0) {
-        // player.getInventory().selected = player.getInventory().selected == 0 ? 8 :
-        // player.getInventory().selected - 1;
-        // }
-
+        // 1.21.11: Inventory.selected is private, requires access widener
+        // Hot bar scrolling disabled (non-critical feature)
         return super.mouseScrolled(x, y, dx, dy);
     }
 

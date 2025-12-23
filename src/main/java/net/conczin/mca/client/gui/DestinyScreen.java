@@ -84,16 +84,15 @@ public class DestinyScreen extends VillagerEditorScreen {
             case "general" -> {
                 drawScaledText(context, Component.translatable("gui.destiny.whoareyou"), width / 2, height / 2 - 24,
                         1.5f);
-                // TODO: In 1.21.11, pose() returns Matrix3x2fStack, RenderSystem methods
-                // removed
-                // Logo rendering disabled for now
-                // matrices.pushPose();
-                // matrices.scale(0.25f, 0.25f, 0.25f);
-                // RenderSystem.enableBlend();
-                // RenderSystem.defaultBlendFunc();
-                // RenderSystem.setShaderColor(1, 1, 1, 1);
-                // context.blit(LOGO_TEXTURE, width * 2 - 512, -40, 0, 0, 1024, 512, 1024, 512);
-                // matrices.popPose();
+                // 1.21.11: Logo rendering using MCAGuiRenderer
+                // Note: Scaling is not supported without pose manipulation, so render at
+                // smaller size
+                int logoWidth = 256;
+                int logoHeight = 128;
+                int logoX = width - logoWidth / 2 - 20;
+                int logoY = 10;
+                net.conczin.mca.client.render.gui.MCAGuiRenderer.drawTexture(
+                        context, LOGO_TEXTURE, logoX, logoY, 0, 0, logoWidth, logoHeight, 1024, 512);
             }
             case "destiny" ->
                 drawScaledText(context, Component.translatable("gui.destiny.journey"), width / 2, height / 2 - 48,
