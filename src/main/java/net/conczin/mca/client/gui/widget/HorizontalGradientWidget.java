@@ -23,17 +23,31 @@ public class HorizontalGradientWidget extends HorizontalColorPickerWidget {
 
     @Override
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        // TODO: In 1.21.11, RenderSystem.enableBlend/defaultBlendFunc/setShader removed
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Gradient rendering disabled for now
+        // 1.21.11: Use MCAGuiRenderer for gradient rendering
+        float[] startColor = startColorSupplier.get();
+        float[] endColor = endColorSupplier.get();
 
-        // Draw simple fallback
-        context.fill(getX(), getY(), getX() + width, getY() + height, 0xFF808080);
+        // Convert RGBA floats to ARGB int
+        int startARGB = ((int) (startColor[3] * 255) << 24) |
+                ((int) (startColor[0] * 255) << 16) |
+                ((int) (startColor[1] * 255) << 8) |
+                (int) (startColor[2] * 255);
+        int endARGB = ((int) (endColor[3] * 255) << 24) |
+                ((int) (endColor[0] * 255) << 16) |
+                ((int) (endColor[1] * 255) << 8) |
+                (int) (endColor[2] * 255);
 
+        net.conczin.mca.client.render.gui.MCAGuiRenderer.drawHorizontalGradient(
+                context, getX(), getY(), width, height, startARGB, endARGB);
+
+        // Draw outline
         WidgetUtils.drawRectangle(context, getX(), getY(), getX() + width, getY() + height, 0xaaffffff);
 
-        // TODO: In 1.21.11, blit requires RenderType
-        // context.blit(MCA_GUI_ICONS_TEXTURE, (int) (getX() + valueX * width) - 8,
-        // (int) (getY() + valueY * height) - 8, 240, 0, 16, 16, 256, 256);
+        // Draw cursor indicator
+        net.conczin.mca.client.render.gui.MCAGuiRenderer.drawTexture(
+                context, ColorPickerWidget.MCA_GUI_ICONS_TEXTURE,
+                (int) (getX() + valueX * width) - 8,
+                (int) (getY() + valueY * height) - 8,
+                240, 0, 16, 16, 256, 256);
     }
 }
