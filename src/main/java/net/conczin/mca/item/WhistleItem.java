@@ -22,7 +22,7 @@ public class WhistleItem extends TooltippedItem {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.WHISTLE), serverPlayer);
         }
 
-        // TODO: In 1.21.11, InteractionResultHolder removed\n return
-        // InteractionResult.SUCCESS;
+        // In 1.21.11, return InteractionResult.SUCCESS
+        return InteractionResult.SUCCESS;
     }
 }
