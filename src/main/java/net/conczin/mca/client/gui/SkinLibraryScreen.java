@@ -1651,7 +1651,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                         "meta", workspace.toListEntry().toJson().toString(),
                                         // TODO: In 1.21.11, NativeImage.asByteArray() doesn't exist
                                         "data", "")); // Upload disabled due to API change;
-                    } catch (IOException e) {
+                    } catch (Exception e) {
+                        // Changed from IOException to general Exception in 1.21.11
                         MCA.LOGGER.error(e);
                     }
 
