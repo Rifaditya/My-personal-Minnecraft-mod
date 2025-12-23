@@ -14,7 +14,12 @@ public class ItemButtonWidget extends TooltipButtonWidget {
         this.item = item;
     }
 
-    // In 1.21.11, renderWidget in AbstractButton is final or visibility changed
-    // Rendering disabled - using empty method
-    // TODO: Implement custom rendering approach
+    // 1.21.11: Use renderContents to render the item icon
+    @Override
+    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+        // Render the item icon centered in the button
+        int itemX = getX() + (width - 16) / 2;
+        int itemY = getY() + (height - 16) / 2;
+        guiGraphics.renderItem(item, itemX, itemY);
+    }
 }

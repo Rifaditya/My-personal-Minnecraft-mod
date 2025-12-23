@@ -41,13 +41,12 @@ public class LegacyImageButton extends ImageButton {
         if (isHoveredOrFocused()) {
             i += textureDifference;
         }
-        // TODO: In 1.21.11, RenderSystem.enableDepthTest removed
-        // RenderSystem.enableDepthTest();
-        // TODO: In 1.21.11, blit requires RenderType
-        // guiGraphics.blit(texture, x, y, uOffset, i, width, height, textureWidth,
-        // textureHeight);
+        // 1.21.11: Use MCAGuiRenderer for texture rendering
+        net.conczin.mca.client.render.gui.MCAGuiRenderer.drawTexture(
+                guiGraphics, texture, x, y, uOffset, i, width, height, textureWidth, textureHeight);
     }
 
-    // In 1.21.11, renderWidget in AbstractButton is final or visibility changed
-    // Rendering disabled - base class renders
+    // 1.21.11: ImageButton.renderContents is final, cannot override
+    // Base class will use WidgetSprites provided in constructor
+    // For custom UV-based rendering, callers should invoke renderTexture directly
 }

@@ -54,8 +54,7 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
     }
 
     public void renderTooltip(GuiGraphics context, int mouseX, int mouseY) {
-        // TODO: In 1.21.11, renderComponentTooltip doesn't exist
-        // context.renderComponentTooltip(Minecraft.getInstance().font,
-        // FlowingText.wrap(tooltipSupplier.get(), 160), mouseX, mouseY);
+        // 1.21.11: renderTooltip signature changed - tooltip rendering disabled for now
+        // TODO: Research new tooltip API from Jade/Create-Fly references
     }
 }
