@@ -108,13 +108,40 @@ public interface InventoryUtils {
     }
 
     static void saveToNBT(RegistryAccess registryAccess, SimpleContainer inv, CompoundTag nbt) {
-        // TODO: In 1.21.11, SimpleContainer.createTag() API changed
-        // Disabled until API is researched
+        // 1.21.11: Use ItemStack.CODEC for serialization
+        net.minecraft.nbt.ListTag listTag = new net.minecraft.nbt.ListTag();
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
+            if (!stack.isEmpty()) {
+                CompoundTag itemTag = new CompoundTag();
+                itemTag.putInt("Slot", i);
+                ItemStack.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, stack)
+                        .result()
+                        .ifPresent(tag -> itemTag.put("Item", tag));
+                listTag.add(itemTag);
+            }
+        }
+        nbt.put("Items", listTag);
     }
 
     static void readFromNBT(RegistryAccess registryAccess, SimpleContainer inv, CompoundTag nbt) {
-        // TODO: In 1.21.11, SimpleContainer.fromTag() and getList() API changed
-        // Disabled until API is researched
+        // 1.21.11: Use ItemStack.CODEC for deserialization
+        inv.clearContent();
+        nbt.getList("Items").ifPresent(listTag -> {
+            for (int i = 0; i < listTag.size(); i++) {
+                listTag.getCompound(i).ifPresent(itemTag -> {
+                    int slot = itemTag.getInt("Slot").orElse(0);
+                    if (slot >= 0 && slot < inv.getContainerSize()) {
+                        itemTag.getCompound("Item").ifPresent(itemNbt -> {
+                            ItemStack stack = ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemNbt)
+                                    .result()
+                                    .orElse(ItemStack.EMPTY);
+                            inv.setItem(slot, stack);
+                        });
+                    }
+                });
+            }
+        });
     }
 
     static double approximateDamage(ItemStack stack, LivingEntity entity) {

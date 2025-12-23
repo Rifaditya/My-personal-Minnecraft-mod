@@ -4,10 +4,14 @@ import net.conczin.mca.util.localization.FlowingText;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
     protected final Supplier<Component> tooltipSupplier;
@@ -54,7 +58,14 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
     }
 
     public void renderTooltip(GuiGraphics context, int mouseX, int mouseY) {
-        // 1.21.11: renderTooltip signature changed - tooltip rendering disabled for now
-        // TODO: Research new tooltip API from Jade/Create-Fly references
+        // 1.21.11: Use Create-Fly pattern with ClientTooltipComponent and
+        // DefaultTooltipPositioner
+        Minecraft mc = Minecraft.getInstance();
+        List<Component> tooltipLines = FlowingText.wrap(tooltipSupplier.get(), 160);
+        List<ClientTooltipComponent> components = tooltipLines.stream()
+                .map(Component::getVisualOrderText)
+                .map(ClientTooltipComponent::create)
+                .collect(Collectors.toList());
+        context.renderTooltip(mc.font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null);
     }
 }
