@@ -872,18 +872,15 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                     });
                 }
 
-                // group
-                // TODO: In 1.21.11, CycleButton.builder signature changed
-                // CycleButton disabled for now
-                // addRenderableWidget(CycleButton.builder(SubscriptionFilter::getText)
+                // group - Subscription filter
+                // 1.21.11: CycleButton.builder now requires 2 parameters (Function +
+                // Supplier|T)
+                // Disabled until proper API research
+                // addRenderableWidget(CycleButton.builder(SubscriptionFilter::getText, ?)
                 // .withValues(SubscriptionFilter.values())
                 // .withInitialValue(subscriptionFilter)
                 // .displayOnlyValue()
-                // .create(width / 2 - 200, height / 2 - 110, 60, 20, Component.literal(""),
-                // (button, filter) -> {
-                // this.subscriptionFilter = filter;
-                // refreshContentList();
-                // }));
+                // .create(...));
 
                 // controls
                 int i = 0;
@@ -1077,17 +1074,15 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                             openHelp();
                         }));
 
-                // gender
-                // TODO: In 1.21.11, CycleButton.builder signature changed
-                // Gender CycleButton disabled for now
-                // addRenderableWidget(CycleButton.builder(Gender::getText)
+                // gender - Gender selector
+                // 1.21.11: CycleButton.builder now requires 2 parameters (Function +
+                // Supplier|T)
+                // Disabled until proper API research
+                // addRenderableWidget(CycleButton.builder(Gender::getText, ?)
                 // .withValues(Gender.MALE, Gender.NEUTRAL, Gender.FEMALE)
                 // .withInitialValue(workspace.gender)
                 // .displayOnlyValue()
-                // .create(width / 2 - 200, height / 2 - 80, 105, 20, Component.literal(""),
-                // (button, gender) -> {
-                // this.workspace.gender = gender;
-                // }));
+                // .create(...));
 
                 // temperature
                 if (workspace.skinType == SkinType.CLOTHING) {
