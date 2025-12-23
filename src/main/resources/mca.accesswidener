@@ -4,3 +4,29 @@ accessWidener	v2	named
 # From Create-Fly accesswidener for 1.21.11 compatibility
 accessible	class	net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 accessible	method	net/minecraft/world/level/block/entity/BlockEntityType	<init>	(Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V
+
+# 1.21.11: Inventory.selected is private - needed for hotbar scrolling in InteractScreen
+accessible	field	net/minecraft/world/entity/player/Inventory	selected	I
+mutable	field	net/minecraft/world/entity/player/Inventory	selected	I
+
+# 1.21.11: ModelPart fields are private - needed for animation/pose manipulation
+accessible	field	net/minecraft/client/model/geom/ModelPart	x	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	y	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	z	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	xRot	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	yRot	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	zRot	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	xScale	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	yScale	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	zScale	F
+accessible	field	net/minecraft/client/model/geom/ModelPart	visible	Z
+mutable	field	net/minecraft/client/model/geom/ModelPart	x	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	y	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	z	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	xRot	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	yRot	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	zRot	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	xScale	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	yScale	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	zScale	F
+mutable	field	net/minecraft/client/model/geom/ModelPart	visible	Z

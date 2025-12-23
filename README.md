@@ -10,6 +10,22 @@
 - **I do not claim ownership** of the original code, assets, or creative work
 - All credit belongs to the **original MCA Reborn development team**
 
+### ⚠️ AI-Assisted Code Warning
+
+> **IMPORTANT**: This is NOT a complete 1:1 port of the original MCA Reborn.
+
+- The AI assistant added code to fix API changes, but **may not fully understand** what some code does
+- Some features were **modified or simplified** to work with 1.21.11's changed APIs
+- The AI added helper utilities and workarounds that **did not exist in the original mod**
+- Some features are **disabled or stubbed** because the proper 1.21.11 API equivalent wasn't found
+
+**For security:**
+
+- I have tried my best to **not let any malicious code** the AI might have added into this port.
+- All code is **open source** and available for review in this repository
+- You are encouraged to **review the code yourself** before using this mod
+- If you find any suspicious code, please report it
+
 ### Why the Different Name?
 
 The mod currently appears as "MCA Dasik Edition" in the code because:
