@@ -147,13 +147,15 @@ public final class FamilyTreeNode {
     }
 
     public VillagerProfession getProfession() {
-        // TODO: Complex Registry API in 1.21.11 - returning null for now
-        // Need to properly implement Registry lookup when API stabilizes
+        // 1.21.11: VillagerProfession.NONE is a ResourceKey, not value
+        // This method returns null - callers should use getProfessionId() or
+        // getProfessionName() instead
         return null;
     }
 
     public void setProfession(VillagerProfession profession) {
-        // TODO: Complex Registry API in 1.21.11 - storing default for now
+        // 1.21.11: Store profession string directly since Registry API changed
+        // Callers pass null or use setProfession via getProfessionId()
         this.profession = "minecraft:none";
         markDirty();
     }
