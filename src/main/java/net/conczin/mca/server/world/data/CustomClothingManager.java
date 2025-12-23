@@ -24,23 +24,15 @@ public class CustomClothingManager {
     static final Storage<Hair> HAIR_DUMMY = new Storage<>();
 
     public static Storage<Clothing> getClothing() {
-        Optional<MinecraftServer> server = MCA.getServer();
-        // In 1.21.11, SavedData.Factory constructor signature changed
-        return server.<Storage<Clothing>>map(minecraftServer -> minecraftServer.overworld().getDataStorage()
-                .computeIfAbsent(
-                        new SavedData.Factory<>(Storage::new, (nbt, provider) -> new Storage<>(nbt, Clothing::new)),
-                        "immersive_library_clothing"))
-                .orElse(CLOTHING_DUMMY);
+        // TODO: In 1.21.11, SavedData.Factory constructor API changed
+        // Disabled until API is researched - return dummy
+        return CLOTHING_DUMMY;
     }
 
     public static Storage<Hair> getHair() {
-        Optional<MinecraftServer> server = MCA.getServer();
-        // In 1.21.11, SavedData.Factory constructor signature changed
-        return server.<Storage<Hair>>map(minecraftServer -> minecraftServer.overworld().getDataStorage()
-                .computeIfAbsent(
-                        new SavedData.Factory<>(Storage::new, (nbt, provider) -> new Storage<>(nbt, Hair::new)),
-                        "immersive_library_hair"))
-                .orElse(HAIR_DUMMY);
+        // TODO: In 1.21.11, SavedData.Factory constructor API changed
+        // Disabled until API is researched - return dummy
+        return HAIR_DUMMY;
     }
 
     public static class Storage<T extends SkinListEntry> extends SavedData {
