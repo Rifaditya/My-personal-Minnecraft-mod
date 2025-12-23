@@ -271,19 +271,40 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
     }
 
     public record Letter(String title, List<Component> pages) {
-        // TODO: In 1.21.11, ComponentSerialization.FLAT_CODEC doesn't exist
-        // Simplified to just store title for now
+        // 1.21.11: Use ComponentSerialization.CODEC for Component serialization
 
         public Letter(CompoundTag nbt, HolderLookup.Provider registries) {
             this(
                     nbt.getString("title").orElse(""),
-                    List.of()); // TODO: Fix pages deserialization
+                    deserializePages(nbt));
+        }
+
+        private static List<Component> deserializePages(CompoundTag nbt) {
+            List<Component> pages = new java.util.ArrayList<>();
+            nbt.getList("pages").ifPresent(listTag -> {
+                for (int i = 0; i < listTag.size(); i++) {
+                    listTag.getCompound(i).ifPresent(pageTag -> {
+                        // Use ComponentSerialization.CODEC to parse Component from NBT
+                        ComponentSerialization.CODEC.parse(NbtOps.INSTANCE, pageTag)
+                                .result()
+                                .ifPresent(pages::add);
+                    });
+                }
+            });
+            return pages;
         }
 
         CompoundTag toTag(HolderLookup.Provider registries) {
             CompoundTag nbt = new CompoundTag();
             nbt.putString("title", title);
-            // TODO: Fix pages serialization
+            // Serialize pages using ComponentSerialization.CODEC
+            ListTag pagesTag = new ListTag();
+            for (Component page : pages) {
+                ComponentSerialization.CODEC.encodeStart(NbtOps.INSTANCE, page)
+                        .result()
+                        .ifPresent(pagesTag::add);
+            }
+            nbt.put("pages", pagesTag);
             return nbt;
         }
     }
