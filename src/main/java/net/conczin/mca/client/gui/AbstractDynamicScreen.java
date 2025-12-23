@@ -2,14 +2,18 @@ package net.conczin.mca.client.gui;
 
 import net.conczin.mca.client.resources.Icon;
 import net.conczin.mca.entity.interaction.Constraint;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractDynamicScreen extends Screen {
     protected static final float iconScale = 1.5f;
@@ -95,13 +99,24 @@ public abstract class AbstractDynamicScreen extends Screen {
     }
 
     protected void drawHoveringIconText(GuiGraphics context, Component text, String key) {
-        // TODO: In 1.21.11, renderTooltip signature changed
-        // Icon icon = MCAScreens.getInstance().getIcon(key);
+        // 1.21.11: Use ClientTooltipComponent and DefaultTooltipPositioner
+        Icon icon = MCAScreens.getInstance().getIcon(key);
+        int x = icon.x() + (int) (8 * iconScale);
+        int y = icon.y() + (int) (8 * iconScale);
+        List<ClientTooltipComponent> components = List.of(
+                ClientTooltipComponent.create(text.getVisualOrderText()));
+        context.renderTooltip(font, components, x, y, DefaultTooltipPositioner.INSTANCE, null);
     }
 
-    protected void drawHoveringIconText(GuiGraphics context, List<Component> text, String key) {
-        // TODO: In 1.21.11, renderComponentTooltip removed
-        // Icon icon = MCAScreens.getInstance().getIcon(key);
+    protected void drawHoveringIconText(GuiGraphics context, List<Component> textList, String key) {
+        // 1.21.11: Use ClientTooltipComponent for multi-line tooltips
+        Icon icon = MCAScreens.getInstance().getIcon(key);
+        int x = icon.x() + (int) (8 * iconScale);
+        int y = icon.y() + (int) (8 * iconScale);
+        List<ClientTooltipComponent> components = textList.stream()
+                .map(c -> ClientTooltipComponent.create(c.getVisualOrderText()))
+                .collect(Collectors.toList());
+        context.renderTooltip(font, components, x, y, DefaultTooltipPositioner.INSTANCE, null);
     }
 
     // checks if the mouse hovers over a specified button
