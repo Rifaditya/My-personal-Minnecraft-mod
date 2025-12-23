@@ -22,7 +22,10 @@ public class ButtonWidget extends net.minecraft.client.gui.components.Button {
     // In 1.21.11, AbstractButton requires this method to be implemented
     @Override
     protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        // TODO: renderString doesn't exist on Button in 1.21.11
-        // Empty for now - buttons won't render text until fixed
+        // 1.21.11: Render button text using Jade pattern
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
+        graphics.drawCenteredString(mc.font, this.getMessage(), this.getX() + this.width / 2,
+                this.getY() + (this.height - 8) / 2, textColor);
     }
 }
