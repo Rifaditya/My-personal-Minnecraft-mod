@@ -76,21 +76,79 @@ public interface InventoryUtils {
     }
 
     static Optional<ItemStack> getBestArmor(Container inv, EquipmentSlot slot) {
-        // TODO: In 1.21.11, ArmorItem.getEquipmentSlot() and getDefense() API changed
-        // Disabled until API is researched - return empty
-        return Optional.empty();
+        // 1.21.11: Use DataComponents.EQUIPPABLE to check if item fits slot
+        // and DataComponents.ATTRIBUTE_MODIFIERS to get armor value
+        ItemStack best = null;
+        double bestDefense = 0;
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack.isEmpty())
+                continue;
+
+            // Check if equippable in target slot
+            var equippable = stack.get(DataComponents.EQUIPPABLE);
+            if (equippable == null || equippable.slot() != slot)
+                continue;
+
+            // Get armor defense from attribute modifiers
+            var attrMods = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
+            if (attrMods != null) {
+                double defense = attrMods.modifiers().stream()
+                        .filter(entry -> entry.attribute().value().equals(Attributes.ARMOR.value()))
+                        .mapToDouble(entry -> entry.modifier().amount())
+                        .sum();
+                if (defense > bestDefense) {
+                    bestDefense = defense;
+                    best = stack;
+                }
+            } else if (best == null) {
+                best = stack; // Any equippable is better than nothing
+            }
+        }
+        return Optional.ofNullable(best);
     }
 
     static Optional<ItemStack> getBestSword(Container inv) {
-        // TODO: In 1.21.11, SwordItem API may have changed
-        // Disabled until API is researched - return empty
-        return Optional.empty();
+        // 1.21.11: Check for items with attack damage attribute
+        ItemStack best = null;
+        double bestDamage = 0;
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack.isEmpty())
+                continue;
+
+            // Check for attack damage attribute modifier
+            var attrMods = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
+            if (attrMods == null)
+                continue;
+
+            double damage = attrMods.modifiers().stream()
+                    .filter(entry -> entry.attribute().value().equals(Attributes.ATTACK_DAMAGE.value()))
+                    .mapToDouble(entry -> entry.modifier().amount())
+                    .sum();
+            if (damage > bestDamage) {
+                bestDamage = damage;
+                best = stack;
+            }
+        }
+        return Optional.ofNullable(best);
     }
 
     static Optional<ItemStack> getBestRanged(Container inv) {
-        // TODO: In 1.21.11, ProjectileWeaponItem API may have changed
-        // Disabled until API is researched - return empty
-        return Optional.empty();
+        // 1.21.11: Check for ProjectileWeaponItem subclass or use data components
+        ItemStack best = null;
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack.isEmpty())
+                continue;
+
+            // Check if it's a projectile weapon (bow, crossbow, etc.)
+            if (stack.getItem() instanceof net.minecraft.world.item.ProjectileWeaponItem) {
+                best = stack;
+                break; // First ranged weapon found
+            }
+        }
+        return Optional.ofNullable(best);
     }
 
     static void dropAllItems(Entity entity, Container inv) {
@@ -145,8 +203,16 @@ public interface InventoryUtils {
     }
 
     static double approximateDamage(ItemStack stack, LivingEntity entity) {
-        // TODO: In 1.21.11, ItemAttributeModifiers.compute() signature changed
-        // Return base value until API is researched
-        return entity.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
+        // 1.21.11: Use DataComponents.ATTRIBUTE_MODIFIERS to get damage
+        double baseDamage = entity.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
+        var attrMods = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
+        if (attrMods != null) {
+            double weaponDamage = attrMods.modifiers().stream()
+                    .filter(entry -> entry.attribute().value().equals(Attributes.ATTACK_DAMAGE.value()))
+                    .mapToDouble(entry -> entry.modifier().amount())
+                    .sum();
+            return baseDamage + weaponDamage;
+        }
+        return baseDamage;
     }
 }
