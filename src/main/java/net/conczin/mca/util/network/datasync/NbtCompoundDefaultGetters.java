@@ -28,13 +28,8 @@ public class NbtCompoundDefaultGetters {
     }
 
     public static ItemStack getItemStack(CompoundTag nbt, String key, ItemStack def, HolderLookup.Provider provider) {
-        try {
-            // In 1.21.11, contains() only takes key, not type
-            if (nbt.contains(key)) {
-                return nbt.getCompound(key).flatMap(compound -> ItemStack.parse(provider, compound)).orElse(def);
-            }
-        } catch (ClassCastException ignored) {
-        }
+        // TODO: In 1.21.11, ItemStack.parse API may have changed
+        // Disabled until API is researched - return default
         return def;
     }
 }

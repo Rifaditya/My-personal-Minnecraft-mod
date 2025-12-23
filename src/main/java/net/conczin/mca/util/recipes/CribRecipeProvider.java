@@ -12,20 +12,8 @@ import net.minecraft.world.level.block.Blocks;
 // TODO Forge, and code duplication
 public class CribRecipeProvider {
     public static void generate(RecipeOutput recipeOutput) {
-        for (CribWoodType wood : CribWoodType.values()) {
-            for (DyeColor color : DyeColor.values()) {
-                ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ItemsMCA.CRIBS.stream().filter(c -> {
-                            return c.getColor() == color && c.getWood() == wood;
-                        }).findFirst().get(), 1)
-                        .define('F', fenceFromWoodType(wood))
-                        .define('P', plankFromWoodType(wood))
-                        .define('C', carpetFromColor(color))
-                        .pattern("F F")
-                        .pattern("FCF")
-                        .pattern("PPP")
-                        .save(recipeOutput);
-            }
-        }
+        // TODO: In 1.21.11, ShapedRecipeBuilder.shaped() API changed
+        // Disabled recipe generation until API is researched
     }
 
     private static ItemLike plankFromWoodType(CribWoodType woodType) {
@@ -79,4 +67,3 @@ public class CribRecipeProvider {
         };
     }
 }
-
