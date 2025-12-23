@@ -126,6 +126,7 @@ public class SpawnQueue {
                 && !handlesSpawnReason(villagerEntity.mca$getSpawnReason())) {
             return false;
         }
+        // From 1.21.1 reference: dimension().location() works
         if (Config.getInstance().villagerDimensionBlacklist
                 .contains(entity.getCommandSenderWorld().dimension().location().toString())) {
             return false;

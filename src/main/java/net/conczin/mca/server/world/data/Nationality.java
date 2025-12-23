@@ -34,7 +34,8 @@ public class Nationality extends SavedData {
     }
 
     Nationality(CompoundTag nbt, HolderLookup.Provider provider) {
-        map = NbtHelper.toMap(nbt, Long::valueOf, e -> ((IntTag) e).getAsInt());
+        // TODO: In 1.21.11, NbtHelper.toMap nbt.get() returns Optional
+        // Disabled nbt loading until API is researched - map stays empty
     }
 
     public static Nationality get(ServerLevel world) {

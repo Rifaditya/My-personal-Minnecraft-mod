@@ -40,12 +40,16 @@ public interface WorldUtils {
         return world.getEntitiesOfClass(c, new AABB(pos, pos).inflate(range));
     }
 
-    @SuppressWarnings({ "DataFlowIssue", "unchecked" })
+    @SuppressWarnings("DataFlowIssue")
     static <T extends SavedData> T loadData(ServerLevel world, BiFunction<CompoundTag, HolderLookup.Provider, T> loader,
             Function<ServerLevel, T> factory, String dataId) {
-        // TODO: In 1.21.11, SavedData.Factory constructor API changed
-        // Disabled until API is researched - return new instance from factory
-        return factory.apply(world);
+        // From 1.21.1 reference: SavedData.Factory takes 3 params with null third param
+        return world.getDataStorage().computeIfAbsent(
+                new SavedData.Factory<>(
+                        () -> factory.apply(world),
+                        loader,
+                        null),
+                dataId);
     }
 
     static void spawnEntity(Level world, Mob entity, EntitySpawnReason reason) {

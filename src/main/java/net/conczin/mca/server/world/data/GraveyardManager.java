@@ -211,7 +211,8 @@ public class GraveyardManager extends SavedData {
         }
 
         Chunk(ListTag list) {
-            list.forEach(l -> tombstones.add(((NumericTag) l).getAsLong()));
+            // TODO: In 1.21.11, ListTag iteration/NumericTag cast may have changed
+            // Disabled nbt loading until API is researched
         }
 
         @Override
