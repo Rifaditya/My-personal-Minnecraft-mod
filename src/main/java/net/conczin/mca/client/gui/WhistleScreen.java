@@ -124,8 +124,8 @@ public class WhistleScreen extends Screen {
 
     public void setVillagerData(@NotNull CompoundTag data) {
         villagerData = data;
-        // TODO: In 1.21.11, CompoundTag.getAllKeys() renamed - trying keySet()\n keys =
-        // new ArrayList<>(data.keySet());
+        // 1.21.11: CompoundTag.getAllKeys() renamed to keySet()
+        keys = new ArrayList<>(data.keySet());
         loadingAnimationTicks = -1;
         selectedIndex = 0;
 
@@ -134,13 +134,14 @@ public class WhistleScreen extends Screen {
 
     private void setVillagerData(int index) {
         if (!keys.isEmpty()) {
-            // TODO: In 1.21.11, getCompound returns Optional
+            // 1.21.11: getCompound returns Optional - using orElse
             CompoundTag firstData = villagerData.getCompound(keys.get(index)).orElse(new CompoundTag());
 
             dummy = EntitiesMCA.MALE_VILLAGER.create(Minecraft.getInstance().level,
                     net.minecraft.world.entity.EntitySpawnReason.LOAD);
-            // TODO: In 1.21.11, readAdditionalSaveData uses ValueInput
-            // dummy.readAdditionalSaveData(firstData);
+            // 1.21.11: readAdditionalSaveData uses ValueInput - simplified for now
+            // Dummy entity created but data not loaded - shows default appearance
+            // To properly load data, would need to implement ValueInput pattern
 
             villagerNameButton.setMessage(dummy.getDisplayName());
 
