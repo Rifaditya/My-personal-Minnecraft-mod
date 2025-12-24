@@ -27,8 +27,7 @@ public class OnlineSpeechManager {
     private boolean warningIssued = false;
 
     public static void languageNotSupported() {
-        // TODO: In 1.21.11, ClickEvent is abstract, can't instantiate directly
-        // Using alternative approach
+        // 1.21.11: ClickEvent not used here - simplified message display
         Minecraft.getInstance().gui.getChat().addMessage(
                 Component.translatable("command.tts_unsupported_language").withStyle(s -> s
                         .withColor(ChatFormatting.RED)));

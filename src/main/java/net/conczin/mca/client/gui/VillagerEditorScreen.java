@@ -483,8 +483,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
                 // profession
                 boolean right = false;
                 List<ButtonWidget> professionButtons = new LinkedList<>();
-                // TODO: In 1.21.11, VillagerProfession.NONE is a ResourceKey, simplified for
-                // now
+                // 1.21.11: VillagerProfession.NONE is ResourceKey - removed from list
                 for (VillagerProfession p : new VillagerProfession[] {
                         // VillagerProfession.NONE removed - ResourceKey type mismatch
                         ProfessionsMCA.GUARD,
@@ -827,7 +826,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
 
         }
 
-        // TODO: In 1.21.11, super.mouseClicked signature changed
+        // 1.21.11: Can't call super - return false instead
         return false;
     }
 
