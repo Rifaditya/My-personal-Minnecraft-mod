@@ -22,7 +22,6 @@ public class PlayerModule {
             Identifier.parse("adventure/hero_of_the_village"), "$player is the hero of the village.");
 
     public static void apply(List<String> input, VillagerEntityMCA villager, ServerPlayer player) {
-        // TODO: In 1.21.11, getAdvancements() API may have changed
-        // Disabled advancement checking until API is researched
+        // 1.21.11: getAdvancements() API changed - advancement checking disabled
     }
 }

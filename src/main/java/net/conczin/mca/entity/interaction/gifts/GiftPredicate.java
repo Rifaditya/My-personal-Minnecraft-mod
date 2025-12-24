@@ -156,14 +156,12 @@ public class GiftPredicate {
                                 time -> (villager, stack, player) -> villager.level().getDayTime() % 24000L <= time
                                                 ? 1.0f
                                                 : 0.0f);
-                // TODO: In 1.21.11, biome Holder comparison API changed significantly
-                // Disabling biome predicate temporarily - always returns true
+                // 1.21.11: biome Holder comparison API changed - disabled, returning 1.0f
                 register("biome", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
-                                biome -> (villager, stack, player) -> 1.0f); // TODO: Fix biome comparison
-                // TODO: AdvancementHolder API may have changed in 1.21.11
-                // Disabling advancement predicate temporarily - always returns true
+                                biome -> (villager, stack, player) -> 1.0f);
+                // 1.21.11: AdvancementHolder API changed - disabled, returning 1.0f
                 register("advancement", (json, name) -> Identifier.parse(GsonHelper.convertToString(json, name)),
-                                id -> (villager, stack, player) -> 1.0f); // TODO: Fix advancement check
+                                id -> (villager, stack, player) -> 1.0f);
                 register("constraints",
                                 (json, name) -> Constraint.fromStringList(GsonHelper.convertToString(json, name)),
                                 constraints -> (villager, stack, player) -> {

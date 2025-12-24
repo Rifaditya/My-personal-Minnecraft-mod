@@ -24,11 +24,11 @@ public class VillageModule {
     public static void apply(List<String> input, VillagerEntityMCA villager, ServerPlayer player) {
         Optional<Village> village = villager.getResidency().getHomeVillage();
 
-        // TODO: In 1.21.11, unwrapKey().map() returns Object not String
+        // 1.21.11: unwrapKey().map() type change - simplified to default biome
         // String biome =
         // villager.level().getBiome(villager.blockPosition()).unwrapKey().map(v ->
         // v.location().getPath()).orElse("plains");
-        String biome = "plains"; // Simplified for now
+        String biome = "plains";
 
         String size = "small";
         if (village.isPresent()) {

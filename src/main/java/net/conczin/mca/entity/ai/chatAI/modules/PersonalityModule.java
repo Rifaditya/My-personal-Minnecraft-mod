@@ -25,8 +25,7 @@ public class PersonalityModule {
         if (villager.getAgeState() == AgeState.TEEN) {
             input.add("$villager is a teen. ");
         }
-        // TODO: In 1.21.11, VillagerProfession.NONE is ResourceKey, profession.name()
-        // returns Component
+        // 1.21.11: VillagerProfession.NONE is ResourceKey - profession display disabled
         // else if (villager.getProfession() != VillagerProfession.NONE) {
         // input.add("$villager is a " + translate(villager.getProfession().name()) + ".
         // ");

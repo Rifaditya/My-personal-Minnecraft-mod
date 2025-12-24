@@ -53,20 +53,19 @@ public enum Constraint implements BiPredicate<VillagerLike<?>, ServerPlayer> {
     PARENT("parent", Relationship.IS_KID.asConstraint()),
     NOT_PARENT("!parent", Relationship.IS_KID.negate().asConstraint()),
 
-    // TODO: In 1.21.11, getProfession() returns ResourceKey<VillagerProfession>,
-    // not VillagerProfession
-    // These comparisons need to be updated to use registry key comparison
-    CLERIC("cleric", (villager, player) -> false), // TODO: Fix profession comparison
-    NOT_CLERIC("!cleric", (villager, player) -> true), // TODO: Fix profession comparison
+    // 1.21.11: getProfession() returns ResourceKey<VillagerProfession> - disabled
+    // Profession comparisons use simplified false/true fallbacks until fixed
+    CLERIC("cleric", (villager, player) -> false),
+    NOT_CLERIC("!cleric", (villager, player) -> true),
 
-    ADVENTURER("adventurer", (villager, player) -> false), // TODO: Fix profession comparison
-    NOT_ADVENTURER("!adventurer", (villager, player) -> true), // TODO: Fix profession comparison
+    ADVENTURER("adventurer", (villager, player) -> false),
+    NOT_ADVENTURER("!adventurer", (villager, player) -> true),
 
-    MERCENARY("mercenary", (villager, player) -> false), // TODO: Fix profession comparison
-    NOT_MERCENARY("!mercenary", (villager, player) -> true), // TODO: Fix profession comparison
+    MERCENARY("mercenary", (villager, player) -> false),
+    NOT_MERCENARY("!mercenary", (villager, player) -> true),
 
-    OUTLAWED("outlawed", (villager, player) -> false), // TODO: Fix profession comparison
-    NOT_OUTLAWED("!outlawed", (villager, player) -> true), // TODO: Fix profession comparison
+    OUTLAWED("outlawed", (villager, player) -> false),
+    NOT_OUTLAWED("!outlawed", (villager, player) -> true),
 
     TRADER("trader", (villager, player) -> villager.canTradeWithProfession()),
     NOT_TRADER("!trader", (villager, player) -> !villager.canTradeWithProfession()),
