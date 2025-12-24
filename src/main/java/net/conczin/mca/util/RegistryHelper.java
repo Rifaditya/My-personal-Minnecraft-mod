@@ -13,8 +13,8 @@ import java.util.Optional;
 public class RegistryHelper {
 
     public static <T> Optional<TagKey<T>> tryGetTagKey(Registry<T> registry, Identifier id) {
-        // TODO: In 1.21.11, getTagNames() API may have changed
-        // Disabled until API is researched - return empty
+        // 1.21.11: getTag() doesn't exist on Registry, getTagNames() changed
+        // Returning empty until proper API is researched
         return Optional.empty();
     }
 
@@ -25,8 +25,7 @@ public class RegistryHelper {
     }
 
     public static <T> Optional<Holder<T>> tryGetEntry(Registry<T> registry, T object) {
-        // TODO: In 1.21.11, getHolderOrThrow API may have changed
-        // Disabled until API is researched - return empty
+        // 1.21.11: wrapAsHolder may not exist, returning empty until researched
         return Optional.empty();
     }
 
