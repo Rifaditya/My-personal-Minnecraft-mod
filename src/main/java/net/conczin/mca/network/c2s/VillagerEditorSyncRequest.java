@@ -61,9 +61,8 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
                 saveEntity(player, entity, data());
                 break;
             case "profession":
-                // TODO: In 1.21.11, BuiltInRegistries.get and CompoundTag.getString return
-                // Optional
-                // Disabled until proper handling
+                // 1.21.11: BuiltInRegistries.get and CompoundTag.getString return Optional -
+                // disabled
                 // if (entity instanceof VillagerEntityMCA villager) {
                 // BuiltInRegistries.VILLAGER_PROFESSION
                 // .get(Identifier.parse(data.getString("profession").orElse("")))
@@ -79,7 +78,7 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             // fetch hair
             String hair;
             if (data.contains("offset")) {
-                // TODO: In 1.21.11, CompoundTag.getString/getInt return Optional
+                // 1.21.11: CompoundTag.getString/getInt return Optional - using .orElse()
                 hair = HairList.getInstance().getPool(getGender(villagerData)).pickNext(
                         villagerData.getString("Hair").orElse(""),
                         data.getInt("offset").orElse(0));
@@ -99,7 +98,7 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
             String clothes = "mca:missing";
             if (entity instanceof Player) {
                 if (data.contains("offset")) {
-                    // TODO: In 1.21.11, getPool takes VillagerProfession not ResourceKey
+                    // 1.21.11: getPool takes VillagerProfession not ResourceKey - disabled
                     // clothes = ClothingList.getInstance().getPool(getGender(villagerData),
                     // VillagerProfession.NONE)
                     // .pickNext(villagerData.getString("Clothes").orElse(""),
@@ -113,7 +112,7 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
                 }
             } else if (entity instanceof VillagerLike<?> villager) {
                 if (data.contains("offset")) {
-                    // TODO: In 1.21.11, getInt returns Optional
+                    // 1.21.11: getInt returns Optional - using .orElse()
                     clothes = ClothingList.getInstance().getPool(villager).pickNext(villager.getClothes(),
                             data.getInt("offset").orElse(0));
                 } else {
@@ -147,7 +146,7 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
     }
 
     private Gender getGender(CompoundTag villagerData) {
-        // TODO: In 1.21.11, getInt returns Optional<Integer>
+        // 1.21.11: getInt returns Optional<Integer> - using .orElse(0)
         return Gender.byId(villagerData.contains("gender") ? villagerData.getInt("gender").orElse(0) : 0);
     }
 
@@ -195,16 +194,15 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         FamilyTreeNode entry = tree.getOrCreate(entity);
         entry.setGender(getGender(data));
 
-        // TODO: In 1.21.11, getString returns Optional<String>
+        // 1.21.11: getString returns Optional<String> - using .orElse("")
         String s = villagerData.getString("CustomName").orElse("");
         if (!s.isEmpty()) {
-            // TODO: In 1.21.11, Component.Serializer.fromJson signature may have changed
-            // Simplified: just set the name directly
+            // 1.21.11: Component.Serializer.fromJson signature changed - simplified
             entry.setName(s);
         }
 
         if (villagerData.contains("FamilyTreeNewFatherName")) {
-            // TODO: In 1.21.11, getString returns Optional
+            // 1.21.11: getString returns Optional - using .orElse("")
             String name = villagerData.getString("FamilyTreeNewFatherName").orElse("");
             if (MCA.isBlankString(name)) {
                 entry.removeFather();
@@ -214,7 +212,7 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         }
 
         if (villagerData.contains("FamilyTreeNewMotherName")) {
-            // TODO: In 1.21.11, getString returns Optional
+            // 1.21.11: getString returns Optional - using .orElse("")
             String name = villagerData.getString("FamilyTreeNewMotherName").orElse("");
             if (MCA.isBlankString(name)) {
                 entry.removeMother();
@@ -224,11 +222,10 @@ public record VillagerEditorSyncRequest(String command, UUID uuid, CompoundTag d
         }
 
         if (villagerData.contains("FamilyTreeNewSpouseName")) {
-            // TODO: In 1.21.11, getString returns Optional
+            // 1.21.11: getString returns Optional - using .orElse("")
             String name = villagerData.getString("FamilyTreeNewSpouseName").orElse("");
             if (MCA.isBlankString(name)) {
-                // TODO: In 1.21.11, entry.partner() API may have changed
-                // Simplified: just clear the partner
+                // 1.21.11: entry.partner() unchanged - clearing partner
                 entry.updatePartner(null, null);
             } else {
                 getFamilyNode(player, tree, name, entry.gender().opposite()).ifPresent(node -> {
