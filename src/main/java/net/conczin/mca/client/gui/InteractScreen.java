@@ -206,21 +206,29 @@ public class InteractScreen extends AbstractDynamicScreen {
         // traits
         Set<Traits.Trait> traits = villager.getTraits().getTraits();
         if (!traits.isEmpty()) {
+            // Build trait text for display
+            MutableComponent traitText = Component.translatable("traits.title");
+            List<Component> traitNames = new java.util.ArrayList<>();
+            traits.stream().map(Traits.Trait::getName).forEach(t -> {
+                if (!traitText.getSiblings().isEmpty()) {
+                    traitText.append(Component.literal(", "));
+                }
+                traitText.append(t);
+                traitNames.add(t.copy().withStyle(ChatFormatting.GOLD));
+            });
+
+            // Show list text
+            context.drawString(font, traitText, 10, 30 + h * 4, 0xFFFFFFFF);
+
+            // Show tooltip on hover
             if (hoveringOverText(10, 30 + h * 4, 128)) {
-                // details - simplified to just show first trait description
-                // TODO: In 1.21.11, renderComponentTooltip doesn't exist
-                // context.renderComponentTooltip(font, traitText, 10, 30 + h * 4);
-            } else {
-                // list
-                MutableComponent traitText = Component.translatable("traits.title");
-                traits.stream().map(Traits.Trait::getName).forEach(t -> {
-                    if (!traitText.getSiblings().isEmpty()) {
-                        traitText.append(Component.literal(", "));
-                    }
-                    traitText.append(t);
-                });
-                // TODO: In 1.21.11, renderTooltip signature changed
-                context.drawString(font, traitText, 10, 30 + h * 4, 0xFFFFFFFF);
+                List<net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent> components = traitNames
+                        .stream()
+                        .map(c -> net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
+                                .create(c.getVisualOrderText()))
+                        .collect(java.util.stream.Collectors.toList());
+                context.renderTooltip(font, components, 10, 30 + h * 4,
+                        net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE, null);
             }
         }
 
