@@ -17,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// TODO: In 1.21.11, ChunkAccess constructor signature changed significantly
-// This mixin is disabled until proper constructor signature is determined
+// 1.21.11: ChunkAccess constructor signature changed significantly - mixin disabled
 @Mixin(ProtoChunk.class)
 abstract class MixinProtoChunk {
     // Mixin body disabled - ChunkAccess constructor incompatible

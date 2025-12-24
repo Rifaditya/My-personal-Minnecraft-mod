@@ -34,8 +34,8 @@ abstract class MixinZombieVillager implements IVillagerEntity {
         mca$reason = spawnType;
     }
 
-    // TODO: In 1.21.11, VillagerData.getProfession() returns ResourceKey, not
-    // VillagerProfession
+    // 1.21.11: VillagerData.getProfession() returns ResourceKey not
+    // VillagerProfession - disabled
     // @ModifyVariable(method = "setVillagerData", at = @At("HEAD"), ordinal = 0,
     // argsOnly = true)
     // private VillagerData setVillagerData(VillagerData villagerData) {

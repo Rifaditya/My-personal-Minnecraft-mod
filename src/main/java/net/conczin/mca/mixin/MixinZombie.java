@@ -18,7 +18,7 @@ public abstract class MixinZombie extends Monster {
         super(entityType, world);
     }
 
-    // TODO: In 1.21.11, killedEntity signature changed
+    // 1.21.11: killedEntity signature changed - injection disabled
     // @Inject(method =
     // "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z",
     // at = @At("HEAD"), cancellable = true)

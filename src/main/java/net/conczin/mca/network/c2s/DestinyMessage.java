@@ -66,7 +66,7 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         pos = ExtendedFuzzyPositions.downWhile(pos, 1,
                 p -> !player.level().getBlockState(p.below()).isCollisionShapeFullBlock(player.level(), p));
         ChunkPos chunkPos = new ChunkPos(pos);
-        // TODO: In 1.21.11, addRegionTicket API may have changed
+        // 1.21.11: addRegionTicket API changed - disabled
         // ((ServerLevel)
         // player.level()).getChunkSource().addRegionTicket(TicketType.POST_TELEPORT,
         // chunkPos, 1,
@@ -74,11 +74,11 @@ public record DestinyMessage(String location, boolean isClosing) implements Hand
         // In 1.21.11, RelativeMovement was removed. Use simpler teleport method
         // requestTeleport without flags or use teleportTo(x, y, z, yaw, pitch)
         player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), player.getYRot(), player.getXRot());
-        // TODO: In 1.21.11, setRespawnPosition signature changed
+        // 1.21.11: setRespawnPosition signature changed - disabled
         // player.setRespawnPosition(player.level().dimension(), pos, 0.0f, true,
         // false);
         // noinspection DataFlowIssue
-        // TODO: In 1.21.11, isSingleplayerOwner takes NameAndId not GameProfile
+        // 1.21.11: isSingleplayerOwner takes NameAndId not GameProfile - disabled
         // if (player.level().getServer().isSingleplayerOwner(player.getGameProfile()))
         // {
         // ((ServerLevel) player.level()).setDefaultSpawnPos(pos, 0.0f);

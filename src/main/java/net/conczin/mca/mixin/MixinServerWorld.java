@@ -20,14 +20,11 @@ import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 abstract class MixinServerWorld extends Level implements WorldGenLevel {
-    // TODO: In 1.21.11, Level constructor signature changed
-    // protected MixinServerWorld(WritableLevelData writableLevelData,
-    // ResourceKey<Level> resourceKey, RegistryAccess registryAccess,
-    // Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl,
-    // boolean bl2, long l, int i) {
-    // super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl,
-    // bl2, l, i);
-    // }
+    // 1.21.11: Level constructor signature changed - using new signature below
+    // Old: (WritableLevelData, ResourceKey<Level>, RegistryAccess,
+    // Holder<DimensionType>, Supplier<ProfilerFiller>, boolean, boolean, long, int)
+    // New: (WritableLevelData, ResourceKey<Level>, RegistryAccess,
+    // Holder<DimensionType>, boolean, boolean, long, int)
     protected MixinServerWorld(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey,
             RegistryAccess registryAccess, Holder<DimensionType> holder, boolean bl, boolean bl2, long l, int i) {
         super(writableLevelData, resourceKey, registryAccess, holder, bl, bl2, l, i);
