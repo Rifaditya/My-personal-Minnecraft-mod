@@ -34,6 +34,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -408,10 +409,12 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                 InventoryScreen.renderEntityInInventoryFollowsMouse(context, cx - 30, cy - 60, cx + 30, cy + 60, 60, 0,
                         mouseX, mouseY, villagerVisualization);
 
-                // metadata
-                // TODO: In 1.21.11, renderComponentTooltip doesn't exist
-                // context.renderComponentTooltip(font, getMetaDataText(focusedContent), width /
-                // 2 + 200, height / 2 - 50);
+                // metadata - 1.21.11: Use ClientTooltipComponent pattern
+                List<ClientTooltipComponent> metaComponents = getMetaDataText(focusedContent).stream()
+                        .map(c -> ClientTooltipComponent.create(c.getVisualOrderText()))
+                        .collect(java.util.stream.Collectors.toList());
+                context.renderTooltip(font, metaComponents, width / 2 + 200, height / 2 - 50,
+                        net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE, null);
             }
             case LOADING -> {
                 context.drawString(font, Component.translatable("gui.loading"), width / 2, height / 2, 0xFFFFFFFF);
@@ -419,8 +422,12 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
 
         if (tooltip != null) {
-            // TODO: In 1.21.11, renderComponentTooltip doesn't exist
-            // context.renderComponentTooltip(font, tooltip, mouseX, mouseY);
+            // 1.21.11: Use ClientTooltipComponent pattern for tooltip rendering
+            List<ClientTooltipComponent> tooltipComponents = tooltip.stream()
+                    .map(c -> ClientTooltipComponent.create(c.getVisualOrderText()))
+                    .collect(java.util.stream.Collectors.toList());
+            context.renderTooltip(font, tooltipComponents, mouseX, mouseY,
+                    net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner.INSTANCE, null);
         }
 
         if (error != null) {
