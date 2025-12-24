@@ -186,11 +186,17 @@ public abstract class AbstractDynamicScreen extends Screen {
             return apiButton;
         }
 
-        // In 1.21.11, AbstractButton requires this method to be implemented
+        // 1.21.11: AbstractButton requires this method to be implemented
         @Override
         protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-            // TODO: renderString doesn't exist on Button in 1.21.11
-            // Empty for now - buttons won't render text until fixed
+            // Render button text centered
+            int textColor = this.active ? 0xFFFFFFFF : 0xFFA0A0A0;
+            graphics.drawCenteredString(
+                    Minecraft.getInstance().font,
+                    this.getMessage(),
+                    this.getX() + this.width / 2,
+                    this.getY() + (this.height - 8) / 2,
+                    textColor);
         }
     }
 }

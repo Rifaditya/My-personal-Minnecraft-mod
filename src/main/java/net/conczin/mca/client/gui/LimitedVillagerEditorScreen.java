@@ -20,7 +20,7 @@ public class LimitedVillagerEditorScreen extends VillagerEditorScreen {
 
     @Override
     protected boolean shouldUsePlayerModel() {
-        // TODO: In 1.21.11, CompoundTag.getInt() returns Optional
+        // 1.21.11: CompoundTag.getInt() returns Optional - using orElse(0)
         return villagerData.getInt("PlayerModel").orElse(0) != VillagerLike.PlayerModel.VILLAGER.ordinal();
     }
 
