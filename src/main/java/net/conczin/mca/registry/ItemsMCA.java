@@ -176,7 +176,7 @@ public interface ItemsMCA {
                         .addPage(new TitlePage("cult_ancient", ChatFormatting.DARK_RED))
                         .addPage(new CenteredTextPage(Component.literal(
                                         "We are the universe. We are everything you think isn't you. You are looking at us now, through your skin and your eyes. And why does the universe touch your skin, and throw light on you? To see you, player. To know you. And to be known. I shall tell you a story."))
-                                        // TODO: In 1.21.11, withFont takes ResourceLocation
+                                        // 1.21.11: Using Style.EMPTY (withFont would take ResourceLocation)
                                         .setStyle(Style.EMPTY))));
 
         Item CIVIL_REGISTRY = register("civil_registry",

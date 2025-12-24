@@ -211,8 +211,13 @@ public class GraveyardManager extends SavedData {
         }
 
         Chunk(ListTag list) {
-            // TODO: In 1.21.11, ListTag iteration/NumericTag cast may have changed
-            // Disabled nbt loading until API is researched
+            // 1.21.11: ListTag iteration works, casting from Tag to specific types
+            for (int i = 0; i < list.size(); i++) {
+                net.minecraft.nbt.Tag tag = list.get(i);
+                if (tag instanceof net.minecraft.nbt.LongTag longTag) {
+                    tombstones.add(longTag.longValue());
+                }
+            }
         }
 
         @Override
