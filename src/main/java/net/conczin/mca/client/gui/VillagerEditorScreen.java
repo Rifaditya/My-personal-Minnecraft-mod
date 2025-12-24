@@ -865,8 +865,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
             }
 
             // hint for confused people
-            // TODO: In 1.21.11, pose() returns Matrix3x2fStack and getInt returns Optional
-            // Disabled pose transformation for now
+            // 1.21.11: pose() returns Matrix3x2fStack - disabled pose transformation
             if (shouldPrintPlayerHint() && villagerUUID.equals(playerUUID)) {
                 context.drawCenteredString(font, Component.translatable("gui.villager_editor.model_hint"),
                         x + DATA_WIDTH / 2, y - 145,
@@ -875,8 +874,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
         }
 
         if (page.equals("clothing") || page.equals("hair")) {
-            // TODO: In 1.21.11, Entity.save/load use ValueOutput/ValueInput, simplified for
-            // now
+            // 1.21.11: Entity.save/load use ValueOutput/ValueInput - disabled for now
             // CompoundTag nbt = new CompoundTag();
             // villager.save(nbt);
             // villagerVisualization.load(nbt);
@@ -929,12 +927,12 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
     public void setVillagerData(CompoundTag villagerData) {
         if (villager != null) {
             this.villagerData = villagerData;
-            // TODO: In 1.21.11, Entity.load uses ValueInput - simplified for now
+            // 1.21.11: Entity.load uses ValueInput - disabled for now
             // villager.load(villagerData);
 
             int hairDye = villager.getHairDye();
             hsvColoredHair = hairDye != 0xFF000000;
-            // TODO: In 1.21.11, FastColor.ABGR32 package removed - using bit operations
+            // 1.21.11: FastColor.ABGR32 removed - using bit operations
             color.setRGB(
                     ((hairDye >> 16) & 0xFF) / 255.0,
                     ((hairDye >> 8) & 0xFF) / 255.0,
@@ -963,7 +961,7 @@ public class VillagerEditorScreen extends Screen implements SkinListUpdateListen
 
     public void syncVillagerData() {
         CompoundTag nbt = villagerData;
-        // TODO: In 1.21.11, Entity.save uses ValueOutput - simplified for now
+        // 1.21.11: Entity.save uses ValueOutput - disabled for now
         // villager.save(nbt);
         nbt.putInt("Age", villagerBreedingAge);
         Network.sendToServer(new VillagerEditorSyncRequest("sync", villagerUUID, nbt));
