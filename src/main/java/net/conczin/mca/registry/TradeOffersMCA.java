@@ -19,10 +19,8 @@ import net.minecraft.world.level.ItemLike;
  */
 public class TradeOffersMCA {
     public static void bootstrap() {
-        // TODO: In 1.21.11, custom professions are disabled (null)
-        // Cannot register trades until professions are fixed
-        // Disabled trade registration for ADVENTURER and CULTIST
-        // since ProfessionsMCA.ADVENTURER and ProfessionsMCA.CULTIST are currently null
+        // 1.21.11: Custom professions disabled (null) - cannot register trades
+        // Trade registration for ADVENTURER and CULTIST disabled
     }
 
     // Custom factory that buys items for emeralds

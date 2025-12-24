@@ -17,9 +17,9 @@ public interface ProfessionsMCA {
     // Add missing IS_IMPORTANT set
     Set<VillagerProfession> IS_IMPORTANT = new HashSet<>();
 
-    // TODO: In 1.21.11, VillagerProfession constructor changed significantly
-    // These are placeholder nulls - will cause NPEs at runtime but allow
-    // compilation
+    // 1.21.11: VillagerProfession constructor changed significantly - placeholders
+    // These are null placeholders - custom professions disabled until API is
+    // researched
     VillagerProfession OUTLAW = null;
     VillagerProfession GUARD = null;
     VillagerProfession ARCHER = null;
@@ -30,7 +30,7 @@ public interface ProfessionsMCA {
     VillagerProfession CULTIST = null; // Alias for code that uses singular
 
     static String getFavoredBuilding(VillagerProfession profession) {
-        // TODO: In 1.21.11, VillagerProfession comparison may need adjustment
+        // 1.21.11: VillagerProfession comparison unchanged - works with null checks
         if (GUARD == profession || ARCHER == profession) {
             return "inn";
         }

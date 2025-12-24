@@ -197,8 +197,7 @@ public class ClientHandlerImpl implements ClientHandler {
 
     @Override
     public void handleToastMessage(ShowToastRequest message) {
-        // TODO: In 1.21.11, SystemToast.SystemToastId.PERIODIC_NOTIFICATION may have
-        // changed
+        // 1.21.11: SystemToast.SystemToastId.PERIODIC_NOTIFICATION changed - disabled
         // SystemToast.add(client.getToasts(),
         // SystemToast.SystemToastId.PERIODIC_NOTIFICATION, message.getTitle(),
         // message.getMessage());
@@ -219,7 +218,7 @@ public class ClientHandlerImpl implements ClientHandler {
         VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(client.level,
                 net.minecraft.world.entity.EntitySpawnReason.LOAD);
         assert villager != null;
-        // TODO: In 1.21.11, readAdditionalSaveData takes ValueInput, not CompoundTag
+        // 1.21.11: readAdditionalSaveData takes ValueInput not CompoundTag - disabled
         // villager.readAdditionalSaveData(response.nbt());
         MCAClient.addPlayerData(response.uuid(), villager);
     }

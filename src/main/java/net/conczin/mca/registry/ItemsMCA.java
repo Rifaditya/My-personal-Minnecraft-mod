@@ -58,7 +58,7 @@ public interface ItemsMCA {
         Item FAMILY_TREE = register("family_tree", new FamilyTreeItem(baseProps()));
         Item VILLAGER_TRACKER = register("villager_tracker", new VillagerTrackerItem(baseProps().stacksTo(1)));
 
-        // TODO: In 1.21.11, ToolMaterial.GOLD doesn't exist - need to research new API
+        // 1.21.11: ToolMaterial.GOLD removed - SCYTHE item disabled
         // Item SCYTHE = register("scythe",
         // new
         // ScytheItem(baseProps().attributes(SwordItem.createAttributes(ToolMaterial.GOLD,

@@ -53,7 +53,7 @@ public interface EntitiesMCA {
         static <T extends LivingEntity> EntityType<T> register(String name, EntityType.Builder<T> builder,
                         Supplier<AttributeSupplier.Builder> attributes) {
                 Identifier id = MCA.locate(name);
-                // TODO: In 1.21.11, build takes ResourceKey not String
+                // 1.21.11: build takes ResourceKey not String - implemented correctly
                 ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, id);
                 EntityType<T> entity = builder.build(key);
                 ATTRIBUTES.put(entity, attributes.get());
@@ -63,7 +63,7 @@ public interface EntitiesMCA {
 
         static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
                 Identifier id = MCA.locate(name);
-                // TODO: In 1.21.11, build takes ResourceKey not String
+                // 1.21.11: build takes ResourceKey not String - implemented correctly
                 ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, id);
                 EntityType<T> entity = builder.build(key);
                 ENTITIES.put(id, entity);
