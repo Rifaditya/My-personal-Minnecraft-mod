@@ -21,7 +21,7 @@ public record CallToPlayerMessage(UUID uuid) implements HandleablePayload {
 
     @Override
     public void handleServer(ServerPlayer player) {
-        // TODO: In 1.21.11, fixed incorrect cast
+        // 1.21.11: Using level().getEntity() instead of serverLevel
         Entity e = player.level().getEntity(uuid);
         if (e instanceof VillagerEntityMCA v) {
             if (v.isSleeping()) {

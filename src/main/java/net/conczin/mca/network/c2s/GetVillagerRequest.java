@@ -42,7 +42,7 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
             data = PlayerSaveData.get(serverPlayer).getEntityData();
         } else if (e instanceof LivingEntity) {
             data = new CompoundTag();
-            // TODO: In 1.21.11, Entity.save takes ValueOutput
+            // 1.21.11: Entity.save takes ValueOutput - disabled for now
             // e.save(data);
         } else {
             return null;
@@ -60,7 +60,7 @@ public record GetVillagerRequest(UUID id) implements HandleablePayload {
 
     @Override
     public void handleServer(ServerPlayer player) {
-        // TODO: In 1.21.11, fixed wrong cast
+        // 1.21.11: Using level().getEntity() instead of serverLevel
         Entity e = player.level().getEntity(id);
         CompoundTag villagerData = getVillagerData(e);
         if (villagerData != null) {

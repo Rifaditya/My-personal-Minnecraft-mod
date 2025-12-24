@@ -28,13 +28,13 @@ public record GetFamilyRequest() implements HandleablePayload {
         Stream.concat(
                 playerData.getFamilyEntry().getAllRelatives(4),
                 playerData.getPartnerUUID().stream()).distinct()
-                // TODO: In 1.21.11, fixed wrong cast
+                // 1.21.11: Using level().getEntity() instead of serverLevel
                 .map(uuid -> player.level().getEntity(uuid))
                 .filter(e -> e instanceof VillagerLike<?>)
                 .limit(100)
                 .forEach(e -> {
                     CompoundTag nbt = new CompoundTag();
-                    // TODO: In 1.21.11, addAdditionalSaveData signature changed
+                    // 1.21.11: addAdditionalSaveData takes ValueOutput - disabled
                     // ((Mob) e).addAdditionalSaveData(nbt);
                     nbt.remove("Brain");
                     nbt.remove("Memories");

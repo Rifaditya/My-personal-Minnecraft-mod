@@ -28,7 +28,7 @@ public record InteractionDialogueMessage(
 
     @Override
     public void handleServer(ServerPlayer player) {
-        // TODO: In 1.21.11, fixed wrong cast
+        // 1.21.11: Using level().getEntity() instead of serverLevel
         Entity v = player.level().getEntity(villagerUUID);
         if (v instanceof VillagerEntityMCA villager) {
             Dialogues.getInstance().selectAnswer(villager, player, question, answer);
