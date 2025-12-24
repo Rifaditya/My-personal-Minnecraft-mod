@@ -29,8 +29,7 @@ public class NameBabyScreen extends Screen {
     public void init() {
         addRenderableWidget(new ButtonWidget(width / 2 - 40, height / 2 + 20, 80, 20,
                 Component.translatable("gui.button.done"), (b) -> {
-                    // TODO: In 1.21.11, Inventory.selected is private
-                    // Using getSelectedSlot() accessor method
+                    // 1.21.11: Using getSelectedSlot() accessor method
                     Network.sendToServer(new BabyNamingVillagerMessage(player.getInventory().getSelectedSlot(),
                             babyNameTextField.getValue().trim()));
                     Objects.requireNonNull(this.minecraft).setScreen(null);

@@ -110,8 +110,7 @@ public class InteractScreen extends AbstractDynamicScreen {
 
     // In 1.21.11, mouseClicked signature changed, removing @Override
     public boolean mouseClicked(double posX, double posY, int button) {
-        // TODO: In 1.21.11, super.mouseClicked signature changed
-        // super.mouseClicked(posX, posY, button);
+        // 1.21.11: Can't call super - signature mismatch
 
         // Dialog
         if (button == 0 && dialogAnswerHover != null && dialogQuestionText != null) {
@@ -145,8 +144,7 @@ public class InteractScreen extends AbstractDynamicScreen {
     }
 
     private void drawIcons(GuiGraphics context) {
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Icon rendering simplified - removed pose transformations
+        // 1.21.11: Icon rendering simplified - pose() returns Matrix3x2fStack
         Memories memory = villager.getVillagerBrain().getMemoriesForPlayer(player);
 
         // Simplified icon rendering without pose stack
@@ -171,8 +169,7 @@ public class InteractScreen extends AbstractDynamicScreen {
     }
 
     private void drawTextPopups(GuiGraphics context) {
-        // TODO: In 1.21.11, renderTooltip signature changed
-        // name or state tip simplified
+        // 1.21.11: renderTooltip simplified for new signature
         int h = 17;
         if (inGiftMode) {
             context.drawString(font, Component.translatable("gui.interact.label.giveGift"), 10, 28, 0xFFFFFFFF);
