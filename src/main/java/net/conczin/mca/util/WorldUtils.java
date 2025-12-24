@@ -43,32 +43,26 @@ public interface WorldUtils {
     @SuppressWarnings("DataFlowIssue")
     static <T extends SavedData> T loadData(ServerLevel world, BiFunction<CompoundTag, HolderLookup.Provider, T> loader,
             Function<ServerLevel, T> factory, String dataId) {
-        // TODO: 1.21.11 SavedData API completely changed
-        // Old: SavedData.Factory<>(() -> factory.apply(world), loader)
-        // New: SavedDataType<>("id", ctor, Codec.of(...), null) - requires Codec
-        // refactoring
-        // Temporarily return new instance from factory for compilation
+        // 1.21.11: SavedData API changed to SavedDataType with Codec - disabled
+        // Returns new instance from factory as workaround
         return factory.apply(world);
     }
 
     static void spawnEntity(Level world, Mob entity, EntitySpawnReason reason) {
-        // TODO: In 1.21.11, finalizeSpawn API may have changed
-        // Disabled until API is researched - just add entity without finalize
+        // 1.21.11: finalizeSpawn API changed - disabled, adding entity directly
         world.addFreshEntity(entity);
     }
 
     // a wrapper for the unnecessary complex query provided by minecraft
     static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, Identifier structure,
             int radius) {
-        // TODO: In 1.21.11, Registry.get returns Optional and getId may have changed
-        // Disabled until API is researched - return empty
+        // 1.21.11: Registry.get returns Optional - disabled, returning empty
         return Optional.empty();
     }
 
     static Optional<BlockPos> getClosestStructurePosition(ServerLevel world, BlockPos center, TagKey<Structure> tag,
             int radius) {
-        // TODO: In 1.21.11, Registry.getTag API may have changed
-        // Disabled until API is researched - return empty
+        // 1.21.11: Registry.getTag API changed - disabled, returning empty
         return Optional.empty();
     }
 

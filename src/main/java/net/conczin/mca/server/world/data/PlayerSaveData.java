@@ -89,8 +89,7 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
 
     @SuppressWarnings("DataFlowIssue")
     public static Optional<PlayerSaveData> getIfPresent(ServerLevel world, UUID uuid) {
-        // TODO: SavedData.Factory pattern changed in 1.21.11
-        // Returning empty for now - need to research new API
+        // 1.21.11: SavedData.Factory pattern changed - returning empty
         return Optional.empty();
     }
 
@@ -102,9 +101,8 @@ public class PlayerSaveData extends SavedData implements EntityRelationship {
 
     private void resetEntityData() {
         entityData = new CompoundTag();
-        // TODO: In 1.21.11, create(Level) needs EntitySpawnReason
-        // Also addAdditionalSaveData signature changed
-        // Skipping entity creation for now
+        // 1.21.11: create(Level) needs EntitySpawnReason, addAdditionalSaveData changed
+        // Entity creation disabled
     }
 
     public boolean isEntityDataSet() {

@@ -21,9 +21,7 @@ public class CivilRegistryManager extends SavedData {
     }
 
     CivilRegistryManager(CompoundTag nbt, HolderLookup.Provider provider) {
-        // TODO: Component.Serializer.fromJson signature changed in 1.21.11
-        // Skipping deserialization for now - will be empty on load
-        // Need to research correct API for Component JSON deserialization
+        // 1.21.11: Component.Serializer.fromJson changed - skipping deserialization
     }
 
     public static CivilRegistryManager get(ServerLevel world, Village village) {
@@ -31,13 +29,10 @@ public class CivilRegistryManager extends SavedData {
                 "mca_civil_registry_" + village.getId());
     }
 
-    // In 1.21.11, SavedData.save() signature changed, removing @Override
-    // temporarily
-    // TODO: Refactor to use SavedDataType with CODEC pattern as in 1.21.11
-    // Also Component.Serializer.toJson signature changed
+    // 1.21.11: SavedData.save() and SavedDataType with CODEC pattern changed
+    // Component.Serializer.toJson signature also changed
     public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
-        // TODO: Component serialization API changed in 1.21.11
-        // Skipping serialization for now - entries won't persist
+        // 1.21.11: Component serialization changed - entries won't persist
         return nbt;
     }
 

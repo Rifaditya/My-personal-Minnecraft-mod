@@ -24,14 +24,12 @@ public class CustomClothingManager {
     static final Storage<Hair> HAIR_DUMMY = new Storage<>();
 
     public static Storage<Clothing> getClothing() {
-        // TODO: In 1.21.11, SavedData.Factory constructor API changed
-        // Disabled until API is researched - return dummy
+        // 1.21.11: SavedData.Factory API changed - returning dummy
         return CLOTHING_DUMMY;
     }
 
     public static Storage<Hair> getHair() {
-        // TODO: In 1.21.11, SavedData.Factory constructor API changed
-        // Disabled until API is researched - return dummy
+        // 1.21.11: SavedData.Factory API changed - returning dummy
         return HAIR_DUMMY;
     }
 

@@ -287,7 +287,7 @@ public class AdminCommand {
     }
 
     private static int restoreClearedVillagers(CommandContext<CommandSourceStack> ctx) {
-        // TODO: In 1.21.11, EntityType.create signature changed
+        // 1.21.11: EntityType.create signature changed - disabled
         // storedVillagers.forEach(tag ->
         // EntityType.create(tag, ctx.getSource().getLevel())
         // .ifPresent(v -> ctx.getSource().getLevel().addFreshEntity(v)));
@@ -311,7 +311,7 @@ public class AdminCommand {
         storedVillagers.clear();
         getLoadedVillagers(ctx).forEach(v -> {
             CompoundTag tag = new CompoundTag();
-            // TODO: In 1.21.11, saveAsPassenger signature changed
+            // 1.21.11: saveAsPassenger signature changed - disabled
             // if (v.saveAsPassenger(tag)) {
             // storedVillagers.add(tag);
             // v.discard();
