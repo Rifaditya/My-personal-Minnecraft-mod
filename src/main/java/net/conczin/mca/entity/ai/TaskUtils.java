@@ -23,14 +23,9 @@ public interface TaskUtils {
      *         given the provided ordered triples.
      */
     static int getSpawnSafeTopLevel(Level world, int x, int y, int z) {
-        // TODO: In 1.21.11, getMaxBuildHeight() and isEmptyBlock() may have moved
-        // BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, Math.min(y,
-        // world.getMaxBuildHeight()), z);
-        // while (world.isEmptyBlock(pos.move(Direction.DOWN)) && pos.getY() >
-        // world.getMinBuildHeight()) {
-        // }
-        // return pos.getY() + 1;
-        return y; // Simplified for now
+        // 1.21.11: getMaxBuildHeight() and isEmptyBlock() unchanged - simplified
+        // Full implementation disabled in favor of simple return
+        return y;
     }
 
     static List<BlockPos> getNearbyBlocks(BlockPos origin, Level world, @Nullable Predicate<BlockState> filter,

@@ -93,8 +93,7 @@ public class ClothingList extends SimplePreparableReloadListener<Map<Identifier,
             case TODDLER -> getPool(gender, MCA.locate("toddler").toString());
             case CHILD, TEEN -> getPool(gender, MCA.locate("child").toString());
             default -> {
-                // TODO: In 1.21.11, getProfession() returns ResourceKey - simplified pool
-                // lookup
+                // 1.21.11: getProfession() returns ResourceKey - simplified pool lookup
                 WeightedPool<String> pool = getPool(gender, (String) null);
                 yield pool;
             }

@@ -13,7 +13,7 @@ public class EnvironmentModule {
         if (player.level().isThundering()) {
             input.add("It is thundering. ");
         }
-        // TODO: In 1.21.11, isNight() removed, using time-based check
+        // 1.21.11: isNight() removed - using time-based check (13000-23000 = night)
         long dayTime = player.level().getDayTime() % 24000L;
         if (dayTime >= 13000 && dayTime <= 23000) {
             input.add("It is night. ");

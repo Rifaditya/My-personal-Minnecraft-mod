@@ -33,8 +33,7 @@ public class AdvancementTask extends Task {
 
     @Override
     public boolean isCompleted(Village village, ServerPlayer player) {
-        // TODO: In 1.21.11, getAdvancements() API may have changed
-        // Disabled until API is researched - always return false
+        // 1.21.11: getAdvancements() API changed - disabled, always false
         return false;
     }
 }

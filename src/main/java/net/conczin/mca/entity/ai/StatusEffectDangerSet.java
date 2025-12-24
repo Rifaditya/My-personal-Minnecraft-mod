@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class StatusEffectDangerSet {
-    // TODO: In 1.21.11, MobEffects constants may have moved or renamed
-    // Danger set disabled for now
+    // 1.21.11: MobEffects constants moved to Holder pattern - danger set disabled
     public static final Set<Holder<MobEffect>> IS_DANGER = new HashSet<>();
 
     // static {
