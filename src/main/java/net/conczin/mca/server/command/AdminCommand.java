@@ -81,8 +81,7 @@ public class AdminCommand {
     private static int listVillages(CommandContext<CommandSourceStack> ctx) {
         for (Village village : VillageManager.get(ctx.getSource().getLevel())) {
             final BlockPos pos = village.getBox().getCenter();
-            // TODO: In 1.21.11, HoverEvent/ClickEvent factory methods may not exist
-            // Simplified output without hover/click events
+            // 1.21.11: Simplified output without hover/click events
             success(String.format(Locale.ROOT, "%d: %s with %d buildings and %d/%d villager(s) at %d, %d",
                     village.getId(),
                     village.getName(),

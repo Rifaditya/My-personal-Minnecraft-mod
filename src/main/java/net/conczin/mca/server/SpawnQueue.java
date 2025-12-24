@@ -126,14 +126,9 @@ public class SpawnQueue {
                 && !handlesSpawnReason(villagerEntity.mca$getSpawnReason())) {
             return false;
         }
-        // TODO: 1.21.11 dimension() returns ResourceKey, location() doesn't exist
-        // Old: dimension().location().toString()
-        // New: dimension() needs different method for String conversion
-        // Temporarily disabled dimension blacklist check for compilation
-        // if (Config.getInstance().villagerDimensionBlacklist
-        // .contains(entity.getCommandSenderWorld().dimension().???().toString())) {
-        // return false;
-        // }
+        // 1.21.11: dimension() returns ResourceKey which doesn't have location()
+        // Dimension blacklist disabled until proper API is researched
+        // ResourceKey needs .registryKey() or similar to get location
         if (Config.getInstance().overwriteOriginalVillagers
                 && (entity.getClass().equals(Villager.class) ||
                         Config.getInstance().moddedVillagerWhitelist
