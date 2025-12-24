@@ -44,7 +44,7 @@ public class ExtendedMeleeAttackTask extends Behavior<Mob> {
         } else {
             mobEntity.swing(InteractionHand.MAIN_HAND);
         }
-        // TODO: In 1.21.11, doHurtTarget requires ServerLevel parameter
+        // 1.21.11: doHurtTarget requires ServerLevel - implemented correctly
         mobEntity.doHurtTarget(world, livingEntity);
         mobEntity.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_COOLING_DOWN, true, interval);
 

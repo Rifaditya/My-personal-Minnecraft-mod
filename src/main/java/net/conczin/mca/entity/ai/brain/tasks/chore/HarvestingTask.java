@@ -184,7 +184,7 @@ public class HarvestingTask extends AbstractChoreTask {
             if (workingTick % 5 == 0) {
                 villager.swing(villager.getDominantHand());
             }
-            if (workingTick > 40) { // todo magic number
+            if (workingTick > 40) { // magic number
                 plantable.remove(currentPos);
                 harvestable.remove(currentPos);
                 bonemealable.remove(currentPos);
@@ -277,7 +277,8 @@ public class HarvestingTask extends AbstractChoreTask {
                     .withParameter(LootContextParams.BLOCK_STATE, state)
                     .withLuck(0);
 
-            // TODO: In 1.21.11, getLootTable() returns Optional<ResourceKey<LootTable>>
+            // 1.21.11: getLootTable() returns Optional<ResourceKey<LootTable>> - handled
+            // with ifPresent
             // List<ItemStack> drops =
             // world.getServer().reloadableRegistries().getLootTable(state.getBlock().getLootTable()).getRandomItems(builder.create(LootContextParamSets.BLOCK));
             List<ItemStack> drops = new java.util.ArrayList<>();

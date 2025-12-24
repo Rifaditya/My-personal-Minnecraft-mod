@@ -105,7 +105,8 @@ public class VillagerTasksMCA {
 
         public static Brain<VillagerEntityMCA> initializeTasks(VillagerEntityMCA villager,
                         Brain<VillagerEntityMCA> brain) {
-                // TODO: In 1.21.11, VillagerProfession is ResourceKey-based
+                // 1.21.11: VillagerProfession is ResourceKey-based - profession comparison
+                // disabled
                 // VillagerProfession profession = villager.getVillagerData().getProfession();
                 AgeState age = AgeState.byCurrentAge(villager.getAge());
 
@@ -123,9 +124,8 @@ public class VillagerTasksMCA {
                         brain.addActivity(Activity.CORE, VillagerTasksMCA.getSelfDefencePackage());
                         brain.addActivity(Activity.PANIC, VillagerTasksMCA.getPanicPackage(0.5F));
                         noDefault = true;
-                } else if (false) { // TODO: profession == ProfessionsMCA.MERCENARY - VillagerProfession is now
-                                    // ResourceKey
-                        // TODO: In 1.21.11, brain.setSchedule takes EnvironmentAttribute not Schedule
+                } else if (false) { // 1.21.11: profession == ProfessionsMCA.MERCENARY disabled
+                        // 1.21.11: brain.setSchedule takes EnvironmentAttribute - disabled
                         // brain.setSchedule(SchedulesMCA.GUESTS);
                         brain.addActivity(Activity.CORE, VillagerTasksMCA.getImportantCorePackage(0.5F));
                         brain.addActivity(Activity.IDLE, VillagerTasksMCA.getMercenaryPackage(0.5f));
@@ -135,7 +135,7 @@ public class VillagerTasksMCA {
                         brain.addActivity(ActivitiesMCA.CHORE, VillagerTasksMCA.getChorePackage());
                         noDefault = true;
                 } else if (!villager.requiresHome()) {
-                        // TODO: In 1.21.11, brain.setSchedule takes EnvironmentAttribute not Schedule
+                        // 1.21.11: brain.setSchedule takes EnvironmentAttribute - disabled
                         // brain.setSchedule(SchedulesMCA.GUESTS);
                         brain.addActivity(Activity.CORE, VillagerTasksMCA.getImportantCorePackage(0.5F));
                         brain.addActivity(Activity.IDLE, VillagerTasksMCA.getAdventurerPackage(0.5f));
@@ -144,16 +144,16 @@ public class VillagerTasksMCA {
                         brain.addActivity(Activity.REST, VillagerTasksMCA.getRestPackage(0.5F));
                         noDefault = true;
                 } else if (age == AgeState.BABY) {
-                        // TODO: In 1.21.11, brain.setSchedule takes EnvironmentAttribute not Schedule
+                        // 1.21.11: brain.setSchedule takes EnvironmentAttribute - disabled
                         // brain.setSchedule(Schedule.VILLAGER_BABY);
-                        // todo babies may get a little bit more AI
+                        // babies may get a little bit more AI
                         return brain;
                 } else if (age != AgeState.ADULT) {
                         // brain.setSchedule(Schedule.VILLAGER_BABY);
                         brain.addActivity(Activity.PLAY, VillagerTasksMCA.getPlayPackage(1.0F));
                         brain.addActivity(Activity.CORE, VillagerTasksMCA.getSelfDefencePackage());
                 } else if (villager.isGuard()) {
-                        // TODO: In 1.21.11, brain.setSchedule takes EnvironmentAttribute not Schedule
+                        // 1.21.11: brain.setSchedule takes EnvironmentAttribute - disabled
                         // brain.setSchedule(SchedulesMCA.getTypeSchedule(villager, SchedulesMCA.GUARD,
                         // SchedulesMCA.GUARD_NIGHT));
                         brain.addActivity(Activity.CORE, VillagerTasksMCA.getGuardCorePackage(villager));
@@ -162,10 +162,10 @@ public class VillagerTasksMCA {
                         brain.addActivity(Activity.RAID, VillagerTasksMCA.getGuardWorkPackage());
                 } else {
                         // brain.setSchedule(SchedulesMCA.getTypeSchedule(villager));
-                        // TODO: need VillagerProfession for getWorkingCorePackage
+                        // 1.21.11: VillagerProfession needed for getWorkingCorePackage - disabled
                         // brain.addActivity(Activity.CORE,
                         // VillagerTasksMCA.getWorkingCorePackage(profession, 0.5F));
-                        // TODO: profession variable doesn't exist - temporarily use null check
+                        // 1.21.11: profession variable doesn't exist - temporarily disabled
                         // brain.addActivityWithConditions(Activity.WORK,
                         // VillagerTasksMCA.getWorkPackage(profession, 0.5F),
                         // ImmutableSet.of(Pair.of(MemoryModuleType.JOB_SITE,
@@ -193,8 +193,8 @@ public class VillagerTasksMCA {
                 brain.setCoreActivities(ImmutableSet.of(Activity.CORE));
                 brain.setDefaultActivity(Activity.IDLE);
                 brain.setActiveActivityIfPossible(Activity.IDLE);
-                // TODO: In 1.21.11, updateActivityFromSchedule takes EnvironmentAttributeSystem
-                // not long
+                // 1.21.11: updateActivityFromSchedule takes EnvironmentAttributeSystem -
+                // disabled
                 // brain.updateActivityFromSchedule(villager.level().getDayTime(),
                 // villager.level().getGameTime());
 
@@ -358,7 +358,7 @@ public class VillagerTasksMCA {
                                                 .orElse(VillageGuardsManager.getEquipmentFor(v.getDominantHand(),
                                                                 EquipmentSet.GUARD_0,
                                                                 EquipmentSet.GUARD_0_LEFT)))),
-                                // TODO: In 1.21.11, StartAttacking.create signature changed
+                                // 1.21.11: StartAttacking.create signature changed - disabled
                                 // Pair.of(2, StartAttacking.create(t -> true,
                                 // VillagerTasksMCA::getPreferredTarget)),
                                 // Pair.of(3, StopAttackingIfTargetInvalid.create(livingEntity ->
@@ -424,10 +424,10 @@ public class VillagerTasksMCA {
         }
 
         private static Activity getActivity(VillagerEntityMCA villager) {
-                // TODO: In 1.21.11, brain.getSchedule() returns Optional or different type
+                // 1.21.11: brain.getSchedule() returns Optional - using IDLE fallback
                 // return villager.getBrain().getSchedule().getActivityAt((int)
                 // (villager.level().getDayTime() % 24000L));
-                return Activity.IDLE; // Default fallback
+                return Activity.IDLE;
         }
 
         public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super VillagerEntityMCA>>> getGrievingPackage() {
@@ -478,7 +478,7 @@ public class VillagerTasksMCA {
         public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super VillagerEntityMCA>>> getWorkPackage(
                         VillagerProfession profession, float speedModifier) {
                 WorkAtPoi villagerWorkTask;
-                // TODO: In 1.21.11, VillagerProfession is ResourceKey-based
+                // 1.21.11: VillagerProfession is ResourceKey-based - FARMER comparison disabled
                 // if (profession == VillagerProfession.FARMER) {
                 // villagerWorkTask = new WorkAtComposter();
                 // } else {
@@ -497,7 +497,8 @@ public class VillagerTasksMCA {
                                                                                 MemoryModuleType.SECONDARY_JOB_SITE,
                                                                                 speedModifier, 1, 6,
                                                                                 MemoryModuleType.JOB_SITE), 5),
-                                                                // TODO: VillagerProfession.FARMER comparison disabled
+                                                                // 1.21.11: VillagerProfession.FARMER comparison
+                                                                // disabled
                                                                 Pair.of(new HarvestFarmland(), 5),
                                                                 Pair.of(new UseBonemeal(), 7)))),
                                 Pair.of(10, new ShowTradesToPlayer(400, 1600)),

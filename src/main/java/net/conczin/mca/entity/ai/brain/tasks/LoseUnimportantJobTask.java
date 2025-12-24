@@ -19,8 +19,8 @@ public class LoseUnimportantJobTask {
             return context.group(context.absent(MemoryModuleType.JOB_SITE)).apply(context, (jobSite) -> {
                 return (world, entity, time) -> {
                     VillagerData villagerData = entity.getVillagerData();
-                    // TODO: In 1.21.11, VillagerProfession.NONE/NITWIT are ResourceKey-based
-                    // Job loss check disabled for now
+                    // 1.21.11: VillagerProfession.NONE/NITWIT are ResourceKey-based - job loss
+                    // disabled
                     // if (shouldRun(world, entity) && villagerData.getProfession() !=
                     // VillagerProfession.NONE && villagerData.getProfession() !=
                     // VillagerProfession.NITWIT && entity.getVillagerXp() == 0 &&

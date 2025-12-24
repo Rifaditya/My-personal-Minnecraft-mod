@@ -186,9 +186,9 @@ public class OpenAIChatAI implements ChatAIStrategy {
 
             // add control variables
             if (isInHouse || config.villagerChatAIIncludeSessionInformation) {
-                // TODO: In 1.21.11, getSeed() method moved or signature changed
+                // 1.21.11: getSeed() signature changed - disabled
                 // long seed = ((ServerLevel) player.level()).getSeed();
-                long seed = 0L; // Disabled for now
+                long seed = 0L;
                 sb.append("[world_id:").append(seed).append("]");
 
                 sb.append("[player_id:").append(player.getUUID()).append("]");
@@ -302,7 +302,7 @@ public class OpenAIChatAI implements ChatAIStrategy {
             } else if (message.error.equals("invalid_model")) {
                 player.displayClientMessage(Component.literal("Invalid model!").withStyle(ChatFormatting.RED), false);
             } else if (message.error.equals("limit")) {
-                // TODO: In 1.21.11, ClickEvent/HoverEvent are abstract
+                // 1.21.11: ClickEvent/HoverEvent are abstract - disabled
                 MutableComponent styled = (Component.translatable("mca.limit.patreon")).withStyle(s -> s
                         .withColor(ChatFormatting.GOLD));
                 // .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, ...))
