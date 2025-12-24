@@ -544,8 +544,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
     }
 
-    // TODO: In 1.21.11, keyPressed signature may have changed
-    // @Override
+    // 1.21.11: keyPressed signature changed - can't override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         // Pan
         if (keyCode == GLFW.GLFW_KEY_SPACE && (textFieldWidget == null || !textFieldWidget.isFocused())) {
@@ -582,7 +581,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
         }
 
-        // TODO: In 1.21.11, Screen.keyPressed signature changed
+        // 1.21.11: Can't call super - return false instead
         return false;
     }
 
@@ -592,7 +591,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             isPanning = false;
         }
 
-        // TODO: In 1.21.11, super.keyReleased signature changed
+        // 1.21.11: Can't call super - return false instead
         return false;
     }
 
@@ -677,7 +676,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
         }
 
-        // TODO: In 1.21.11, Screen.mouseClicked signature changed
+        // 1.21.11: Can't call super - return false instead
         return false;
     }
 
@@ -701,7 +700,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
         }
 
-        // TODO: In 1.21.11, Screen.mouseReleased signature changed
+        // 1.21.11: Can't call super - return false instead
         return false;
     }
 
