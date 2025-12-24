@@ -9,7 +9,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 
 import java.util.concurrent.CompletableFuture;
 
-// TODO: In 1.21.11, FabricRecipeProvider requires createRecipeProvider and getName methods
+// 1.21.11: FabricRecipeProvider now requires createRecipeProvider and getName methods - implemented below
 public class FabricCribRecipeProvider extends FabricRecipeProvider {
     public FabricCribRecipeProvider(FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture) {

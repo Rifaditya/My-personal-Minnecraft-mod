@@ -30,8 +30,9 @@ public class CribItemModelProvider extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerators itemModelGenerator) {
-        // TODO: In 1.21.11, ItemModelGenerators.output may have changed
-        // Disabling crib model generation until proper API is determined
+        // 1.21.11: ItemModelGenerators.output API changed - crib model generation
+        // disabled
+        // Models are generated manually for now
         /*
          * for (CribWoodType wood : CribWoodType.values()) {
          * for (DyeColor color : DyeColor.values()) {
