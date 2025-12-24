@@ -18,9 +18,8 @@ public class CivilRegistry extends ExtendedWrittenBookItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
             TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltip, tooltipFlag);
-
-        // TODO: In 1.21.11, getDescriptionId(stack) removed, using getDescriptionId()\n
-        // tooltip.addAll(FlowingText.wrap(Component.translatable(getDescriptionId() +
-        // \".tooltip\").withStyle(ChatFormatting.GRAY), 160));
+        // 1.21.11: getDescriptionId() without stack works for tooltip
+        tooltip.addAll(FlowingText
+                .wrap(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
     }
 }

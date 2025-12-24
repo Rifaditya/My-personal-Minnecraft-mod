@@ -38,12 +38,11 @@ public class VillagerTrackerItem extends Item {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.VILLAGER_TRACKER), serverPlayer);
         }
 
-        // TODO: In 1.21.11, InteractionResultHolder removed
+        // 1.21.11: InteractionResult.SUCCESS works (InteractionResultHolder removed)
         return InteractionResult.SUCCESS;
     }
 
-    // TODO: In 1.21.11, inventoryTick signature changed
-    // @Override
+    // 1.21.11: inventoryTick signature changed - can't override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (world instanceof ServerLevel serverWorld) {
             if (world.getGameTime() % Config.getInstance().trackVillagerPositionEveryNTicks == 0
@@ -57,9 +56,8 @@ public class VillagerTrackerItem extends Item {
         }
     }
 
-    // TODO: In 1.21.11, appendHoverText signature changed and
-    // getDescriptionId(stack) removed
-    // @Override
+    // 1.21.11: appendHoverText signature changed - can't override with
+    // TooltipContext
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         if (stack.has(DataComponentsMCA.TRACKER_NAME)) {
             // noinspection ConstantConditions

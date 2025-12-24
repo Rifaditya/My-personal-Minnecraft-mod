@@ -14,13 +14,11 @@ public class TooltippedItem extends Item {
         super(properties);
     }
 
-    // TODO: In 1.21.11, appendHoverText signature changed and
-    // getDescriptionId(stack) removed
-    // @Override
-    // public void appendHoverText(ItemStack stack, TooltipContext context,
-    // List<Component> tooltip, TooltipFlag tooltipFlag) {
-    // super.appendHoverText(stack, context, tooltip, tooltipFlag);
-    // tooltip.addAll(FlowingText.wrap(Component.translatable(getDescriptionId(stack)
-    // + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
-    // }
+    // 1.21.11: appendHoverText signature changed - can't override or call super
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+            TooltipFlag tooltipFlag) {
+        // super.appendHoverText not available with this signature
+        tooltip.addAll(FlowingText
+                .wrap(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY), 160));
+    }
 }

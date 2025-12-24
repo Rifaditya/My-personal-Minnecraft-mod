@@ -46,8 +46,8 @@ public class PotionOfMetamorphosisItem extends TooltippedItem {
             // remove item
             ItemStack stack = player.getItemInHand(hand);
             stack.shrink(1);
-            // TODO: In 1.21.11, InteractionResultHolder removed\n return
-            // InteractionResult.SUCCESS;
+            // 1.21.11: Return success here (InteractionResultHolder removed)
+            return InteractionResult.SUCCESS;
         }
         return super.use(world, player, hand);
     }

@@ -23,8 +23,8 @@ public class NeedleAndThreadItem extends TooltippedItem {
         if (player instanceof ServerPlayer serverPlayer) {
             ItemStack stack = player.getItemInHand(hand);
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.NEEDLE_AND_THREAD), serverPlayer);
-            // TODO: In 1.21.11, InteractionResultHolder removed\n return
-            // InteractionResult.SUCCESS;
+            // 1.21.11: Return success here (InteractionResultHolder removed)
+            return InteractionResult.SUCCESS;
         }
         return super.use(world, player, hand);
     }

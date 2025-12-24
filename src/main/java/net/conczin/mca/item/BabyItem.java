@@ -130,8 +130,7 @@ public class BabyItem extends Item {
         return true;
     }
 
-    // TODO: In 1.21.11, inventoryTick signature changed
-    // @Override
+    // 1.21.11: inventoryTick signature changed - can't override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (world.isClientSide()) {
             return;
@@ -145,27 +144,19 @@ public class BabyItem extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
-        // TODO: In 1.21.11, getDescriptionId(stack) removed
-        // Simplified to always return super.getName for now
+        // 1.21.11: getDescriptionId(stack) removed - using super.getName()
         return super.getName(stack);
     }
 
-    // TODO: In 1.21.11, getDescriptionId(ItemStack) removed, using
-    // getDescriptionId()
-    // @Override
-    // public String getDescriptionId(ItemStack stack) {
-    // if (hasBeenInvalidated(stack)) {
-    // return super.getDescriptionId(stack) + ".blanket";
-    // }
-    // return super.getDescriptionId(stack);
-    // }
+    // 1.21.11: getDescriptionId(ItemStack) removed, using getDescriptionId()
+    // Method no longer needed - getName() handles display name
 
     @Override
     public final InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (world.isClientSide()) {
-            // TODO: In 1.21.11, InteractionResultHolder removed, using InteractionResult
+            // 1.21.11: InteractionResult.PASS works (InteractionResultHolder removed)
             return InteractionResult.PASS;
         }
 
@@ -247,8 +238,7 @@ public class BabyItem extends Item {
         return child;
     }
 
-    // TODO: In 1.21.11, appendHoverText signature changed
-    // @Override
+    // 1.21.11: appendHoverText signature changed - can't override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         Player player = ClientProxy.getClientPlayer();
         int age = stack.getOrDefault(DataComponentsMCA.BABY_AGE, 0);

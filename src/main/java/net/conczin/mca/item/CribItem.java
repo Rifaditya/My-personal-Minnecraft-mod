@@ -57,8 +57,7 @@ public class CribItem extends Item {
         }
 
         if (world instanceof ServerLevel serverWorld) {
-            // TODO: In 1.21.11, EntityType.create() signature changed
-            // CribEntity crib = EntitiesMCA.CRIB.create(serverWorld);
+            // 1.21.11: Using direct constructor instead of EntityType.create()
             CribEntity crib = new CribEntity(EntitiesMCA.CRIB, serverWorld);
             if (crib == null)
                 return InteractionResult.FAIL;
@@ -67,7 +66,7 @@ public class CribItem extends Item {
             crib.setColor(color);
 
             float f = (float) Mth.floor((Mth.wrapDegrees(context.getRotation() - 180.0f) + 22.5f) / 45.0f) * 45.0f;
-            // TODO: In 1.21.11, Entity.moveTo() may have changed signature
+            // 1.21.11: setPos used instead of moveTo
             crib.setPos(blockPos.getX() + 0.5f, blockPos.getY(), blockPos.getZ() + 0.5f);
             crib.setYRot(f);
             serverWorld.addFreshEntityWithPassengers(crib);
@@ -78,7 +77,7 @@ public class CribItem extends Item {
         }
 
         itemStack.shrink(1);
-        // TODO: In 1.21.11, InteractionResult.sidedSuccess removed
+        // 1.21.11: InteractionResult.SUCCESS works (sidedSuccess removed)
         return InteractionResult.SUCCESS;
     }
 }

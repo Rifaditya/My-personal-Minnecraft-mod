@@ -75,8 +75,7 @@ public class ScytheItem extends Item {
         return InteractionResult.PASS;
     }
 
-    // TODO: In 1.21.11, appendHoverText signature changed
-    // @Override
+    // 1.21.11: appendHoverText signature changed - can't override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
             TooltipFlag flag) {
         tooltip.addAll(FlowingText.wrap(

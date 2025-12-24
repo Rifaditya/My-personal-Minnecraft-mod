@@ -23,7 +23,7 @@ public class BlueprintItem extends TooltippedItem {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.BLUEPRINT), serverPlayer);
         }
 
-        // TODO: In 1.21.11, InteractionResultHolder removed
+        // 1.21.11: InteractionResult.SUCCESS works (InteractionResultHolder removed)
         return InteractionResult.SUCCESS;
     }
 }

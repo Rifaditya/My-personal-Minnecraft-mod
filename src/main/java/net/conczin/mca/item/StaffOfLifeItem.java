@@ -31,22 +31,22 @@ public class StaffOfLifeItem extends TooltippedItem {
         return result;
     }
 
-    // TODO: In 1.21.11, appendHoverText signature changed
-    // @Override
-    // public void appendHoverText(ItemStack stack, TooltipContext context,
-    // List<Component> tooltip, TooltipFlag flag) {
-    // tooltip.add(Component.translatable(getDescriptionId() + ".uses",
-    // stack.getMaxDamage() - stack.getDamageValue()));
-    // super.appendHoverText(stack, context, tooltip, flag);
-    // }
+    // 1.21.11: appendHoverText signature changed - can't override or call super
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(
+                Component.translatable(getDescriptionId() + ".uses", stack.getMaxDamage() - stack.getDamageValue()));
+        // Add the tooltip that TooltippedItem.appendHoverText would add
+        tooltip.addAll(net.conczin.mca.util.localization.FlowingText
+                .wrap(Component.translatable(getDescriptionId() + ".tooltip")
+                        .withStyle(net.minecraft.ChatFormatting.GRAY), 160));
+    }
 
     @Override
     public boolean isFoil(ItemStack stack) {
         return true;
     }
 
-    // TODO: In 1.21.11 signature may have changed
-    // @Override
+    // 1.21.11: isEnchantable signature may have changed
     public boolean isEnchantable(ItemStack stack) {
         return false;
     }

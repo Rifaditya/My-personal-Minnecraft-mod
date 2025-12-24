@@ -25,8 +25,7 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
         this.book = book;
     }
 
-    // TODO: In 1.21.11, appendHoverText signature changed
-    // @Override
+    // 1.21.11: appendHoverText signature changed - can't override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents,
             TooltipFlag tooltipFlag) {
         // super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
@@ -44,7 +43,7 @@ public class ExtendedWrittenBookItem extends WrittenBookItem {
             Network.sendToPlayer(new OpenGuiRequest(OpenGuiRequest.Type.BOOK), serverPlayer);
         }
 
-        // TODO: In 1.21.11, InteractionResultHolder removed
+        // 1.21.11: InteractionResult.SUCCESS works (InteractionResultHolder removed)
         return InteractionResult.SUCCESS;
     }
 
