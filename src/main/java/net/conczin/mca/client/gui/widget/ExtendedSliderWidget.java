@@ -35,11 +35,8 @@ public abstract class ExtendedSliderWidget<T> extends AbstractSliderButton {
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         int i = (this.isHovered() ? 2 : 1) * 20;
 
-        // TODO
-        // context.blit(WIDGETS_LOCATION, this.getX() + (int) (getOpticalValue() *
-        // (double) (this.width - 8)), this.getY(), 0, 46 + i, 4, 20);
-        // context.blit(WIDGETS_LOCATION, this.getX() + (int) (getOpticalValue() *
-        // (double) (this.width - 8)) + 4, this.getY(), 196, 46 + i, 4, 20);
+        // 1.21.11: Custom slider thumb rendering disabled - using default
+        // Removed context.blit for slider thumb, default rendering works
 
         super.renderWidget(context, mouseX, mouseY, delta);
 

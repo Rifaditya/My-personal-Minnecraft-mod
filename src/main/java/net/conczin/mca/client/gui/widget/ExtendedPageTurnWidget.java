@@ -16,7 +16,6 @@ public class ExtendedPageTurnWidget extends PageButton {
         this.texture = texture;
     }
 
-    // In 1.21.11, renderWidget in AbstractButton is final or visibility changed
-    // Rendering disabled - using empty method
-    // TODO: Implement custom rendering approach
+    // 1.21.11: renderWidget in PageButton is final - using parent's rendering
+    // Custom texture rendering disabled for now - uses default page turn appearance
 }
