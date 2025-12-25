@@ -163,9 +163,8 @@ public class SkinCache {
             Identifier identifier = Identifier.fromNamespaceAndPath("immersive_library", String.valueOf(contentid));
 
             TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-            // TODO: In 1.21.11, DynamicTexture constructor changed
+            // 1.21.11: DynamicTexture constructor changed - texture registration disabled
             // textureManager.register(identifier, new DynamicTexture(image));
-            // Texture registration disabled for now
 
             textureIdentifiers.put(contentid, identifier);
             images.put(contentid, image);

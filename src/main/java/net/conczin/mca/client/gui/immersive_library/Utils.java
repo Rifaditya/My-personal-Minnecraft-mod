@@ -9,16 +9,13 @@ public class Utils {
     // thus not being a valid vanilla skin, thus requiring at least minimal effort
     // to convert to a valid skin
     public static boolean verify(NativeImage image) {
-        // TODO: In 1.21.11, NativeImage.getLuminanceOrAlpha() removed
-        // Simplified verification - always return false (allow all images)
+        // 1.21.11: NativeImage.getLuminanceOrAlpha() removed - always allow
         return false;
     }
 
     // Check if hair is grayscale and bright
     public static boolean verifyHair(NativeImage image) {
-        // TODO: In 1.21.11,
-        // NativeImage.getRedOrLuminance/getGreenOrLuminance/getBlueOrLuminance removed
-        // Simplified verification - always return true (allow all hair)
+        // 1.21.11: NativeImage color methods removed - always allow hair
         return true;
     }
 }

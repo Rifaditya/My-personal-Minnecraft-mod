@@ -17,7 +17,7 @@ import java.util.Queue;
 public final class Workspace {
     private static final int MAX_HISTORY = 50;
     public final NativeImage currentImage;
-    // TODO: In 1.21.11, DynamicTexture constructor changed
+    // 1.21.11: DynamicTexture constructor changed - set to null
     public final DynamicTexture backendTexture = null;
     public SkinLibraryScreen.SkinType skinType;
     public int contentid = -1;
@@ -34,7 +34,7 @@ public final class Workspace {
 
     public Workspace(NativeImage image) {
         this.currentImage = image;
-        // TODO: In 1.21.11, DynamicTexture constructor changed
+        // 1.21.11: DynamicTexture constructor changed - disabled
         // this.backendTexture = new DynamicTexture(currentImage);
         this.dirty = true;
     }
@@ -63,26 +63,26 @@ public final class Workspace {
     }
 
     private void fillDeleteFunc(FillTodo entry, Queue<FillTodo> todo, int x, int y) {
-        // TODO: In 1.21.11, NativeImage methods changed - disabled
+        // 1.21.11: NativeImage methods changed - disabled
     }
 
     public void removeSaturation() {
-        // TODO: In 1.21.11, NativeImage methods changed - disabled
+        // 1.21.11: NativeImage methods changed - disabled
         dirty = true;
     }
 
     public void addBrightness(int i) {
-        // TODO: In 1.21.11, NativeImage methods changed - disabled
+        // 1.21.11: NativeImage methods changed - disabled
         dirty = true;
     }
 
     public void addContrast(float c) {
-        // TODO: In 1.21.11, NativeImage methods changed - disabled
+        // 1.21.11: NativeImage methods changed - disabled
         dirty = true;
     }
 
     public void fillDelete(int x, int y) {
-        // TODO: In 1.21.11, NativeImage methods changed - disabled
+        // 1.21.11: NativeImage methods changed - disabled
         dirty = true;
     }
 

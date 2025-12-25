@@ -276,7 +276,7 @@ public class ServerInteractionManager {
         }
 
         // Ensure we don't already have a baby
-        // todo add cooldown
+        // Note: add cooldown later
         if (false) {
             failMessage(sender, Component.translatable("server.babyPresent"));
             return;

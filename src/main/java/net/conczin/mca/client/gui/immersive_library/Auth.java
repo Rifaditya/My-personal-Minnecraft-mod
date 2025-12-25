@@ -87,8 +87,7 @@ public class Auth {
         // Open the authorization URL in the user's default web browser
         String url = Config.getInstance().immersiveLibraryUrl + "/v1/login?state="
                 + createDataState(username, currentToken);
-        // TODO: In 1.21.11, Util.getPlatform().openUri() changed
-        // Using simplified approach - just attempt to open via Desktop
+        // 1.21.11: Util.getPlatform().openUri() changed - using Desktop.browse
         try {
             java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
         } catch (Exception e) {

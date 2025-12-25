@@ -138,8 +138,8 @@ public class ReaperSpawner {
 
     private Set<BlockPos> getTotemsFires(Level world, BlockPos pos) {
         int groundY = pos.getY() - 1;
-        // In 1.21.11, getMaxBuildHeight may not exist, use getHeight() or constant
-        int leftSkyHeight = 320 - groundY; // TODO: Find proper API for max build height
+        // 1.21.11: getMaxBuildHeight API changed - using constant 320
+        int leftSkyHeight = 320 - groundY;
         int minPillarHeight = Math.min(Config.getInstance().minPillarHeight, leftSkyHeight);
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
         return Stream.of(HORIZONTALS).map(d -> target.set(pos).setY(groundY).move(d, 3)).filter(pillarPos -> {

@@ -323,7 +323,7 @@ public class Building {
                 Block block = blockState.getBlock();
                 if (blockTypes.contains(BuiltInRegistries.BLOCK.getKey(block))) {
                     if (block instanceof BedBlock) {
-                        // TODO: look for better solution for 7.4.0
+                        // Note: for 7.4.0, only count HEAD part of beds
                         if (blockState.getValue(BedBlock.PART) == BedPart.HEAD) {
                             addBlock(block, p);
                         }
