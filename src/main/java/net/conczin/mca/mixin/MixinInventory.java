@@ -19,8 +19,7 @@ abstract class MixinInventory implements Container, Nameable {
     @Final
     public Player player;
 
-    // TODO: In 1.21.11, method removeFromSelected may not exist or signature
-    // changed
+    // 1.21.11: removeFromSelected may not exist or signature changed - disabled
     // @Inject(method = "removeFromSelected", at = @At("HEAD"), cancellable = true)
     // public void mca$injectRemoveFromSelected(boolean dropEntireStack,
     // CallbackInfoReturnable<ItemStack> info) {

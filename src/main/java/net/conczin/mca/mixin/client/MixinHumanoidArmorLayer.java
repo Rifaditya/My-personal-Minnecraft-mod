@@ -20,8 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-// TODO: In 1.21.11, HumanoidArmorLayer type bounds changed
-// This mixin is disabled until proper type bounds are determined
+// 1.21.11: HumanoidArmorLayer type bounds changed - mixin disabled
 @Mixin(HumanoidArmorLayer.class)
 public abstract class MixinHumanoidArmorLayer {
     // Mixin body disabled - type bounds incompatible in 1.21.11

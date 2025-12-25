@@ -32,7 +32,7 @@ public abstract class MixinGoat extends Animal {
         if (!this.level().isClientSide() && this.level().isRaining()) {
             long time = this.level().getDayTime() % 24000;
             BlockPos pos = blockPosition();
-            // TODO: In 1.21.11, Biome.coldEnoughToSnow() signature changed
+            // 1.21.11: Biome.coldEnoughToSnow() signature changed - disabled
             // if (time > 16000 && time < 20000 &&
             // this.level().getBiome(pos).value().coldEnoughToSnow(pos)
             if (time > 16000 && time < 20000
@@ -59,7 +59,7 @@ public abstract class MixinGoat extends Animal {
                         CriterionMCA.GENERIC_EVENT.trigger(p, "ancient_cultists");
                     });
 
-                    // TODO: In 1.21.11, kill() takes ServerLevel argument
+                    // 1.21.11: kill() takes ServerLevel argument - using discard()
                     // kill();
                     this.discard();
 

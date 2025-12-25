@@ -466,8 +466,8 @@ public class VillagerTasksMCA {
                                                                                 ItemStack.EMPTY),
                                                                 new LambdaTask<>((v) -> {
                                                                         v.getVillagerBrain().justGrieved();
-                                                                        // TODO: In 1.21.11, updateActivityFromSchedule
-                                                                        // takes EnvironmentAttributeSystem
+                                                                        // 1.21.11: updateActivityFromSchedule
+                                                                        // takes EnvironmentAttributeSystem - disabled
                                                                         // v.getBrain().updateActivityFromSchedule(v.level().getDayTime(),
                                                                         // v.level().getGameTime());
                                                                 })

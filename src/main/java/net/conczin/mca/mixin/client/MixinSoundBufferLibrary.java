@@ -20,7 +20,7 @@ import java.util.concurrent.CompletionException;
 
 @Mixin(SoundBufferLibrary.class)
 public class MixinSoundBufferLibrary {
-    // TODO: In 1.21.11, Util.backgroundExecutor() may not exist
+    // 1.21.11: Util.backgroundExecutor() may not exist - mixin disabled
     // @Inject(method =
     // "getStream(Lnet/minecraft/resources/Identifier;Z)Ljava/util/concurrent/CompletableFuture;",
     // at = @At("HEAD"), cancellable = true)

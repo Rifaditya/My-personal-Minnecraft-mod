@@ -38,7 +38,7 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void mca$injectTick(CallbackInfo ci) {
-        // TODO: In 1.21.11, cameraEntity is now private, use getCameraEntity()
+        // 1.21.11: cameraEntity is private - using getCameraEntity()
         if (MCAClient.areShadersAllowed() && minecraft.getCameraEntity() != null) {
             VillagerLike<?> villagerLike = CommonVillagerModel.getVillager(minecraft.getCameraEntity());
             if (villagerLike != null) {
