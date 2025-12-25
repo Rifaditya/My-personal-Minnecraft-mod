@@ -100,16 +100,13 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
         Identifier skin = getSkin(state);
         if (canUse(skin)) {
             int color = getColor(state);
-            // TODO: Implement proper model rendering with SubmitNodeCollector
-            // The old API used MultiBufferSource.getBuffer() which is different from
-            // SubmitNodeCollector
-            // For now this is a stub - full implementation requires understanding new
-            // rendering pipeline
+            // 1.21.11: model rendering with SubmitNodeCollector not yet implemented
+            // Old API used MultiBufferSource.getBuffer() - new pipeline requires research
         }
 
         Identifier overlay = getOverlay(state);
         if (!Objects.equals(skin, overlay) && canUse(overlay)) {
-            // TODO: Implement overlay rendering with SubmitNodeCollector
+            // 1.21.11: overlay rendering with SubmitNodeCollector not yet implemented
         }
     }
 
@@ -121,7 +118,7 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
         if (showBody) {
             return this.model.renderType(texture);
         }
-        // TODO: Implement translucent and outline rendering for 1.21.11
+        // 1.21.11: translucent and outline rendering not yet implemented
         return null;
     }
 
@@ -145,4 +142,3 @@ public abstract class VillagerLayer<S extends VillagerLikeRenderState, M extends
         });
     }
 }
-

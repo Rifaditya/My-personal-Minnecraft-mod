@@ -87,14 +87,8 @@ public class CribEntityRenderer extends EntityRenderer<CribEntity, CribEntityRen
     @Override
     public void submit(CribEntityRenderState state, PoseStack matrices, SubmitNodeCollector queue,
             CameraRenderState cameraState) {
-        // Note: This is a simplified submit() - full rendering needs to be adapted for
-        // 1.21.11
-        // The old render() method used MultiBufferSource which is no longer available
-        // here
-        // For now, this is a stub that needs further work for full functionality
-
-        // TODO: Fully implement 1.21.11 rendering with SubmitNodeCollector
-        // The model rendering API has changed significantly
+        // 1.21.11: simplified submit() - old render() used MultiBufferSource
+        // Model rendering with SubmitNodeCollector not yet implemented
     }
 
     private String getTextureID(CribWoodType wood, DyeColor color) {

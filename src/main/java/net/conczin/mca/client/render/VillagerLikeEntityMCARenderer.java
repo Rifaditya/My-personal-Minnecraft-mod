@@ -107,7 +107,7 @@ public class VillagerLikeEntityMCARenderer<T extends Mob & VillagerLike<T>>
         return null;
     }
 
-    // TODO: In 1.21.11, shouldShowName signature may have changed
+    // 1.21.11: shouldShowName signature may have changed - override disabled
     // @Override
     protected boolean shouldShowName(VillagerLikeRenderState state) {
         return state.hasCustomName
