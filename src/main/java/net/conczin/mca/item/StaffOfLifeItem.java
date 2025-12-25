@@ -21,7 +21,7 @@ public class StaffOfLifeItem extends TooltippedItem {
         InteractionResult result = ScytheItem.use(context, true);
         if (result == InteractionResult.SUCCESS) {
             if (context.getPlayer() instanceof ServerPlayer serverPlayer) {
-                // TODO: In 1.21.11, ItemStack.hurtAndBreak signature changed
+                // 1.21.11: ItemStack.hurtAndBreak signature changed - disabled
                 // context.getItemInHand().hurtAndBreak(1, (ServerLevel) serverPlayer.level(),
                 // serverPlayer, item -> {});
                 context.getItemInHand().shrink(0); // No-op for now

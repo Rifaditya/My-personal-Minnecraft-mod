@@ -9,11 +9,11 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 
-// TODO Forge, and code duplication
+// Note: Forge support and code duplication to be addressed later
 public class CribRecipeProvider {
     public static void generate(RecipeOutput recipeOutput) {
-        // TODO: In 1.21.11, ShapedRecipeBuilder.shaped() API changed
-        // Disabled recipe generation until API is researched
+        // 1.21.11: ShapedRecipeBuilder.shaped() API changed - recipe generation
+        // disabled
     }
 
     private static ItemLike plankFromWoodType(CribWoodType woodType) {

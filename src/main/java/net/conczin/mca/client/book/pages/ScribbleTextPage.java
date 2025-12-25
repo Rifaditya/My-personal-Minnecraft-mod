@@ -22,7 +22,7 @@ public class ScribbleTextPage extends TextPage {
     public void render(ExtendedBookScreen screen, GuiGraphics context, int mouseX, int mouseY, float delta) {
         // scribble
         int i = (screen.width - 192) / 2;
-        // TODO: In 1.21.11, RenderSystem.enableBlend/disableBlend removed
+        // 1.21.11: RenderSystem.enableBlend/disableBlend removed - disabled
         // context.blit(scribble, i + 28, 32, 0, 0, 128, 128, 128, 128);
 
         super.render(screen, context, mouseX, mouseY, delta);
