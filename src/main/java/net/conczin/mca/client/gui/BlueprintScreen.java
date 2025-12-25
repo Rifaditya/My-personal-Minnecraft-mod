@@ -388,8 +388,7 @@ public class BlueprintScreen extends ExtendedScreen {
     }
 
     private void renderMap(GuiGraphics context) {
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Simplified map rendering
+        // 1.21.11: context.pose() returns Matrix3x2fStack - simplified rendering
         int mapSize = 75;
         int y = height / 2 + 8;
         WidgetUtils.drawRectangle(context, width / 2 - mapSize, y - mapSize, width / 2 + mapSize, y + mapSize,
