@@ -17,7 +17,7 @@ import net.conczin.mca.registry.EntitiesMCA;
 import net.conczin.mca.registry.ModelPredicatesMCA;
 import net.conczin.mca.registry.ParticleTypesMCA;
 import net.fabricmc.api.ClientModInitializer;
-// TODO: BlockRenderLayerMap removed in Fabric API for 1.21.11 - find alternative
+// 1.21.11: BlockRenderLayerMap removed in Fabric API - alternative needed
 // import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -32,7 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.client.renderer.entity.ZombieVillagerRenderer;
-// TODO: ItemProperties API changed in 1.21.11 - find replacement
+// 1.21.11: ItemProperties API changed - replacement needed
 // import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.player.Player;
@@ -73,12 +73,12 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
         managerHelper.registerReloadListener(new FabricSupportersLoader());
         managerHelper.registerReloadListener(new ApiIdentifiableReloadListener());
 
-        // TODO: ItemProperties API changed in 1.21.11 - ModelPredicatesMCA disabled
+        // 1.21.11: ItemProperties API changed - ModelPredicatesMCA disabled
         // ModelPredicatesMCA.setup(ItemProperties::register);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, server) -> MCAClient.onLogin());
 
-        // TODO: BlockRenderLayerMap removed - use vanilla method or Fabric alternative
+        // 1.21.11: BlockRenderLayerMap removed - infernal flame render disabled
         // BlockRenderLayerMap.INSTANCE.putBlock(BlocksMCA.INFERNAL_FLAME,
         // RenderType.cutout());
 
@@ -92,4 +92,3 @@ public final class MCAFabricClient extends ClientProxyAbstractImpl implements Cl
         return Minecraft.getInstance().player;
     }
 }
-

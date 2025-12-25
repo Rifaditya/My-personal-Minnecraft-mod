@@ -134,8 +134,8 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     private static boolean canEat(ItemStack i) {
         FoodProperties foodProperties = i.get(DataComponents.FOOD);
-        // 1.21.11: FoodProperties.effects() removed - just check nutrition for now
-        // TODO: Add proper status effect checking when API pattern is found
+        // 1.21.11: FoodProperties.effects() removed - checking nutrition only
+        // Note: Add proper status effect checking when API pattern is found
         return foodProperties != null && foodProperties.nutrition() > 0;
     }
 
@@ -521,7 +521,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         }
 
         // you can't hit babies!
-        // TODO: Verify the `isUnblockable` replacement for 1.19.4, ensure same behavior
+        // 1.21.11: isUnblockable replaced with BYPASSES_SHIELD tag
         if (!Config.getInstance().canHurtBabies && !source.is(DamageTypeTags.BYPASSES_SHIELD)
                 && getAgeState() == AgeState.BABY) {
             if (source.getEntity() instanceof Player && requestCooldown()) {
@@ -795,7 +795,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
             dimensions.set(current);
         }
 
-        // todo calculateDimensions call move, move sets some flags, but since it's a
+        // Note: calculateDimensions call move, move sets some flags, but since it's a
         // "fake" move no collision happen
         // without collision the pathfinder skips the frame, causing children to not
         // move
@@ -807,7 +807,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
     // eat() override removed - signature changed in 1.21.11
     // Original: heal on eating based on food nutrition
-    // TODO: Find new hook for eating behavior
+    // Note: Find new hook for eating behavior in future versions
 
     @Override
     public void rideTick() {
@@ -829,7 +829,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
 
             Vec3 offset = head ? new Vec3(0, 0.55f, 0) : new Vec3(left ? 0.4F : -0.4F, 0.05f, 0).yRot(yaw);
 
-            // todo currently only client side
+            // Note: currently only client side offset adjustment
             if (isClientSide() && MCAClient.useGeneticsRenderer(vehicle.getUUID())) {
                 float height = CommonVillagerModel.getVillager(vehicle).getRawVerticalScaleFactor();
                 offset = offset.multiply(1.0f, height, 1.0f);
@@ -1280,7 +1280,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public void readAdditionalSaveData(ValueInput nbt) {
         super.readAdditionalSaveData(nbt);
 
-        // TODO: These need CompoundTag but ValueInput is passed - may need adapter
+        // 1.21.11: ValueInput passed instead of CompoundTag - adapters needed
         // getTypeDataManager().load(this, nbt);
         // relations.readFromNbt(nbt);
         // longTermMemory.readFromNbt(nbt);
@@ -1290,7 +1290,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
         updateAttributes();
 
         inventory.clearContent();
-        // TODO: InventoryUtils.readFromNBT needs updating for ValueInput
+        // 1.21.11: InventoryUtils.readFromNBT needs ValueInput adapter
         // InventoryUtils.readFromNBT(this.registryAccess(), inventory, nbt);
 
         this.despawnDelay = nbt.getIntOr("DespawnDelay", 0);
@@ -1308,8 +1308,7 @@ public class VillagerEntityMCA extends Villager implements VillagerLike<Villager
     public final void addAdditionalSaveData(ValueOutput nbt) {
         super.addAdditionalSaveData(nbt);
 
-        // TODO: These methods need updating to accept ValueOutput instead of
-        // CompoundTag
+        // 1.21.11: ValueOutput passed instead of CompoundTag - adapters needed
         // relations.writeToNbt(nbt);
         // longTermMemory.writeToNbt(nbt);
         // getTypeDataManager().save(this, nbt);

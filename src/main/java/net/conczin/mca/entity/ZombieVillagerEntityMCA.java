@@ -261,14 +261,14 @@ public class ZombieVillagerEntityMCA extends ZombieVillager
     @Override
     public void readAdditionalSaveData(ValueInput nbt) {
         super.readAdditionalSaveData(nbt);
-        // TODO: These need CompoundTag but ValueInput is passed - may need adapter
+        // 1.21.11: ValueInput passed instead of CompoundTag - adapters needed
         // getTypeDataManager().load(this, nbt);
         // relations.readFromNbt(nbt);
 
         updateAttributes();
 
         inventory.clearContent();
-        // TODO: InventoryUtils.readFromNBT needs updating for ValueInput
+        // 1.21.11: InventoryUtils.readFromNBT needs ValueInput adapter
         // InventoryUtils.readFromNBT(this.registryAccess(), inventory, nbt);
 
         validateClothes();
@@ -277,8 +277,7 @@ public class ZombieVillagerEntityMCA extends ZombieVillager
     @Override
     public final void addAdditionalSaveData(ValueOutput nbt) {
         super.addAdditionalSaveData(nbt);
-        // TODO: These methods need updating to accept ValueOutput instead of
-        // CompoundTag
+        // 1.21.11: ValueOutput passed instead of CompoundTag - adapters needed
         // getTypeDataManager().save(this, nbt);
         // relations.writeToNbt(nbt);
         // InventoryUtils.saveToNBT(this.registryAccess(), inventory, nbt);

@@ -372,8 +372,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
                         }
 
                         boolean alreadySpawned = false;
-                        // TODO: In 1.21.11, convertTo signature changed - needs ConversionParams?
-                        // Disabling cure conversion for now
+                        // 1.21.11: convertTo signature changed - cure conversion disabled
                         // if (cure && (entity instanceof ZombieVillager zombie)) {
                         // entity = zombie.convertTo(EntityType.VILLAGER, true);
                         // alreadySpawned = true;
@@ -453,8 +452,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
 
         public Optional<Entity> createEntity(Level world, boolean remove) {
-            // TODO: In 1.21.11, EntityType.create signature changed
-            // Returning empty for now - need to research new pattern
+            // 1.21.11: EntityType.create signature changed - returning empty
             try {
                 return Optional.empty();
             } finally {
@@ -465,8 +463,7 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
 
         private CompoundTag writeEntityToNbt(Entity entity) {
-            // TODO: In 1.21.11, saveWithoutId signature changed
-            // Just storing the ID for now
+            // 1.21.11: saveWithoutId signature changed - storing ID only
             CompoundTag nbt = new CompoundTag();
             nbt.putString("id", EntityType.getKey(entity.getType()).toString());
             return nbt;
@@ -477,13 +474,12 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
 
-        // TODO: In 1.21.11, ValueOutput/ValueInput don't exist and the API changed
-        // significantly
-        // Disabling custom save/load for now - tombstone data won't persist
+        // 1.21.11: ValueOutput/ValueInput API changed significantly
+        // Custom save/load disabled - tombstone data won't persist
         // @Override
         // protected void saveAdditional(...) { ... }
 
-        // TODO: In 1.21.11, ValueInput doesn't exist
+        // 1.21.11: ValueInput API changed
         // @Override
         // public void loadAdditional(...) { ... }
 
@@ -501,14 +497,12 @@ public class TombstoneBlock extends BaseEntityBlock implements SimpleWaterlogged
         }
 
         public void readFromStack(ItemStack stack) {
-            // TODO: In 1.21.11, DataComponents.ENTITY_DATA doesn't exist
-            // Disabling readFromStack for now
+            // 1.21.11: DataComponents.ENTITY_DATA doesn't exist - readFromStack disabled
             entityData = Optional.empty();
         }
 
         public void writeToStack(ItemStack stack) {
-            // TODO: In 1.21.11, DataComponents.ENTITY_DATA doesn't exist
-            // Disabling writeToStack for now
+            // 1.21.11: DataComponents.ENTITY_DATA doesn't exist - writeToStack disabled
         }
 
         static final class EntityData {

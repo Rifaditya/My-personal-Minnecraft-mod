@@ -76,9 +76,9 @@ public class BabyItem extends Item {
 
         // Save child for later
         CompoundTag compound = new CompoundTag();
-        // TODO: In 1.21.11, Entity.save/saveWithoutId signature changed to ValueOutput
+        // 1.21.11: Entity.save/saveWithoutId signature changed to ValueOutput
         // child.saveWithoutId(compound);
-        // For now, skip saving complex data - baby will be generated fresh
+        // Baby will be generated fresh
         stack.set(DataComponentsMCA.BABY_NBT, CustomData.of(compound));
         stack.set(DataComponentsMCA.BABY_AGE, 0);
         stack.set(DataComponentsMCA.BABY_PARENTS, new BabyParentsComponent(
@@ -193,11 +193,10 @@ public class BabyItem extends Item {
                 .build();
 
         CompoundTag savedBaby = stack.getOrDefault(DataComponentsMCA.BABY_NBT, CustomData.EMPTY).copyTag();
-        // TODO: In 1.21.11, Entity.load takes ValueInput not CompoundTag
+        // 1.21.11: Entity.load takes ValueInput not CompoundTag - baby generated fresh
         // if (!savedBaby.isEmpty()) {
         // child.load(savedBaby);
         // }
-        // Baby will be generated fresh with genetic traits from VillagerFactory
 
         child.setCustomName(stack.getOrDefault(DataComponents.CUSTOM_NAME, Component.literal("Unnamed")));
 

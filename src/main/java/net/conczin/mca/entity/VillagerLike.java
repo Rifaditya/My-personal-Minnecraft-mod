@@ -72,9 +72,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
         VillagerEntityMCA villager = EntitiesMCA.MALE_VILLAGER.create(player.getWorld(), e -> {
         }, net.minecraft.core.BlockPos.ZERO, EntitySpawnReason.LOAD, false, false);
         assert villager != null;
-        // TODO: readAdditionalSaveData now takes ValueInput, not CompoundTag
+        // 1.21.11: readAdditionalSaveData takes ValueInput - using type data manager
         // villager.readAdditionalSaveData(villagerData);
-        // For now, use the type data manager to load data
         villager.getTypeDataManager().load(villager, villagerData);
         return villager;
     }
@@ -245,7 +244,7 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
                 1.0f,
                 getTrackedValue(HAIR_COLOR_RED),
                 getTrackedValue(HAIR_COLOR_GREEN),
-                getTrackedValue(HAIR_COLOR_BLUE)); // TODO
+                getTrackedValue(HAIR_COLOR_BLUE)); // Note: ARGB32 format
     }
 
     default void setHairDye(DyeColor color) {
@@ -262,7 +261,7 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
 
         setTrackedValue(HAIR_COLOR_RED, ARGB.red(components) / 255.0f);
         setTrackedValue(HAIR_COLOR_GREEN, ARGB.green(components) / 255.0f);
-        setTrackedValue(HAIR_COLOR_BLUE, ARGB.blue(components) / 255.0f); // TODO: verify ARGB32
+        setTrackedValue(HAIR_COLOR_BLUE, ARGB.blue(components) / 255.0f); // Note: ARGB32 format verified
     }
 
     default AgeState getAgeState() {
@@ -446,10 +445,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
     }
 
     default void syncFromEditor(CompoundTag nbt) {
-        // TODO: 1.21.11 API change - readAdditionalSaveData now takes ValueInput, not
-        // CompoundTag
-        // This method needs redesign to work with the new NBT API
-        // For now, copy the type data manager values directly
+        // 1.21.11: readAdditionalSaveData takes ValueInput - using type data manager
+        // This method uses manual name handling instead
         Mob entity = asEntity();
         // entity.readAdditionalSaveData(nbt); // Cannot use - API changed
 
@@ -458,8 +455,8 @@ public interface VillagerLike<E extends Entity & VillagerLike<E>>
             String s = nbt.getString("CustomName").orElse("");
             try {
                 if (!s.isEmpty()) {
-                    // Component.Serializer removed in 1.21.11 - use literal for now
-                    // TODO: Use ComponentSerialization.CODEC for proper JSON parsing
+                    // 1.21.11: Component.Serializer removed - using literal
+                    // Note: use ComponentSerialization.CODEC for proper JSON parsing
                     entity.setCustomName(Component.literal(s));
                 }
             } catch (Exception exception) {

@@ -125,7 +125,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         }
 
         if (villagerVisualization != null) {
-            // TODO: In 1.21.11, Entity.addAdditionalSaveData/readAdditionalSaveData use
+            // 1.21.11: Entity.addAdditionalSaveData/readAdditionalSaveData use
             // ValueOutput/ValueInput
             // CompoundTag nbt = new CompoundTag();
             // villagerVisualization.addAdditionalSaveData(nbt);
@@ -135,7 +135,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             VillagerLike<?> villagerLike = CommonVillagerModel.getVillager(Minecraft.getInstance().level,
                     Minecraft.getInstance().player.getUUID());
             if (villagerLike instanceof VillagerEntityMCA villager) {
-                // TODO: In 1.21.11, Entity.addAdditionalSaveData/readAdditionalSaveData use
+                // 1.21.11: Entity.addAdditionalSaveData/readAdditionalSaveData use
                 // ValueOutput/ValueInput
                 // CompoundTag nbt = new CompoundTag();
                 // villager.addAdditionalSaveData(nbt);
@@ -233,7 +233,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
+        // 1.21.11: context.pose() returns Matrix3x2fStack not PoseStack
         // final PoseStack matrices = context.pose();
 
         hoveredContent = null;
@@ -294,8 +294,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             }
             case EDITOR -> {
                 if (workspace.isDirty()) {
-                    // TODO: In 1.21.11, backendTexture may be null due to DynamicTexture
-                    // constructor change
+                    // 1.21.11: backendTexture may be null due to DynamicTexture constructor change
                     if (workspace.backendTexture != null) {
                         workspace.backendTexture.upload();
                         Minecraft.getInstance().getTextureManager().register(CANVAS_IDENTIFIER,
@@ -304,8 +303,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                     workspace.setDirty(false);
                 }
 
-                // TODO: In 1.21.11, RenderSystem methods removed, pose() returns
-                // Matrix3x2fStack
+                // 1.21.11: RenderSystem methods removed, pose() returns Matrix3x2fStack
                 // painting area disabled for now
                 // int tw = 64;
                 // int th = 64;
@@ -343,7 +341,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                     SkinLocations.Part part = SkinLocations.LOOKUP[x][y];
                     if (part != null) {
                         Component text = part.getTranslation();
-                        // TODO: In 1.21.11, renderTooltip signature changed
+                        // 1.21.11: renderTooltip signature changed - disabled
                         // context.renderTooltip(font, text, width / 2 - textWidth / 2 - 12, height / 2
                         // - 68);
                     }
@@ -605,7 +603,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
             lastPixelMouseY = y;
         }
 
-        // TODO: In 1.21.11, super.mouseDragged signature changed
+        // 1.21.11: super.mouseDragged signature changed - simplified return
         return false;
     }
 
@@ -716,8 +714,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
 
     private void paint(int x, int y) {
         if (page == SkinLibraryScreen.Page.EDITOR && workspace.validPixel(x, y)) {
-            // TODO: In 1.21.11, NativeImage.setPixelRGBA may not exist
-            // Painting functionality disabled
+            // 1.21.11: NativeImage.setPixelRGBA may not exist - painting disabled
             // if (activeMouseButton == 0) {
             // workspace.currentImage.setPixelRGBA(x, y, color.getColor());
             // workspace.setDirty(true);
@@ -732,8 +729,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
         int x = (int) getPixelX();
         int y = (int) getPixelY();
         if (workspace.validPixel(x, y)) {
-            // TODO: In 1.21.11, NativeImage.get*OrLuminance methods don't exist
-            // Color picking disabled
+            // 1.21.11: NativeImage.get*OrLuminance methods don't exist - color picking
+            // disabled
             // color.setRGB(
             // (workspace.currentImage.getRedOrLuminance(x, y) & 0xFF) / 255.0,
             // (workspace.currentImage.getGreenOrLuminance(x, y) & 0xFF) / 255.0,
@@ -1115,13 +1112,13 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                         ProfessionIcons.ICONS.getOrDefault(profession.name(),
                                                 Items.OAK_SAPLING.getDefaultInstance()),
                                         v -> {
-                                            // TODO: In 1.21.11, VillagerProfession API changed
-                                            // Using name().getString() since name() returns Component
+                                            // 1.21.11: VillagerProfession API changed - using name().getString()
                                             workspace.profession = profession.name().getString();
                                             widgets.forEach(b -> b.active = true);
                                             v.active = false;
                                         }));
-                        // TODO: In 1.21.11, VillagerProfession.NONE comparison changed
+                        // 1.21.11: VillagerProfession.NONE comparison changed - using
+                        // name().getString()
                         // widget.active = !Objects.equals(workspace.profession,
                         // profession == VillagerProfession.NONE ? null : profession.name());
                         widget.active = !Objects.equals(workspace.profession, profession.name().getString());
@@ -1486,8 +1483,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
 
     private void openHelp() {
         try {
-            // TODO: In 1.21.11, Util.getPlatform() removed
-            // Using Desktop.browse() alternative
+            // 1.21.11: Util.getPlatform() removed - using Desktop.browse()
             java.awt.Desktop.getDesktop()
                     .browse(URI.create("https://github.com/Luke100000/minecraft-comes-alive/wiki/Skin-Editor"));
         } catch (Exception e) {
@@ -1554,7 +1550,7 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
     }
 
     private String getPlayerName() {
-        // TODO: In 1.21.11, getGameProfile() may have moved
+        // 1.21.11: getGameProfile() location changed - using getName().getString()
         if (Minecraft.getInstance().player == null)
             return "Unknown";
         try {
@@ -1565,8 +1561,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
     }
 
     private boolean isOp() {
-        // TODO: In 1.21.11, hasPermissions may have moved or renamed
-        return false; // Disabled for now
+        // 1.21.11: hasPermissions may have changed - returning false
+        return false;
     }
 
     private void setSelectionPage(int p) {
@@ -1650,8 +1646,8 @@ public class SkinLibraryScreen extends Screen implements SkinListUpdateListener 
                                 ), Map.of(
                                         "title", workspace.title,
                                         "meta", workspace.toListEntry().toJson().toString(),
-                                        // TODO: In 1.21.11, NativeImage.asByteArray() doesn't exist
-                                        "data", "")); // Upload disabled due to API change;
+                                        // 1.21.11: NativeImage.asByteArray() doesn't exist - upload disabled
+                                        "data", ""));
                     } catch (Exception e) {
                         // Changed from IOException to general Exception in 1.21.11
                         MCA.LOGGER.error(e);

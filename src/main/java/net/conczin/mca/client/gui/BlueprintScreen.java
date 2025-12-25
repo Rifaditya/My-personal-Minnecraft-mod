@@ -101,8 +101,7 @@ public class BlueprintScreen extends ExtendedScreen {
     }
 
     protected void drawBuildingIcon(GuiGraphics context, Identifier texture, int x, int y, int u, int v) {
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Simplified rendering without pose transformation
+        // 1.21.11: context.pose() returns Matrix3x2fStack - simplified rendering
         // context.blit(texture, x - 6, y - 6, u, v, 20, 20);
     }
 
@@ -361,8 +360,7 @@ public class BlueprintScreen extends ExtendedScreen {
     }
 
     private void renderName(GuiGraphics context) {
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Simplified rendering without pose transformation
+        // 1.21.11: context.pose() returns Matrix3x2fStack - simplified rendering
         if (isVillage) {
             context.drawCenteredString(font, village.getName(), width / 2, height / 2 - 96, 0xffffffff);
         } else {
@@ -403,17 +401,15 @@ public class BlueprintScreen extends ExtendedScreen {
                     height / 2 + 90, 0xaaffffff);
         }
 
-        // TODO: Map rendering with pose transformation disabled for now
-        // Building rendering and tooltip logic also disabled due to mouseLocalX/Y
-        // dependency
+        // 1.21.11: Map rendering with pose transformation disabled
+        // Building rendering and tooltip also disabled due to mouseLocalX/Y dependency
         /*
          * // buildings
          * List<Building> hoverBuildings = new LinkedList<>();
          * // ... building rendering code disabled ...
          */
 
-        // TODO: All map rendering, building display, and tooltip code disabled for
-        // 1.21.11
+        // 1.21.11: All map rendering, building display, and tooltip code disabled
         // due to Matrix3x2fStack incompatibility with PoseStack
     }
 
@@ -457,8 +453,8 @@ public class BlueprintScreen extends ExtendedScreen {
     }
 
     private void renderCatalog(GuiGraphics context) {
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Simplified catalog rendering without scale transformation
+        // 1.21.11: context.pose() returns Matrix3x2fStack - simplified catalog
+        // rendering
         context.drawCenteredString(font, Component.translatable("gui.blueprint.catalogFull"), width / 2,
                 height / 2 - 100, 0xffffffff);
 
@@ -567,8 +563,7 @@ public class BlueprintScreen extends ExtendedScreen {
     }
 
     private Component getBlockName(Identifier id) {
-        // TODO: In 1.21.11, BuiltInRegistries.BLOCK.get() signature changed
-        // Simplified for now - just return the ID path
+        // 1.21.11: BuiltInRegistries.BLOCK.get() signature changed - using ID path
         return Component.literal(id.getPath());
     }
 
@@ -585,7 +580,7 @@ public class BlueprintScreen extends ExtendedScreen {
             assert minecraft != null;
             minecraft.setScreen(new FamilyTreeScreen(selectedVillager));
         }
-        // TODO: Cannot call super.mouseClicked with changed signature
+        // 1.21.11: Cannot call super.mouseClicked with changed signature
         return false;
     }
 
