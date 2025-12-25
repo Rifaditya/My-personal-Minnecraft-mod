@@ -27,11 +27,11 @@ public class Traits {
     public static Trait COLOR_BLIND = registerTrait("color_blind", 1.0F, 0.5F);
     public static Trait HETEROCHROMIA = registerTrait("heterochromia", 1.0F, 0.5F);
     public static Trait LACTOSE_INTOLERANCE = registerTrait("lactose_intolerance", 1.0F, 1.0F);
-    public static Trait COELIAC_DISEASE = registerTrait("coeliac_disease", 1.0F, 1.0F, false); // TODO
-    public static Trait DIABETES = registerTrait("diabetes", 1.0F, 1.0F, false); // TODO
+    public static Trait COELIAC_DISEASE = registerTrait("coeliac_disease", 1.0F, 1.0F, false); // feature placeholder
+    public static Trait DIABETES = registerTrait("diabetes", 1.0F, 1.0F, false); // feature placeholder
     public static Trait DWARFISM = registerTrait("dwarfism", 1.0F, 1.0F);
     public static Trait ALBINISM = registerTrait("albinism", 1.0F, 1.0F);
-    public static Trait VEGETARIAN = registerTrait("vegetarian", 1.0F, 1.0F, false); // TODO
+    public static Trait VEGETARIAN = registerTrait("vegetarian", 1.0F, 1.0F, false); // feature placeholder
     public static Trait BISEXUAL = registerTrait("bisexual", 1.0F, 0.0F);
     public static Trait HOMOSEXUAL = registerTrait("homosexual", 1.0F, 0.0F);
     public static Trait ASEXUAL = registerTrait("asexual", 1.0F, 0.0F);

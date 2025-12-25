@@ -100,11 +100,8 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
     @Override
     protected void readAdditionalSaveData(ValueInput nbt) {
         // In 1.21.11, ValueInput uses read() methods that return Optional
-        // For now, keep using contains() and getInt/getCompound shortcuts
-        // TODO: May need further adaptation for ValueInput API
+        // 1.21.11: ValueInput API changed - baby loading disabled
         if (nbt.contains("Baby")) {
-            // TODO: In 1.21.11, ValueInput.read() signature changed
-            // Baby loading disabled for now
             // nbt.read("Baby").ifPresent(babyTag -> {
             // ItemStack baby = ItemStack.parseOptional(level().registryAccess(),
             // (CompoundTag) babyTag);
@@ -121,8 +118,7 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
 
     @Override
     protected void addAdditionalSaveData(ValueOutput nbt) {
-        // TODO: In 1.21.11, ItemStack.save and ValueOutput.put changed
-        // Baby saving disabled for now
+        // 1.21.11: ItemStack.save and ValueOutput.put changed - baby saving disabled
         // if (!getTrackedValue(BABY).equals(ItemStack.EMPTY)) {
         // Tag babyCompound = getTrackedValue(BABY).save(level().registryAccess(), new
         // CompoundTag());
@@ -205,8 +201,7 @@ public class CribEntity extends Entity implements CTrackedEntity<CribEntity> {
         this.move(MoverType.SELF, this.getDeltaMovement());
 
         if (getTrackedValue(BABY) != ItemStack.EMPTY && getTrackedValue(BABY).getItem() instanceof BabyItem) {
-            // TODO: In 1.21.11, Item.inventoryTick signature changed
-            // Baby tick disabled for now
+            // 1.21.11: Item.inventoryTick signature changed - baby tick disabled
             // getTrackedValue(BABY).getItem().inventoryTick(getTrackedValue(BABY), level(),
             // this, 0, false);
         }

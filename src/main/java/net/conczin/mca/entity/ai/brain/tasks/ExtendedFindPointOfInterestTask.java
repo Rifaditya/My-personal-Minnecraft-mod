@@ -130,8 +130,8 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
         }
     }
 
-    // todo this check is not necessary in vanilla, but since the 1.19.2 port of
-    // 7.4.0 it is requires as occupied beds are used
+    // Note: this check is not necessary in vanilla, but since the 1.19.2 port of
+    // 7.4.0 it is required as occupied beds are used
     private boolean isBedOccupiedByOthers(ServerLevel world, BlockPos pos, LivingEntity entity) {
         BlockState blockState = world.getBlockState(pos);
         return blockState.is(BlockTags.BEDS) && blockState.getValue(BedBlock.OCCUPIED) && !entity.isSleeping();
@@ -166,4 +166,3 @@ public class ExtendedFindPointOfInterestTask extends Behavior<VillagerEntityMCA>
         }
     }
 }
-

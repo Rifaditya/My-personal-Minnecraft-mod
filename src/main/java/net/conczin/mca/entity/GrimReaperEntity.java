@@ -133,7 +133,7 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
         };
         navigator.setCanOpenDoors(false);
         navigator.setCanFloat(false);
-        // TODO: In 1.21.11, setCanPassDoors may have been removed
+        // 1.21.11: setCanPassDoors may have been removed - disabled
         // navigator.setCanPassDoors(true);
         return navigator;
     }
@@ -142,7 +142,7 @@ public class GrimReaperEntity extends PathfinderMob implements CTrackedEntity<Gr
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, damageSource, recentlyHit);
 
-        // TODO: In 1.21.11, spawnAtLocation signature changed
+        // 1.21.11: spawnAtLocation signature changed - scythe drop disabled
         // ItemEntity itemEntity = spawnAtLocation(ItemsMCA.SCYTHE);
         // if (itemEntity != null) {
         // itemEntity.setExtendedLifetime();
