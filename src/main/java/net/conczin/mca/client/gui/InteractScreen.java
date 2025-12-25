@@ -114,7 +114,7 @@ public class InteractScreen extends AbstractDynamicScreen {
 
         // Dialog
         if (button == 0 && dialogAnswerHover != null && dialogQuestionText != null) {
-            // todo double click (Likely fixable via using a different event -- 7.4.0)
+            // Note: double click would require using a different event (7.4.0)
             Network.sendToServer(
                     new InteractionDialogueMessage(villager.asEntity().getUUID(), dialogQuestionId, dialogAnswerHover));
         }

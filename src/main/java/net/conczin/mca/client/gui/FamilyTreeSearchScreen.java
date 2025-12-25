@@ -140,7 +140,7 @@ public class FamilyTreeSearchScreen extends Screen {
             selectVillager(currentVillagerName, selectedVillager);
         }
 
-        // TODO: In 1.21.11, super.mouseClicked signature changed
+        // 1.21.11: super.mouseClicked signature changed - simplified return
         return false;
     }
 

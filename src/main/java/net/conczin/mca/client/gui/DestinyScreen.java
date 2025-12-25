@@ -60,15 +60,14 @@ public class DestinyScreen extends VillagerEditorScreen {
     }
 
     private void drawScaledText(GuiGraphics context, Component text, int x, int y, float scale) {
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Simplified rendering without scale transformation
+        // 1.21.11: context.pose() returns Matrix3x2fStack - simplified rendering
         context.drawCenteredString(font, text, x, y, 0xffffffff);
     }
 
     @Override
     public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         this.renderPanorama(context, partialTick);
-        // TODO: In 1.21.11, renderBlurredBackground signature changed
+        // 1.21.11: renderBlurredBackground signature changed - disabled
         // this.renderBlurredBackground(partialTick);
         this.renderMenuBackground(context);
     }
@@ -77,8 +76,7 @@ public class DestinyScreen extends VillagerEditorScreen {
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Removed unused PoseStack variable
+        // 1.21.11: context.pose() returns Matrix3x2fStack - removed unused PoseStack
 
         switch (page) {
             case "general" -> {

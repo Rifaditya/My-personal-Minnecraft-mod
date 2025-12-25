@@ -101,8 +101,7 @@ public class ExtendedBookScreen extends Screen {
     @Override
     public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(context, mouseX, mouseY, partialTick);
-        // TODO: In 1.21.11, blit signature changed significantly
-        // Disabling custom background rendering for now
+        // 1.21.11: blit signature changed - custom background rendering disabled
     }
 
     @Override

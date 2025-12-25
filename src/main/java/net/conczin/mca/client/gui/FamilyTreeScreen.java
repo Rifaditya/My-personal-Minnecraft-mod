@@ -89,7 +89,7 @@ public class FamilyTreeScreen extends Screen {
             scrollY += deltaY;
             return true;
         }
-        // TODO: In 1.21.11, super.mouseDragged signature changed
+        // 1.21.11: super.mouseDragged signature changed - simplified return
         return false;
     }
 
@@ -102,7 +102,7 @@ public class FamilyTreeScreen extends Screen {
             }
             return true;
         }
-        // TODO: In 1.21.11, super.mouseClicked signature changed
+        // 1.21.11: super.mouseClicked signature changed - simplified return
         return false;
     }
 
@@ -126,8 +126,8 @@ public class FamilyTreeScreen extends Screen {
         GL11.glScissor(x, windowHeight - h - y, w, h);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
-        // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-        // Simplified rendering without pose transformation
+        // 1.21.11: context.pose() returns Matrix3x2fStack not PoseStack - simplified
+        // rendering
         // final PoseStack matrices = context.pose();
         // matrices.pushPose();
 
@@ -259,8 +259,7 @@ public class FamilyTreeScreen extends Screen {
         }
 
         public void render(GuiGraphics context, int mouseX, int mouseY) {
-            // TODO: In 1.21.11, context.pose() returns Matrix3x2fStack not PoseStack
-            // Simplified rendering - removed all pose transformations
+            // 1.21.11: context.pose() returns Matrix3x2fStack - simplified rendering
             Bounds bounds = getBounds();
 
             boolean isFocused = id != null && bounds.contains(mouseX, mouseY);

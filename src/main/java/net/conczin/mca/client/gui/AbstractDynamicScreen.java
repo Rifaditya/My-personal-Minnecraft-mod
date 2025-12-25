@@ -93,8 +93,7 @@ public abstract class AbstractDynamicScreen extends Screen {
     }
 
     protected void drawIcon(GuiGraphics context, Identifier texture, String key) {
-        // TODO: In 1.21.11, blit signature changed significantly
-        // Need to research proper RenderType pattern
+        // 1.21.11: blit signature changed - icon rendering disabled
         // Icon icon = MCAScreens.getInstance().getIcon(key);
     }
 
